@@ -1,0 +1,1 @@
+Folder to hold everything regarding the development of the plugin for NuGet.

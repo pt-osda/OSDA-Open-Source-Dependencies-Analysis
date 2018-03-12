@@ -1,0 +1,1 @@
+Folder to store everything regarding the Web Application to be developed.
