@@ -1,0 +1,2 @@
+rootProject.name = 'OSDA-plugin'
+include 'Osda'

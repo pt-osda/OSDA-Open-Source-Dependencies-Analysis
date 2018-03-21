@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/OSDA-plugin.iml" filepath="$PROJECT_DIR$/.idea/modules/OSDA-plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/OSDA-plugin_main.iml" filepath="$PROJECT_DIR$/.idea/modules/OSDA-plugin_main.iml" group="OSDA-plugin" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/OSDA-plugin_test.iml" filepath="$PROJECT_DIR$/.idea/modules/OSDA-plugin_test.iml" group="OSDA-plugin" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Osda/Osda.iml" filepath="$PROJECT_DIR$/.idea/modules/Osda/Osda.iml" group="Osda" />
+    </modules>
+  </component>
+</project>
