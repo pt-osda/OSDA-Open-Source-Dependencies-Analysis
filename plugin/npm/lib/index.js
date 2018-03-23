@@ -2,23 +2,15 @@
 
 const fs = require('fs')
 
-switch(process.argv[2]){
-
-case 'read':{
+module.exports = {
+	readPackage,
+	writePackage
+}
+function readPackage(){
 	const fileData = fs.readFileSync('./package.json', 'utf-8')
-	console.log(fileData)
-	break
+	return fileData
 }
-case 'write':{
-	const fileData = fs.readFileSync('./package.json', 'utf-8')
-	writeToFile('./lib/testFileWrite.txt', fileData)
-	break
-}
-
-}
-
-
-function writeToFile(filePath, data){
+function writePackage(filePath, data){
 	const fileDescriptor = fs.openSync(filePath, 'w')
 	fs.writeFileSync(fileDescriptor, data, 'utf-8')
 	fs.closeSync(fileDescriptor)
