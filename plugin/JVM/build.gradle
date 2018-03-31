@@ -1,4 +1,4 @@
-group 'pt.PS.RuiDTLima.OSDA-plugin'
+group 'pt.osda.OSDA-plugin'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
