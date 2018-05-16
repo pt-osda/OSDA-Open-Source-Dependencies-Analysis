@@ -6,6 +6,6 @@ import org.springframework.boot.runApplication
 @SpringBootApplication
 class ProjectValidationManagerApplication
 
-fun main(args: Array<String>) {
-    runApplication<ProjectValidationManagerApplication>(*args)
-}
+    fun main(args: Array<String>) {
+        runApplication<ProjectValidationManagerApplication>(*args)
+    }
