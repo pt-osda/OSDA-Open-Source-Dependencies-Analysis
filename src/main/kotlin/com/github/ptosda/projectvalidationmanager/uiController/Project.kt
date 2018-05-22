@@ -13,6 +13,7 @@ class Project {
         model["name"] = "Testing Mustache"
         model["description"] = "This is a test"
         model["title"] = "Testing UI"
+
         return "index"
     }
 
