@@ -63,7 +63,7 @@ class DependencyController(private val licenseService: LicenseService, private v
         }
 
         artifacts.removeAll(inCache)
-        val vulnerabilitySearchResult = vulnerabilityService.javaWrapper(artifacts)
+        val vulnerabilitySearchResult = vulnerabilityService.javaWrapper(artifacts, manager)
 
         return if(vulnerabilitySearchResult == null) ResponseEntity(HttpStatus.NO_CONTENT)
         else {

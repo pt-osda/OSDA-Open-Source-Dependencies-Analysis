@@ -1,6 +1,7 @@
 package com.github.ptosda.projectvalidationmanager.uiController
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import javafx.fxml.FXMLLoader
 import org.springframework.stereotype.Service
 import java.io.File
 import java.sql.Timestamp
@@ -40,7 +41,7 @@ class UiProvider {
 
     private final fun init() {
 
-        val reportFile = File(javaClass.classLoader.getResource(reportFileName).file)
+        val reportFile = File(javaClass.classLoader.getResource(reportFileName).toURI())
 
         val node = mapper.readTree(reportFile)
 
