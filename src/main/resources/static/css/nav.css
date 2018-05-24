@@ -1,0 +1,37 @@
+.navbar{
+    background-color:black;
+    color:green;
+    font-weight:bold;
+}
+.homeElem{
+    margin-left: 50px;
+    font-size: 20px;
+    text-align: center;
+}
+
+.body-container{
+    extends: container;
+    overflow: auto;
+}
+.container {
+    width: 100%;
+    position: fixed;
+}
+.left-element {
+    display: inline-block;
+    position: absolute;
+    align-self: left;
+    left: 25%;
+}
+.right-element {
+    display: inline-block;
+    position: absolute;
+    align-self: right;
+    left: 75%;
+}
+
+.build-detail {
+    width: 100%;
+    position: absolute;
+    left: 25px;
+}

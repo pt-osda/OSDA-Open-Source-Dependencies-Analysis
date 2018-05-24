@@ -1,8 +1,111 @@
+
 {{> header}}
 
-    NAME: {{name}}
-    <br/>
-    DESCRIPTION: {{description}}
+<div class="body-container">
 
+    <h2>
+        Projects
+    </h2>
+
+    <br>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Filter</h5>
+            <form>
+                <div class="form-row">
+                    <div class="col">
+                        <label for="filterTypeSelect">Type</label>
+                        <select class="form-control form-control-sm" id="filterTypeSelect">
+                            <option>None</option>
+                            <option>Group</option>
+                            <option>Repo</option>
+                            <option>Project</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="filterText">Text</label>
+                            <input type="text" class="form-control" id="filterText" required>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="body-container">
+        <ul class="list-group">
+            {{#projects}}
+                <li class="list-group-item">
+                    Name: <b>{{project_name}}</b>
+                    <br>
+                    <p>
+                        <a class="btn" data-toggle="collapse" href="#{{id}}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                            Latest Builds
+                        </a>
+                    </p>
+                    <div class="collapse" id="{{id}}">
+                        <div class="card card-body" id="build-info">
+                            {{#builds}}
+                                <a href="/report/build/{{project_name}}/{{timestamp}}/detail" class="list-group-item list-group-item-action">
+                                        Project Name: {{project_name}}
+                                        <br>
+                                        Timestamp: {{timestamp}}
+                                        <br>
+                                        Tag: {{tag}}
+                                        <br>
+
+                                        <!--<a class="btn" type="button" href="/report/build/{{project_name}}/{{timestamp}}/detail">Detail</a>-->
+                                </a>
+                            {{/builds}}
+                        </div>
+                    </div>
+                    <a class="btn" type="button" href="/report/build/{{project_name}}">All Builds</a>
+                </li>
+            {{/projects}}
+        </ul>
+    </div>
+
+</div>
 
 {{> footer}}
+
+
+
+
+    <!--<div class="left-element">
+        Latest Builds
+        <br>
+        <ul class="list-group">
+            {{#builds}}
+                <li class="list-group-item">
+                    Project Name: {{project_name}}
+                    <br>
+                    Timestamp: {{timestamp}}
+                    <br>
+                    Tag: {{tag}}
+                    <br>
+
+                    <a class="btn" type="button" href="/report/build/{{project_name}}/{{timestamp}}/detail">Detail</a>
+                </li>
+            {{/builds}}
+        </ul>
+    </div>
+
+    <div class="right-element">
+        Latest Projects
+        <br>
+        <ul class="list-group">
+            {{#projects}}
+                <li class="list-group-item">
+                    Project Name: {{project_name}}
+                    <br>
+                    <a class="btn">Detail</a>
+                </li>
+            {{/projects}}
+        </ul>
+    </div>-->

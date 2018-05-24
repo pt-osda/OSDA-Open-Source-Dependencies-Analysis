@@ -1,0 +1,40 @@
+{{> header}}
+
+<div class="build-detail">
+
+    <h3>
+        Project Name: {{project_name}}
+    </h3>
+    <br>
+    Project Version: {{project_version}}
+    <br>
+    Timestamp: {{timestamp}}
+    <br>
+    Tag: {{tag}}
+    <br>
+
+    <label for="dependency-list">
+        <h2>
+            Dependencies
+        </h2>
+    </label>
+    <ul class="list-group" id="dependency-list">
+        {{#dependencies}}
+            <li class="list-group-item">
+                Project Name: {{title}}
+                <br>
+                Main Version: {{version}}
+                <br>
+                {{#license}}
+                    Licenses: {{license}}
+                {{/license}}
+                <br>
+
+                <a>Detail</a>
+            </li>
+        {{/dependencies}}
+    </ul>
+
+</div>
+
+{{> footer}}
