@@ -1,4 +1,4 @@
-package com.github.ptosda.projectvalidationmanager.model
+package com.github.ptosda.projectvalidationmanager.model.entities
 
 import java.io.Serializable
 import javax.persistence.*

@@ -1,5 +1,6 @@
-package com.github.ptosda.projectvalidationmanager.model
+package com.github.ptosda.projectvalidationmanager.model.entities
 
+import com.github.ptosda.projectvalidationmanager.model.entities.DependencyLicense
 import java.io.Serializable
 import javax.persistence.Entity
 import javax.persistence.Id

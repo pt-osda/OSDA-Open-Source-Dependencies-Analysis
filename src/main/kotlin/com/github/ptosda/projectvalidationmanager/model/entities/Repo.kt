@@ -1,5 +1,7 @@
-package com.github.ptosda.projectvalidationmanager.model
+package com.github.ptosda.projectvalidationmanager.model.entities
 
+import com.github.ptosda.projectvalidationmanager.model.entities.Organization
+import com.github.ptosda.projectvalidationmanager.model.entities.Project
 import com.github.ptosda.projectvalidationmanager.validators.interfaces.ValidRepo
 import java.io.Serializable
 import javax.persistence.*
