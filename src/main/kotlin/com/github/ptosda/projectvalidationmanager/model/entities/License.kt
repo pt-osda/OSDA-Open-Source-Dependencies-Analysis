@@ -8,9 +8,9 @@ import javax.persistence.OneToMany
 @Entity
 data class License(
         @Id
-        val spdx_id: String,
+        val spdxId: String,
 
-        val error_info: String,
+        val errorInfo: String,
 
         @OneToMany(mappedBy = "license")
         val dependencies: List<DependencyLicense>

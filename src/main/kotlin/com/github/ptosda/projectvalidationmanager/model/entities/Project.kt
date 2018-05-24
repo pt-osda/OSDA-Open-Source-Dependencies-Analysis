@@ -12,9 +12,6 @@ data class Project(
         @JoinColumn(name = "repo_name", referencedColumnName = "name")
         val repo: Repo,
 
-        @OneToMany(mappedBy = "pk.project")
-        val build: List<Build>/*,
-
         @OneToMany(mappedBy = "project")
-        val buildDependency: List<BuildDependency>*/
+        val build: List<Build>
 ) : Serializable

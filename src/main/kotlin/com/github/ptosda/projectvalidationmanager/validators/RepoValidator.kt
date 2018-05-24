@@ -1,6 +1,6 @@
 package com.github.ptosda.projectvalidationmanager.validators
 
-import com.github.ptosda.projectvalidationmanager.model.Repo
+import com.github.ptosda.projectvalidationmanager.model.entities.Repo
 import com.github.ptosda.projectvalidationmanager.validators.interfaces.ValidRepo
 import javax.validation.ConstraintValidator
 import javax.validation.ConstraintValidatorContext
