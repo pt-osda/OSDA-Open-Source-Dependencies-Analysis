@@ -1,0 +1,4 @@
+#Key and value types
+#Thu May 24 13:55:08 BST 2018
+keyType=java.lang.String
+valueType=com.github.ptosda.projectvalidationmanager.model.DependencyInfo
