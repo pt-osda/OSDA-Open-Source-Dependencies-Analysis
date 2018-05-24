@@ -1,6 +1,7 @@
 .gradle
 /build/
 !gradle/wrapper/gradle-wrapper.jar
+/src/main/resources/cache/
 
 #Mac files
 .DS_Store
