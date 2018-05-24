@@ -16,10 +16,10 @@ spring:
             non_contextual_creation: true
     generate-ddl: true
   datasource:
-    url: jdbc:postgresql://localhost:5432/G4
-    username: grupo4
-    password: helloworld
-    driver-class-name: org.gjt.mm.mysql.Driver
+    url: jdbc:postgresql://localhost:5432/Reports
+    username: osda
+    password: osda
+    driver-class-name: org.postgresql.Driver
 logging:
   level:
     org:

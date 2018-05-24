@@ -25,7 +25,7 @@ class DependencyController(private val licenseService: LicenseService, private v
         return licenseService.findLicense(manager, id, version, licenseUrl!!)
     }
 
-    @PostMapping("/vulnerabilities")
+    /*@PostMapping("/vulnerabilities")
     fun getDependencyVulnerabilities(resp: HttpServletResponse,
                                      @PathVariable("manager") manager: String,
                                      @RequestBody artifacts: ArrayList<Artifacts>) : ResponseEntity<Any>
@@ -37,7 +37,7 @@ class DependencyController(private val licenseService: LicenseService, private v
         } else {
 
         }
-    }
+    }*/
 
     data class Artifacts(val pm: String, val name: String, val version: String, @JsonIgnore val group: String)
 
