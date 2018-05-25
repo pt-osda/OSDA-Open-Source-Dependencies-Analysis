@@ -6,16 +6,13 @@ import javax.persistence.*
 @Entity
 @Table(name = "build")
 data class Build(
-        @Id
-        val timestamp: String,
 
-        @Id
-        @ManyToOne
-        @JoinColumn(name = "name")
-        val project: Project,
+        @EmbeddedId
+        val pk: BuildPk,
 
         val tag: String,
 
         @ManyToMany
         val dependency: Set<Dependency>
+
 ) : Serializable

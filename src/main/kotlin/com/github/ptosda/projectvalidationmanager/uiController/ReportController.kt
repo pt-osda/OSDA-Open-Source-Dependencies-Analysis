@@ -1,30 +1,57 @@
 package com.github.ptosda.projectvalidationmanager.uiController
 
+import com.github.ptosda.projectvalidationmanager.model.repositories.BuildRepository
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
-import kotlin.collections.HashMap
+import java.net.URLEncoder
+import java.sql.Timestamp
+import java.time.Instant
 import kotlin.collections.set
 
 @Controller
 @RequestMapping("/report")
-class ReportController(val provider: UiProvider) {
+class ReportController(val provider: UiProvider, val buildRepo: BuildRepository) {
 
     /**
      * Get the latest build reports received. Show projects and add a filter ( group, repository )
      */
-    @GetMapping
+    @GetMapping // TODO Think about adding version to project and description. Need to change the timestamp since it cant be used in some formats as a request variable
     fun getHome(model: HashMap<String, Any>) : String{
 
-        model["page_title"] = "Home"
+        model["page_title"] = "OSDA"
 
-        model["builds"] = provider.provideLatestBuilds()
+        val projects = provider.provideLatestProjects()
 
-        model["projects"] = provider.provideLatestProjects()
+
+        val output = ArrayList<ProjectInfo>()
+
+        projects.forEach{
+            val buildInfos = ArrayList<BuildInfo>()
+            val builds = provider.buildRepo.getAllBuildsFromProject(it.name)
+
+            builds.forEach{
+                buildInfos.add(BuildInfo(it.pk.project.name, URLEncoder.encode(it.pk.timestamp,"UTF-8"), it.tag))
+            }
+
+            output.add(ProjectInfo(it.name, output.count(), buildInfos))
+        }
+
+        model["projects"] = output
 
         return "index"
     }
+
+    data class ProjectInfo(val project_name: String = "First Test ReportController",val id: Int, val builds: List<BuildInfo> = ArrayList())
+
+    data class BuildInfo(val project_name: String = "First Test ReportController",
+                         //val project_version: String = "1.0.0",
+                         //val description: String = "",
+                         val timestamp: String = Timestamp.from(Instant.now()).toString(),
+                         val tag: String = "First Tag id",
+                         val dependencies: ArrayList<Dependency> = ArrayList()
+    )
 
 
     /**
@@ -34,9 +61,7 @@ class ReportController(val provider: UiProvider) {
     fun getProjectBuilds(@RequestParam("project-name", required = false) projectName: String?,
                          model: HashMap<String, Any>) : String{
 
-        model["page_title"] = "Home"
-
-        model["builds"] = provider.provideLatestBuilds()
+        model["page_title"] = "Builds"
 
         model["projects"] = provider.provideLatestProjects()
 
