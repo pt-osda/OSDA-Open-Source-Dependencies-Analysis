@@ -5,15 +5,11 @@ import com.github.ptosda.projectvalidationmanager.model.entities.Project
 import com.github.ptosda.projectvalidationmanager.model.repositories.BuildRepository
 import com.github.ptosda.projectvalidationmanager.model.repositories.ProjectRepository
 import org.springframework.stereotype.Service
-import java.io.File
 import java.sql.Timestamp
 import java.time.Instant
 
 @Service
 class UiProvider(val buildRepo: BuildRepository, val projectRepo: ProjectRepository) {
-    init {
-        init()
-    }
 
     companion object {
         val buildInfo = arrayListOf(BuildInfo(),
@@ -39,7 +35,7 @@ class UiProvider(val buildRepo: BuildRepository, val projectRepo: ProjectReposit
         val mapper = ObjectMapper()
     }
 
-    private final fun init() {
+    /*private final fun init() {
 
         val reportFile = File(javaClass.classLoader.getResource(reportFileName).toURI())
 
@@ -56,7 +52,7 @@ class UiProvider(val buildRepo: BuildRepository, val projectRepo: ProjectReposit
                 }
             }
 
-            /*
+            *//*
             it["vulnerabilityModels"].asIterable().forEach{
                 val i :ArrayList<Any> = ArrayList()
 
@@ -68,7 +64,7 @@ class UiProvider(val buildRepo: BuildRepository, val projectRepo: ProjectReposit
                                 StreamSupport.stream(it["versions"].asIterable().spliterator(), false)
                                         .collect(Collectors.toList()) as List<String>
                 ))
-            }*/
+            }*//*
 
             formattedDependencies.add(
                     Dependency(it["title"].asText(), it["main_version"].asText(),
@@ -77,7 +73,7 @@ class UiProvider(val buildRepo: BuildRepository, val projectRepo: ProjectReposit
         }
 
         buildDetailInfo = BuildInfo(node["name"].asText(), node["version"].asText(), node["description"].asText(), dependencies = formattedDependencies)
-    }
+    }*/
 
 
     fun provideLatestBuilds(): ArrayList<BuildInfo> {

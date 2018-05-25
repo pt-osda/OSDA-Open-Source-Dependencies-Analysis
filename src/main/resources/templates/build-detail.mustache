@@ -6,8 +6,6 @@
         Project Name: {{project_name}}
     </h3>
     <br>
-    Project Version: {{project_version}}
-    <br>
     Timestamp: {{timestamp}}
     <br>
     Tag: {{tag}}
@@ -21,15 +19,16 @@
     <ul class="list-group" id="dependency-list">
         {{#dependencies}}
             <li class="list-group-item">
-                Project Name: {{title}}
+                Project Name: {{pk.id}}
                 <br>
-                Main Version: {{version}}
+                Main Version: {{pk.mainVersion}}
                 <br>
                 {{#license}}
-                    Licenses: {{license}}
+                    License Name: {{pk.license.spdxId}}
+                    <br>
+                    License Source: {{source}}
                 {{/license}}
                 <br>
-
                 <a>Detail</a>
             </li>
         {{/dependencies}}

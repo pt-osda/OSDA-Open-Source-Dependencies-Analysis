@@ -12,12 +12,10 @@ data class Dependency (
 
         val description: String,
 
-        @ManyToMany(cascade = [CascadeType.ALL])
-        @JoinTable(name = "dependencies",
-                joinColumns= [JoinColumn(name="id", referencedColumnName = "id"), JoinColumn(name="main_version", referencedColumnName = "mainVersion")],
-                inverseJoinColumns=[JoinColumn(name="dependencies.id", referencedColumnName = "id"), JoinColumn(name="dependencies.main_version", referencedColumnName = "mainVersion")])
-        val dependencies: Set<Dependency>,
+        val vulnerabilitiesCount: Int,
 
+        @ManyToMany(cascade = [CascadeType.ALL])
+        val dependencies: Set<Dependency>,
 
         @ManyToMany(mappedBy = "dependency")
         val build: Set<Build>,
@@ -28,3 +26,21 @@ data class Dependency (
         @OneToMany(mappedBy = "pk.dependency")
         val vulnerabilities: List<DependencyVulnerability>
 ) : Serializable
+{
+        override fun equals(other: Any?): Boolean {
+                var result = false
+                if (other is Dependency) {
+                        val otherObj = other as Dependency?
+                        result = this.pk.id == otherObj!!.pk.id &&
+                                this.pk.mainVersion == otherObj.pk.mainVersion &&
+                                this.description == otherObj.description
+                }
+                return result
+        }
+
+        override fun hashCode(): Int {
+                return this.pk.id.hashCode() * 41 +
+                        this.pk.mainVersion.hashCode() * 17 +
+                        this.description.hashCode() * 41
+        }
+}
