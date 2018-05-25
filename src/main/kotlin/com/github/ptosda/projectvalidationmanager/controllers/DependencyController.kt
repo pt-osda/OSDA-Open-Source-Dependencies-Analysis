@@ -1,6 +1,5 @@
 package com.github.ptosda.projectvalidationmanager.controllers
 
-import com.fasterxml.jackson.annotation.JsonInclude
 import com.github.ptosda.projectvalidationmanager.CachingConfig
 import com.github.ptosda.projectvalidationmanager.model.*
 import com.github.ptosda.projectvalidationmanager.services.LicenseService
@@ -42,19 +41,15 @@ class DependencyController(private val licenseService: LicenseService, private v
     @PostMapping("/vulnerabilities")
     fun getDependencyVulnerabilities(resp: HttpServletResponse,
                                      @PathVariable("manager") manager: String,
-                                     @RequestBody artifacts: ArrayList<Artifacts>) : ResponseEntity<ArrayList<VulnerabilitiesEvaluation>>
+                                     @RequestBody artifacts: ArrayList<Artifacts>) : ResponseEntity<ArrayList<VulnerabilitiesEvaluationOutput>>
     {
         val dependenciesCache = CachingConfig.getDependenciesCache()
         val inCache = ArrayList<Artifacts>()
-        val vulnerabilities = ArrayList<VulnerabilitiesEvaluation>()
+        val vulnerabilities = ArrayList<VulnerabilitiesEvaluationOutput>()
 
         artifacts.forEach {
-            val dependencyId = if(it.group.equals(' ')){
-                it.group+":"+it.name
-            } else {
-                it.name
-            }
-            val cacheKey = "$manager:$dependencyId:${it.version}"
+            val dependencyName = if(it.group != null) "${it.name}:${it.group}" else it.name
+            val cacheKey = "$manager:$dependencyName:${it.version}"
             val cacheEntry = dependenciesCache.get(cacheKey)
             if(cacheEntry?.vulnerabilities != null){
                 vulnerabilities.add(cacheEntry.vulnerabilities!!)
@@ -63,23 +58,26 @@ class DependencyController(private val licenseService: LicenseService, private v
         }
 
         artifacts.removeAll(inCache)
-        val vulnerabilitySearchResult = vulnerabilityService.javaWrapper(artifacts, manager)
+        if(!artifacts.isEmpty()) {
+            val vulnerabilitySearchResult = vulnerabilityService.getVulnerabilities(artifacts)
 
-        return if(vulnerabilitySearchResult == null) ResponseEntity(HttpStatus.NO_CONTENT)
-        else {
-            vulnerabilities.addAll(vulnerabilitySearchResult)
-            vulnerabilitySearchResult.forEach{
-                val cacheKey = "$manager:${it.title}:${it.mainVersion}"
-                val cacheEntry = dependenciesCache.get(cacheKey)
-                if(cacheEntry == null){
-                    dependenciesCache.put(cacheKey, DependencyInfo(null, it))
+            if(vulnerabilitySearchResult == null)
+                return ResponseEntity(HttpStatus.BAD_GATEWAY)
+            else {
+                vulnerabilities.addAll(vulnerabilitySearchResult)
+                vulnerabilitySearchResult.forEach {
+                    val cacheKey = "$manager:${it.title}:${it.mainVersion}"
+                    val cacheEntry = dependenciesCache.get(cacheKey)
+                    if (cacheEntry == null) {
+                        dependenciesCache.put(cacheKey, DependencyInfo(null, it))
+                    } else {
+                        cacheEntry.vulnerabilities = it
+                        dependenciesCache.put(cacheKey, cacheEntry)
+                    }
                 }
-                else{
-                    cacheEntry.vulnerabilities = it
-                    dependenciesCache.put(cacheKey, cacheEntry)
-                }
+                return ResponseEntity(vulnerabilities, HttpStatus.OK)
             }
-            return ResponseEntity(vulnerabilities, HttpStatus.ACCEPTED)
         }
+        return ResponseEntity(vulnerabilities, HttpStatus.OK)
     }
 }
