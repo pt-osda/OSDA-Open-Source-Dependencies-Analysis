@@ -21,6 +21,8 @@
                             <option>Group</option>
                             <option>Repo</option>
                             <option>Project</option>
+                            <option>Dependency</option>
+                            <option>License</option>
                         </select>
                     </div>
                     <div class="col">
@@ -58,8 +60,6 @@
                                         <br>
                                         Tag: {{tag}}
                                         <br>
-
-                                        <!--<a class="btn" type="button" href="/report/build/{{project_name}}/{{timestamp}}/detail">Detail</a>-->
                                 </a>
                             {{/builds}}
                         </div>
@@ -73,39 +73,3 @@
 </div>
 
 {{> footer}}
-
-
-
-
-    <!--<div class="left-element">
-        Latest Builds
-        <br>
-        <ul class="list-group">
-            {{#builds}}
-                <li class="list-group-item">
-                    Project Name: {{project_name}}
-                    <br>
-                    Timestamp: {{timestamp}}
-                    <br>
-                    Tag: {{tag}}
-                    <br>
-
-                    <a class="btn" type="button" href="/report/build/{{project_name}}/{{timestamp}}/detail">Detail</a>
-                </li>
-            {{/builds}}
-        </ul>
-    </div>
-
-    <div class="right-element">
-        Latest Projects
-        <br>
-        <ul class="list-group">
-            {{#projects}}
-                <li class="list-group-item">
-                    Project Name: {{project_name}}
-                    <br>
-                    <a class="btn">Detail</a>
-                </li>
-            {{/projects}}
-        </ul>
-    </div>-->

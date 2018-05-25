@@ -1,26 +1,16 @@
 package com.github.ptosda.projectvalidationmanager.model.entities
 
 import java.io.Serializable
+import javax.persistence.EmbeddedId
 import javax.persistence.Entity
-import javax.persistence.Id
 import javax.persistence.ManyToOne
 
 @Entity
 data class DependencyLicense(
-        @Id
-        val license_spdx_id: String,
 
-        @Id
-        val dependency_id: Long,
+        @EmbeddedId
+        val pk: DependencyLicensePk,
 
-        @Id
-        val dependency_main_version: String,
+        val source: String
 
-        val source: String,
-
-        @ManyToOne
-        val dependency: Dependency,
-
-        @ManyToOne
-        val license: License
 ) : Serializable

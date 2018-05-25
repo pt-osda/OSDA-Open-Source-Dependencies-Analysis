@@ -1,32 +1,28 @@
 package com.github.ptosda.projectvalidationmanager.uiController
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import javafx.fxml.FXMLLoader
+import com.github.ptosda.projectvalidationmanager.model.entities.Project
+import com.github.ptosda.projectvalidationmanager.model.repositories.BuildRepository
+import com.github.ptosda.projectvalidationmanager.model.repositories.ProjectRepository
 import org.springframework.stereotype.Service
-import java.io.File
 import java.sql.Timestamp
 import java.time.Instant
-import java.util.stream.Collectors
-import java.util.stream.StreamSupport
 
 @Service
-class UiProvider {
-    init {
-        init()
-    }
+class UiProvider(val buildRepo: BuildRepository, val projectRepo: ProjectRepository) {
 
     companion object {
         val buildInfo = arrayListOf(BuildInfo(),
                 BuildInfo("First Test Project",
-                timestamp= Timestamp.from(Instant.now().plusSeconds(10000000)).toString(),
-                tag="Second Tag id")
+                        timestamp= Timestamp.from(Instant.now().plusSeconds(10000000)).toString(),
+                        tag="Second Tag id")
         )
         val projectInfo = arrayListOf(ProjectInfo(id= 1, builds= buildInfo),
                 ProjectInfo("Second Test Project", 2,
                         arrayListOf(
                                 BuildInfo("Second Test ReportController",
-                                    timestamp = Timestamp.from(Instant.now()).toString(),
-                                    tag="First Tag id"),
+                                        timestamp = Timestamp.from(Instant.now()).toString(),
+                                        tag="First Tag id"),
                                 BuildInfo("Second Test ReportController",
                                         timestamp = Timestamp.from(Instant.now().plusSeconds(10000000)).toString(),
                                         tag="Second Tag id")))
@@ -39,7 +35,7 @@ class UiProvider {
         val mapper = ObjectMapper()
     }
 
-    private final fun init() {
+    /*private final fun init() {
 
         val reportFile = File(javaClass.classLoader.getResource(reportFileName).toURI())
 
@@ -56,36 +52,36 @@ class UiProvider {
                 }
             }
 
-            /*
-            it["vulnerabilities"].asIterable().forEach{
+            *//*
+            it["vulnerabilityModels"].asIterable().forEach{
                 val i :ArrayList<Any> = ArrayList()
 
-                vulnerabilities.add(
-                        Vulnerability(it["vulnerability_title"].asText(),
+                vulnerabilityModels.add(
+                        VulnerabilityModel(it["vulnerability_title"].asText(),
                                 it["description"].asText(),
                                 StreamSupport.stream(it["references"].asIterable().spliterator(), false)
                                         .collect(Collectors.toList()) as List<String>,
                                 StreamSupport.stream(it["versions"].asIterable().spliterator(), false)
                                         .collect(Collectors.toList()) as List<String>
                 ))
-            }*/
+            }*//*
 
             formattedDependencies.add(
                     Dependency(it["title"].asText(), it["main_version"].asText(),
-                    licenses)
+                            licenses)
             )
         }
 
         buildDetailInfo = BuildInfo(node["name"].asText(), node["version"].asText(), node["description"].asText(), dependencies = formattedDependencies)
-    }
+    }*/
 
 
     fun provideLatestBuilds(): ArrayList<BuildInfo> {
         return buildInfo
     }
 
-    fun provideLatestProjects(): ArrayList<ProjectInfo> {
-        return projectInfo
+    fun provideLatestProjects(): List<Project> {
+        return projectRepo.findAll() as List<Project>
     }
 
     fun provideBuildDetail() : BuildInfo {
