@@ -17,9 +17,6 @@ data class Dependency (
         @ManyToMany(cascade = [CascadeType.ALL])
         val dependencies: Set<Dependency>,
 
-        @ManyToMany(mappedBy = "dependency")
-        val build: Set<Build>,
-
         @OneToMany(mappedBy = "pk.dependency")
         val license: List<DependencyLicense>,
 

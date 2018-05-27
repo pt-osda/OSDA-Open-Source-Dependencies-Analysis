@@ -28,13 +28,14 @@ class LicenseService {
             "MIT License",
             "Mozilla Public License Version 1.1",
             "Mozilla Public License, Version 2.0",
-            "Microsoft .NET Library")
+            "MICROSOFT SOFTWARE LICENSE")
 
-    val licensesUrl : HashMap<String, String> = hashMapOf(
+    val licensesRelatedWords : HashMap<String, String> = hashMapOf(
             Pair("http://www.apache.org/licenses/LICENSE-1.1" ,"Apache Software License, Version 1.1"),
             Pair("http://www.apache.org/licenses/LICENSE-2.0" ,"Apache Software License, Version 2.0"),
             Pair("https://opensource.org/licenses/BSD-2-Clause", "The 2-Clause BSD License"),
             Pair("https://opensource.org/licenses/BSD-3-Clause", "The 3-Clause BSD License"),
+            Pair("The BSD License", "The 3-Clause BSD License"),
             Pair("http://repository.jboss.org/licenses/cc0-1.0.txt", "Creative Commons Legal Code"),
             Pair("https://www.eclipse.org/legal/epl-v10.html", "Eclipse Public License - v 1.0"),
             Pair("https://www.eclipse.org/legal/cpl-v10.html", "Common Public License - v 1.0"),
@@ -47,7 +48,7 @@ class LicenseService {
             Pair("https://opensource.org/licenses/MIT", "MIT License"),
             Pair("https://www.mozilla.org/en-US/MPL/1.1", "Mozilla Public License Version 1.1"),
             Pair("https://www.mozilla.org/en-US/MPL/2.0", "Mozilla Public License, Version 2.0"),
-            Pair("https://www.microsoft.com/net/dotnet_library_license.htm", "Microsoft .NET Library License")
+            Pair("Microsoft .NET Library", "MICROSOFT SOFTWARE LICENSE")
     )
 
     fun findLicense(manager: String, id: String, version: String, licenseUrl: String): ArrayList<LicenseModel> {
@@ -84,11 +85,11 @@ class LicenseService {
     }
 
     private fun findLicenseUrlInFile(licenseContent: String): String? {
-        for (url in licensesUrl.keys)
+        for (url in licensesRelatedWords.keys)
         {
             if (licenseContent.contains(url))
             {
-                return licensesUrl[url]
+                return licensesRelatedWords[url]
             }
         }
         return null

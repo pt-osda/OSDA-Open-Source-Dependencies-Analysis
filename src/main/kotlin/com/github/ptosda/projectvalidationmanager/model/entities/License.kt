@@ -10,7 +10,7 @@ data class License(
         @Id
         val spdxId: String,
 
-        val errorInfo: String,
+        val errorInfo: String?,
 
         @OneToMany(mappedBy = "pk.license")
         val dependencies: List<DependencyLicense>
