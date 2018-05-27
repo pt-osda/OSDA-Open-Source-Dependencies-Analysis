@@ -12,7 +12,7 @@ data class Build(
 
         val tag: String,
 
-        @ManyToMany
+        @OneToMany(mappedBy = "pk.build")
         val dependency: Set<Dependency>
 
 ) : Serializable

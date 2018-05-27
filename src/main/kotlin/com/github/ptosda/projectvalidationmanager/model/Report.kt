@@ -18,13 +18,13 @@ data class ReportDependency(
         @JsonProperty("main_version") val mainVersion : String,
         @JsonProperty("private_versions") val privateVersions : ArrayList<String>?,
         val licenses : ArrayList<ReportLicense>,
-        val vulnerabilitiesCount : Int,
+        @JsonProperty("vulnerabilities_count") val vulnerabilitiesCount : Int,
         val vulnerabilities : ArrayList<ReportVulnerability>,
         val parents : ArrayList<ReportDependency>?
 )
 
 data class ReportLicense(
-    val spdxId : String,
+    @JsonProperty("spdx_id") val spdxId : String,
     val source : String
 )
 
