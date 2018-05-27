@@ -1,0 +1,29 @@
+{{> header}}
+
+<div class="container-fluid">
+
+    <h3>
+        Dependency Name: {{title}}
+    </h3>
+    <br>
+    Main Version: {{main_version}}
+    <br>
+    Description: {{description}}
+    <br>
+    {{#license}}
+        License Name: {{pk.license.spdxId}}
+        <br>
+        License Source: {{source}}
+    {{/license}}
+
+
+</div>
+
+<!--#vulnerabilities}}
+                    Vulnerability Title: title}}
+                    <br>
+                    Vulnerability Description: description}}
+                /vulnerabilities}}
+                <br> -->
+
+{{> footer}}

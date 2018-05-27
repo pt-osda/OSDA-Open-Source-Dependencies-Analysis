@@ -10,9 +10,9 @@ data class Build(
         @EmbeddedId
         val pk: BuildPk,
 
-        val tag: String,
+        val tag: String?,
 
         @OneToMany(mappedBy = "pk.build")
-        val dependency: Set<Dependency>
+        val dependency: Set<Dependency>?
 
 ) : Serializable

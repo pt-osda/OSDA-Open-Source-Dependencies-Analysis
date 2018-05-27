@@ -1,8 +1,10 @@
 package com.github.ptosda.projectvalidationmanager.uiController
 
-import com.github.ptosda.projectvalidationmanager.model.entities.BuildPk
-import com.github.ptosda.projectvalidationmanager.model.entities.Project
+import com.github.ptosda.projectvalidationmanager.model.entities.*
 import com.github.ptosda.projectvalidationmanager.model.repositories.BuildRepository
+import com.github.ptosda.projectvalidationmanager.model.repositories.DependencyRepository
+import com.github.ptosda.projectvalidationmanager.model.repositories.DependencyVulnerabilityRepository
+import com.github.ptosda.projectvalidationmanager.model.repositories.VulnerabilityRepository
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -14,18 +16,17 @@ import kotlin.collections.set
 
 @Controller
 @RequestMapping("/report")
-class ReportController(val provider: UiProvider, val buildRepo: BuildRepository) {
+class ReportController(val provider: UiProvider, val buildRepo: BuildRepository, val dependencyVulnerabilityRepo: DependencyVulnerabilityRepository, val dependencyRepo: DependencyRepository, val vulnerabilityRepo: VulnerabilityRepository) {
 
     /**
      * Get the latest build reports received. Show projects and add a filter ( group, repository )
      */
-    @GetMapping // TODO Think about adding version to project and description. Need to change the timestamp since it cant be used in some formats as a request variable
+    @GetMapping
     fun getHome(model: HashMap<String, Any>) : String{
 
         model["page_title"] = "Home"
 
         val projects = provider.provideLatestProjects()
-
 
         val output = ArrayList<ProjectInfo>()
 
@@ -34,7 +35,7 @@ class ReportController(val provider: UiProvider, val buildRepo: BuildRepository)
             val builds = buildRepo.getBuildsFromProject(it.name)
 
             builds.forEach{
-                buildInfos.add(BuildInfo(it.pk.project.name, it.pk.timestamp, it.tag))
+                buildInfos.add(BuildInfo(it.pk.project.name, it.pk.timestamp, it.tag!!))
             }
 
             output.add(ProjectInfo(it.name, output.count(), buildInfos))
@@ -48,8 +49,6 @@ class ReportController(val provider: UiProvider, val buildRepo: BuildRepository)
     data class ProjectInfo(val project_name: String = "First Test ReportController", val id: Int, val builds: List<BuildInfo> = ArrayList())
 
     data class BuildInfo(val project_name: String = "First Test ReportController",
-                         //val project_version: String = "1.0.0",
-                         //val description: String = "",
                          val timestamp: String = Timestamp.from(Instant.now()).toString(),
                          val tag: String = "First Tag id",
                          val dependencies: ArrayList<Dependency> = ArrayList()
@@ -59,11 +58,11 @@ class ReportController(val provider: UiProvider, val buildRepo: BuildRepository)
     /**
      * Tem que se verificar a chave primaria de projecto pois pode haver com nomes iguais
      */
-    @GetMapping("/build/{project-name}")
+    @GetMapping("project/{project-name}/build")
     fun getProjectBuilds(@PathVariable("project-name") projectName: String?,
                          model: HashMap<String, Any>) : String{
 
-        model["page_title"] = "Builds"
+        model["page_title"] = "Project Builds"
 
         model["projects"] = provider.provideLatestProjects()
 
@@ -76,12 +75,12 @@ class ReportController(val provider: UiProvider, val buildRepo: BuildRepository)
      * TODO Highlight dependencies that have vulnerabilities, by showing them in a different list than the rest for example
      *
      */
-    @GetMapping("build/{project-name}/{timestamp}/detail")
+    @GetMapping("project/{project-name}/build/{timestamp}/detail")
     fun getBuildDetail(@PathVariable("project-name") projectName: String,
                        @PathVariable("timestamp") timestamp: String,
                        model: HashMap<String, Any>) : String
     {
-        model["page_title"] = "BuildDetail"
+        model["page_title"] = "Build Detail"
 
         val buildInfo = buildRepo.findById(BuildPk(timestamp, Project(projectName, null, null)))
 
@@ -93,8 +92,8 @@ class ReportController(val provider: UiProvider, val buildRepo: BuildRepository)
 
         model["project_name"] = projectName
         model["timestamp"] = build.pk.timestamp
-        model["tag"] = build.tag
-        model["dependencies"] = build.dependency
+        model["tag"] = build.tag!!
+        model["dependencies"] = build.dependency!!
 
         return "build-detail"
     }
@@ -102,12 +101,27 @@ class ReportController(val provider: UiProvider, val buildRepo: BuildRepository)
     /**
      * Get the details of a dependency ( Dependencies, Licenses and Vulnerabilities )
      */
-    @GetMapping("dependency/{id}/{version}/detail")
-    fun getDependencyDetail(@PathVariable("id", required = false) dependencyId: String?,
-                            @PathVariable("version", required = false) version: String?,
+    @GetMapping("project/{project-id}/build/{build-id}/dependency/{id}/{version}/detail")
+    fun getDependencyDetail(@PathVariable("project-id") projectId: String,
+                            @PathVariable("build-id") buildId: String,
+                            @PathVariable("id") dependencyId: String,
+                            @PathVariable("version") version: String,
                             model: HashMap<String, Any>) : String
     {
-        model["page_title"] = "DependencyDetail"
+        model["page_title"] = "Dependency Detail"
+
+        val dependencyInfo = dependencyRepo.findById(DependencyPk(dependencyId, Build(BuildPk(buildId, Project(projectId, null, null)), null, null), version))
+
+        if(!dependencyInfo.isPresent) {
+            throw Exception("Dependency not found")
+        }
+
+        val dependency = dependencyInfo.get()
+
+        model["title"] = dependency.pk.id
+        model["main_version"] = dependency.pk.mainVersion
+        model["description"] = dependency.description
+        model["license"] = dependency.license
 
         return "dependency-detail"
     }

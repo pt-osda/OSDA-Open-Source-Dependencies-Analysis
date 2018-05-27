@@ -1,10 +1,11 @@
 package com.github.ptosda.projectvalidationmanager.model.entities
 
-import com.github.ptosda.projectvalidationmanager.model.entities.Organization
-import com.github.ptosda.projectvalidationmanager.model.entities.Project
 import com.github.ptosda.projectvalidationmanager.validators.interfaces.ValidRepo
 import java.io.Serializable
-import javax.persistence.*
+import javax.persistence.Entity
+import javax.persistence.Id
+import javax.persistence.ManyToOne
+import javax.persistence.OneToMany
 
 @Entity
 @ValidRepo

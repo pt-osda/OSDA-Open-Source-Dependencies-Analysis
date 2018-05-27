@@ -11,8 +11,6 @@ import java.util.*
 @Repository
 interface BuildRepository : PagingAndSortingRepository<Build, BuildPk> {
 
-    override fun findById(id: BuildPk): Optional<Build>
-
     @Query(value =  "Select name, tag, timestamp " +
             "FROM build " +
             "WHERE name = :project_name",

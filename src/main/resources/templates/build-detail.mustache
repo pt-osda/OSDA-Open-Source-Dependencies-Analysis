@@ -16,24 +16,43 @@
             Dependencies
         </h2>
     </label>
-    <ul class="list-group" id="dependency-list">
-        {{#dependencies}}
-            <li class="list-group-item">
-                Project Name: {{pk.id}}
-                <br>
-                Main Version: {{pk.mainVersion}}
-                <br>
-                {{#license}}
-                    License Name: {{pk.license.spdxId}}
-                    <br>
-                    License Source: {{source}}
-                {{/license}}
-                <br>
-                <a>Detail</a>
-            </li>
-        {{/dependencies}}
-    </ul>
+    <br>
+
+    Vulnerable
+    <ul class="list-group" id="error-list"></ul>
+
+    <br>
+
+    Not Vulnerable
+    <ul class="list-group" id="dependency-list"></ul>
+
+
+    {{#dependencies}}
+        <script>
+            filterVulnerableDependencies({{vulnerabilitiesCount}},'<li class="list-group-item">' +
+                    '               <a href="/report/project/{{project_name}}/build/{{timestamp}}/dependency/{{pk.id}}/{{pk.mainVersion}}/detail" class="list-group-item list-group-item-action">' +
+                    '                Project Name: {{pk.id}}\n' +
+                    '                <br>\n' +
+                    '                Main Version: {{pk.mainVersion}}\n' +
+                    '                <br>\n' +
+                    '                {{#license}}\n'+
+                        '                    License Name: {{pk.license.spdxId}} ' +
+                    '                {{/license}}\n' +
+                    '                 <br> ' +
+                    '                 Amount of Vulnerabilities: {{vulnerabilitiesCount}}     '+
+                    '                <br>\n' +
+                    '                </a>\n' +
+                    '            </li>')
+        </script>
+    {{/dependencies}}
 
 </div>
+
+<!--#vulnerabilities}}
+                    Vulnerability Title: title}}
+                    <br>
+                    Vulnerability Description: description}}
+                /vulnerabilities}}
+                <br> -->
 
 {{> footer}}
