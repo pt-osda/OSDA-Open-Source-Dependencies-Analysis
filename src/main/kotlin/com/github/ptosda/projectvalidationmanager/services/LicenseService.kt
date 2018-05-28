@@ -9,7 +9,6 @@ import java.net.URL
 
 @Service
 class LicenseService {
-
     val licensesName : List<String> = listOf(
             "Apache-1.1",
             "Apache-2.0",
@@ -117,6 +116,4 @@ class LicenseService {
         }
         return null
     }
-
-
 }

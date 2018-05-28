@@ -10,7 +10,6 @@ import java.time.Instant
 
 @Service
 class UiProvider(val buildRepo: BuildRepository, val projectRepo: ProjectRepository) {
-
     companion object {
         val buildInfo = arrayListOf(BuildInfo(),
                 BuildInfo("First Test Project",

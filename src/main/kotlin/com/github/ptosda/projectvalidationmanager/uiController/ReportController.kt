@@ -125,5 +125,4 @@ class ReportController(val provider: UiProvider, val buildRepo: BuildRepository,
 
         return "dependency-detail"
     }
-
 }
