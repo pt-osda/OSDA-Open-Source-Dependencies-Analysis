@@ -13,5 +13,5 @@ data class Project(
         val repo: Repo?,
 
         @OneToMany(mappedBy = "pk.project")
-        val build: List<Build>?
+        val build: List<Build>? = arrayListOf()
 ) : Serializable

@@ -1,10 +1,7 @@
 package com.github.ptosda.projectvalidationmanager.uiController
 
 import com.github.ptosda.projectvalidationmanager.database.entities.*
-import com.github.ptosda.projectvalidationmanager.database.repositories.BuildRepository
-import com.github.ptosda.projectvalidationmanager.database.repositories.DependencyRepository
-import com.github.ptosda.projectvalidationmanager.database.repositories.DependencyVulnerabilityRepository
-import com.github.ptosda.projectvalidationmanager.database.repositories.VulnerabilityRepository
+import com.github.ptosda.projectvalidationmanager.database.repositories.*
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -15,7 +12,7 @@ import kotlin.collections.set
 
 @Controller
 @RequestMapping("/report")
-class ReportController(val provider: UiProvider, val buildRepo: BuildRepository, val dependencyVulnerabilityRepo: DependencyVulnerabilityRepository, val dependencyRepo: DependencyRepository, val vulnerabilityRepo: VulnerabilityRepository) {
+class ReportController(val provider: UiProvider, val buildRepo: BuildRepository, val projectRepo: ProjectRepository, val dependencyVulnerabilityRepo: DependencyVulnerabilityRepository, val dependencyRepo: DependencyRepository, val vulnerabilityRepo: VulnerabilityRepository) {
 
     /**
      * Get the latest build reports received. Show projects and add a filter ( group, repository )
@@ -34,7 +31,7 @@ class ReportController(val provider: UiProvider, val buildRepo: BuildRepository,
             val builds = buildRepo.getBuildsFromProject(it.name)
 
             builds.forEach{
-                buildInfos.add(BuildInfo(it.pk.project.name, it.pk.timestamp, it.tag))
+                buildInfos.add(BuildInfo(it.pk.project.name, it.pk.timestamp!!, it.tag))
             }
 
             output.add(ProjectInfo(it.name, output.count(), buildInfos))
@@ -58,14 +55,15 @@ class ReportController(val provider: UiProvider, val buildRepo: BuildRepository,
      * Tem que se verificar a chave primaria de projecto pois pode haver com nomes iguais
      */
     @GetMapping("project/{project-name}/build")
-    fun getProjectBuilds(@PathVariable("project-name") projectName: String?,
+    fun getProjectBuilds(@PathVariable("project-name") projectName: String,
                          model: HashMap<String, Any>) : String{
 
         model["page_title"] = "Project Builds"
 
-        model["projects"] = provider.provideLatestProjects()
+        model["project_name"] = projectName
+        model["builds"] = projectRepo.findById(projectName).get().build!!
 
-        return "index"
+        return "builds"
     }
 
     /**
