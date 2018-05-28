@@ -1,15 +1,14 @@
 package com.github.ptosda.projectvalidationmanager.uiController
 
-import com.github.ptosda.projectvalidationmanager.model.entities.*
-import com.github.ptosda.projectvalidationmanager.model.repositories.BuildRepository
-import com.github.ptosda.projectvalidationmanager.model.repositories.DependencyRepository
-import com.github.ptosda.projectvalidationmanager.model.repositories.DependencyVulnerabilityRepository
-import com.github.ptosda.projectvalidationmanager.model.repositories.VulnerabilityRepository
+import com.github.ptosda.projectvalidationmanager.database.entities.*
+import com.github.ptosda.projectvalidationmanager.database.repositories.BuildRepository
+import com.github.ptosda.projectvalidationmanager.database.repositories.DependencyRepository
+import com.github.ptosda.projectvalidationmanager.database.repositories.DependencyVulnerabilityRepository
+import com.github.ptosda.projectvalidationmanager.database.repositories.VulnerabilityRepository
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import java.sql.Timestamp
 import java.time.Instant
 import kotlin.collections.set

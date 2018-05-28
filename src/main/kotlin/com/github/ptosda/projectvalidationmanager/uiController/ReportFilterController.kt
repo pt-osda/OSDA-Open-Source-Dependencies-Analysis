@@ -1,6 +1,6 @@
 package com.github.ptosda.projectvalidationmanager.uiController
 
-import com.github.ptosda.projectvalidationmanager.model.repositories.*
+import com.github.ptosda.projectvalidationmanager.database.repositories.*
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable

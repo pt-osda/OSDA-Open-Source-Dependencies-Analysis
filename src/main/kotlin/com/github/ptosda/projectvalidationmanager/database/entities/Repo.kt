@@ -1,4 +1,4 @@
-package com.github.ptosda.projectvalidationmanager.model.entities
+package com.github.ptosda.projectvalidationmanager.database.entities
 
 import com.github.ptosda.projectvalidationmanager.validators.interfaces.ValidRepo
 import java.io.Serializable

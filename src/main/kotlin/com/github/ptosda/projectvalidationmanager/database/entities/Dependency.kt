@@ -1,4 +1,4 @@
-package com.github.ptosda.projectvalidationmanager.model.entities
+package com.github.ptosda.projectvalidationmanager.database.entities
 
 import java.io.Serializable
 import javax.persistence.*
@@ -13,6 +13,8 @@ data class Dependency (
         val description: String,
 
         val vulnerabilitiesCount: Int,
+
+        val error_info: String?,
 
         @ManyToMany(cascade = [CascadeType.ALL])
         val dependencies: Set<Dependency>,

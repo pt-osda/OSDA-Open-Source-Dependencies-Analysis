@@ -1,9 +1,9 @@
 package com.github.ptosda.projectvalidationmanager.uiController
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.ptosda.projectvalidationmanager.model.entities.Project
-import com.github.ptosda.projectvalidationmanager.model.repositories.BuildRepository
-import com.github.ptosda.projectvalidationmanager.model.repositories.ProjectRepository
+import com.github.ptosda.projectvalidationmanager.database.entities.Project
+import com.github.ptosda.projectvalidationmanager.database.repositories.BuildRepository
+import com.github.ptosda.projectvalidationmanager.database.repositories.ProjectRepository
 import org.springframework.stereotype.Service
 import java.sql.Timestamp
 import java.time.Instant

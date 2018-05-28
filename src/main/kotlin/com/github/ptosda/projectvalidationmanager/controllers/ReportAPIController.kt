@@ -2,12 +2,11 @@ package com.github.ptosda.projectvalidationmanager.controllers
 
 import com.github.ptosda.projectvalidationmanager.model.Report
 import com.github.ptosda.projectvalidationmanager.model.ReportDependency
-import com.github.ptosda.projectvalidationmanager.model.entities.*
-import com.github.ptosda.projectvalidationmanager.model.repositories.*
+import com.github.ptosda.projectvalidationmanager.database.entities.*
+import com.github.ptosda.projectvalidationmanager.database.repositories.*
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import javax.servlet.http.HttpServletResponse
 
 @RestController
 @RequestMapping("/report")
@@ -16,9 +15,7 @@ class ReportAPIController(val buildRepository : BuildRepository,
                        val dependencyRepository : DependencyRepository,
                        val dependencyVulnerabilityRepository : DependencyVulnerabilityRepository,
                        val licenseRepository : LicenseRepository,
-                       val organizationRepository: OrganizationRepository,
                        val projectRepository: ProjectRepository,
-                       val repoRepository: RepoRepository,
                        val vulnerabilityRepository: VulnerabilityRepository){
 
     @PostMapping
@@ -41,7 +38,7 @@ class ReportAPIController(val buildRepository : BuildRepository,
         return project
     }
 
-    private fun storeBuild(timestamp: String, tag: String, project: Project): Build {
+    private fun storeBuild(timestamp: String, tag: String?, project: Project): Build {
         val build = Build(BuildPk(timestamp, project), tag, setOf())
         buildRepository.save(build)
         return build

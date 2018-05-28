@@ -1,7 +1,6 @@
-package com.github.ptosda.projectvalidationmanager.model.repositories
+package com.github.ptosda.projectvalidationmanager.database.repositories
 
-import com.github.ptosda.projectvalidationmanager.model.entities.Repo
-import org.springframework.data.repository.CrudRepository
+import com.github.ptosda.projectvalidationmanager.database.entities.Repo
 import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
 

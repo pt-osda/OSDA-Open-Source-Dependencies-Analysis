@@ -13,13 +13,11 @@ import javax.servlet.http.HttpServletResponse
 @RequestMapping("/{manager}/dependency")
 class DependencyController(private val licenseService: LicenseService, private val vulnerabilityService: VulnerabilityService) {
 
-    //TODO Need to do exception handling. Need to check licenseUrl
     @GetMapping("/{id}/{version}/licenses", produces = ["application/json"])
     fun getDependencyLicenses(@PathVariable("manager") manager: String,
                               @PathVariable("id") id: String,
                               @PathVariable("version") version: String,
-                              @RequestParam(value="githubProject", required = false) githubProject: String?,
-                              @RequestParam(value="licenseUrl", required = false) licenseUrl: String?): List<LicenseModel>
+                              @RequestParam(value="licenseUrl", required = true) licenseUrl: String): List<LicenseModel>
     {
         val cacheKey = "$manager:$id:$version"
         val dependenciesCache = CachingConfig.getDependenciesCache()
@@ -27,13 +25,14 @@ class DependencyController(private val licenseService: LicenseService, private v
         if(cacheEntry?.licenses != null){
             return cacheEntry.licenses!!
         }
-        val licenses = licenseService.findLicense(manager, id, version, licenseUrl!!)
-        if(cacheEntry == null){
-            dependenciesCache.put(cacheKey, DependencyInfo(licenses, null))
-        }
-        else{
-            cacheEntry.licenses = licenses
-            dependenciesCache.put(cacheKey, cacheEntry)
+        val licenses = licenseService.findLicense(id, version, licenseUrl)
+        if(!licenses.isEmpty()) {
+            if (cacheEntry == null) {
+                dependenciesCache.put(cacheKey, DependencyInfo(licenses, null))
+            } else {
+                cacheEntry.licenses = licenses
+                dependenciesCache.put(cacheKey, cacheEntry)
+            }
         }
         return licenses
     }
