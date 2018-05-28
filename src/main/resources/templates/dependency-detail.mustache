@@ -7,9 +7,11 @@
     </h3>
     <br>
     Main Version: {{main_version}}
-    <br>
-    Description: {{description}}
-    <br>
+    {{#description}}
+        <br>
+        Description: {{description}}
+        <br>
+    {{/description}}
     <h4>Licenses:</h4>
     <ul class="list-group">
         {{#license}}

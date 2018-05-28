@@ -3,6 +3,7 @@ package com.github.ptosda.projectvalidationmanager.model
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class Report (
+        val id : String,
         val version : String?,
         val name : String,
         val description : String?,
