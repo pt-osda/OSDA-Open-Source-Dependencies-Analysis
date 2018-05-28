@@ -10,6 +10,7 @@ data class Dependency (
         @EmbeddedId
         val pk: DependencyPk,
 
+        @Column(columnDefinition = "TEXT")
         val description: String?,
 
         val vulnerabilitiesCount: Int?,
