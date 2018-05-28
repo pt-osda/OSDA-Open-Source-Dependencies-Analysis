@@ -1,6 +1,6 @@
 {{> header}}
 
-<div class="container">
+<div class="body-container">
 
     <h3>
         Project Name: {{project_name}}
@@ -8,7 +8,9 @@
     <br>
     Timestamp: {{timestamp}}
     <br>
-    Tag: {{tag}}
+    {{#tag}}
+        Tag: {{tag}}
+    {{/tag}}
     <br>
 
     <label for="dependency-list">
@@ -36,8 +38,8 @@
                     '                Main Version: {{pk.mainVersion}}\n' +
                     '                <br>\n' +
                     '                {{#license}}\n'+
-                        '                    License Name: {{pk.license.spdxId}} ' +
-                        '                {{/license}}\n' +
+                    '                    License Name: {{pk.license.spdxId}} ' +
+                    '                {{/license}}\n' +
                     '                 <br> ' +
                     '                 Amount of Vulnerabilities: {{vulnerabilitiesCount}}     '+
                     '                <br>\n' +

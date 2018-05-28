@@ -34,7 +34,7 @@ class ReportController(val provider: UiProvider, val buildRepo: BuildRepository,
             val builds = buildRepo.getBuildsFromProject(it.name)
 
             builds.forEach{
-                buildInfos.add(BuildInfo(it.pk.project.name, it.pk.timestamp, it.tag!!))
+                buildInfos.add(BuildInfo(it.pk.project.name, it.pk.timestamp, it.tag))
             }
 
             output.add(ProjectInfo(it.name, output.count(), buildInfos))
@@ -49,7 +49,7 @@ class ReportController(val provider: UiProvider, val buildRepo: BuildRepository,
 
     data class BuildInfo(val project_name: String = "First Test ReportController",
                          val timestamp: String = Timestamp.from(Instant.now()).toString(),
-                         val tag: String = "First Tag id",
+                         val tag: String? = "First Tag id",
                          val dependencies: ArrayList<Dependency> = ArrayList()
     )
 
@@ -77,7 +77,7 @@ class ReportController(val provider: UiProvider, val buildRepo: BuildRepository,
     @GetMapping("project/{project-name}/build/{timestamp}/detail")
     fun getBuildDetail(@PathVariable("project-name") projectName: String,
                        @PathVariable("timestamp") timestamp: String,
-                       model: HashMap<String, Any>) : String
+                       model: HashMap<String, Any?>) : String
     {
         model["page_title"] = "Build Detail"
 
@@ -91,7 +91,7 @@ class ReportController(val provider: UiProvider, val buildRepo: BuildRepository,
 
         model["project_name"] = projectName
         model["timestamp"] = build.pk.timestamp
-        model["tag"] = build.tag!!
+        model["tag"] = build.tag
         model["dependencies"] = build.dependency!!
 
         return "build-detail"
@@ -105,13 +105,11 @@ class ReportController(val provider: UiProvider, val buildRepo: BuildRepository,
                             @PathVariable("build-id") buildId: String,
                             @PathVariable("id") dependencyId: String,
                             @PathVariable("version") version: String,
-                            model: HashMap<String, Any>) : String
+                            model: HashMap<String, Any?>) : String
     {
         model["page_title"] = "Dependency Detail"
 
         val dependencyInfo = dependencyRepo.findById(DependencyPk(dependencyId, Build(BuildPk(buildId, Project(projectId, null, null)), null, null), version))
-
-        //val vulnerability = vulnerabilityRepo.findById(12345L) THROWS SerializationException
 
         if(!dependencyInfo.isPresent) {
             throw Exception("Dependency not found")
@@ -123,6 +121,7 @@ class ReportController(val provider: UiProvider, val buildRepo: BuildRepository,
         model["main_version"] = dependency.pk.mainVersion
         model["description"] = dependency.description
         model["license"] = dependency.license
+        model["vulnerabilities"] = dependency.vulnerabilities
 
         return "dependency-detail"
     }

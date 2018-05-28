@@ -10,12 +10,28 @@
     <br>
     Description: {{description}}
     <br>
-    {{#license}}
-        License Name: {{pk.license.spdxId}}
-        <br>
-        License Source: {{source}}
-    {{/license}}
-
+    <h4>Licenses:</h4>
+    <ul class="list-group">
+        {{#license}}
+            <li class="list-group-item">
+                License Name: {{pk.license.spdxId}}
+                <br>
+                License Source: {{source}}
+            </li>
+        {{/license}}
+    </ul>
+    <br>
+    <h4>Vulnerabilities:</h4>
+    <ul class="list-group">
+        {{#vulnerabilities}}
+            <li class="list-group-item">
+                Vulnerability Title: {{pk.vulnerability.title}}
+                <br>
+                Vulnerability Description: {{pk.vulnerability.description}}
+            </li>
+        {{/vulnerabilities}}
+    </ul>
+    <br>
 
 </div>
 

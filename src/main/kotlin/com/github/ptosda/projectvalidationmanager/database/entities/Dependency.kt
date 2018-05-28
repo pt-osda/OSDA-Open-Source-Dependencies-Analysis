@@ -10,9 +10,9 @@ data class Dependency (
         @EmbeddedId
         val pk: DependencyPk,
 
-        val description: String,
+        val description: String?,
 
-        val vulnerabilitiesCount: Int,
+        val vulnerabilitiesCount: Int?,
 
         val error_info: String?,
 
@@ -40,7 +40,7 @@ data class Dependency (
         override fun hashCode(): Int {
                 return this.pk.id.hashCode() * 41 +
                         this.pk.mainVersion.hashCode() * 17 +
-                        this.description.hashCode() * 41
+                        (this.description?.hashCode()?.times(41) ?: 15)
         }
 
         override fun toString(): String {

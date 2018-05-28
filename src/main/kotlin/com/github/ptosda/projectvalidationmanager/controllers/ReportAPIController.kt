@@ -51,6 +51,7 @@ class ReportAPIController(val buildRepository : BuildRepository,
                     it.description,
                     it.vulnerabilitiesCount,
                     //it.privateVersions,
+                    null,
                     setOf(),
                     arrayListOf(),
                     arrayListOf()
@@ -82,7 +83,6 @@ class ReportAPIController(val buildRepository : BuildRepository,
                             it.title,
                             it.description,
                             it.references,
-                            null,
                             setOf()
                     )
                     vulnerabilityRepository.save(vulnerability)
