@@ -35,3 +35,7 @@
     position: absolute;
     left: 25px;
 }
+
+.filter-error{
+    color: red;
+}

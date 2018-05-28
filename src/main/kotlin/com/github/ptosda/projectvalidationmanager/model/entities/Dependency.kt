@@ -20,7 +20,7 @@ data class Dependency (
         @OneToMany(mappedBy = "pk.dependency")
         val license: List<DependencyLicense>,
 
-        @OneToMany(mappedBy = "pk.dependency")
+        @OneToMany(mappedBy = "pk.dependency", cascade = [CascadeType.ALL])
         val vulnerabilities: List<DependencyVulnerability>
 ) : Serializable
 {
@@ -39,5 +39,9 @@ data class Dependency (
                 return this.pk.id.hashCode() * 41 +
                         this.pk.mainVersion.hashCode() * 17 +
                         this.description.hashCode() * 41
+        }
+
+        override fun toString(): String {
+                return "id:" + pk.id + "; main_version:" + pk.mainVersion + "; description:" + description + "; vulnerabilitiesCount:" + vulnerabilitiesCount
         }
 }

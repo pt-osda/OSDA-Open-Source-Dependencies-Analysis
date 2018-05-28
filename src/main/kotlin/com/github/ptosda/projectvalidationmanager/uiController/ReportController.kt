@@ -112,6 +112,8 @@ class ReportController(val provider: UiProvider, val buildRepo: BuildRepository,
 
         val dependencyInfo = dependencyRepo.findById(DependencyPk(dependencyId, Build(BuildPk(buildId, Project(projectId, null, null)), null, null), version))
 
+        //val vulnerability = vulnerabilityRepo.findById(12345L) THROWS SerializationException
+
         if(!dependencyInfo.isPresent) {
             throw Exception("Dependency not found")
         }

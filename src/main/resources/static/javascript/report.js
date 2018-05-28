@@ -3,15 +3,18 @@
 
 var errorListId = 'error-list'
 var dependencyListId = 'dependency-list'
+var successListClass = 'list-group-item list-group-item-success'
+var errorListClass = 'list-group-item list-group-item-danger'
 
 function filterVulnerableDependencies(vulnerabilitiesCount, text) {
     if(vulnerabilitiesCount > 0) {
         var errorList = document.getElementById(errorListId)
-        errorList.innerHTML += text
+
+        errorList.innerHTML += text.replace('%s', errorListClass)
     }
     else {
         var dependencyList = document.getElementById(dependencyListId)
-        dependencyList.innerHTML += text
+        dependencyList.innerHTML += text.replace('%s', successListClass)
     }
 }
 
@@ -28,29 +31,29 @@ function filterHomeScreen() {
 
     var filterText = document.getElementById(filterTextId).value
 
-    console.log(filterType)
-    console.log(filterText)
+    if(filterText === '') {
+        var filterError = document.getElementById("filter-error")
+        filterError.innerText = 'Text cannot be empty'
+        return
+    }
 
     httpRequest('GET', 'http://localhost:8080/report/filter/'+filterType+'/'+filterText, null, filterCb)
 }
 
 function filterCb (err, data) {
-    console.log(data)
+    var projectList = document.getElementById("project-list")
+    projectList.innerHTML = data
 }
 function httpRequest(method, path, data, cb) {
     var xhr = new XMLHttpRequest()
     xhr.open(method, path, true)
 
-    //Send the proper header information along with the request
     xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
-    xhr.onreadystatechange = function() {//Call a function when the state changes.
-        if(xhr.readyState == XMLHttpRequest.DONE) {
-            if(xhr.status == 200){
-                if(xhr.getResponseHeader('Content-Type') != 'application/json')
-                    cb( null, xhr.response )
-                else
-                    cb( new Error( JSON.parse(xhr.response).error ) )
+    xhr.onreadystatechange = function() {
+        if(xhr.readyState === XMLHttpRequest.DONE) {
+            if(xhr.status === 200){
+                cb( null, xhr.response )
             }
             else{
                 document.open()

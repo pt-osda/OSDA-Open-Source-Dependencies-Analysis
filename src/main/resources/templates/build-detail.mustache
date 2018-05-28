@@ -1,6 +1,6 @@
 {{> header}}
 
-<div class="build-detail">
+<div class="container">
 
     <h3>
         Project Name: {{project_name}}
@@ -29,7 +29,7 @@
 
     {{#dependencies}}
         <script>
-            filterVulnerableDependencies({{vulnerabilitiesCount}},'<li class="list-group-item">' +
+            filterVulnerableDependencies({{vulnerabilitiesCount}},'<li class="%s">' +
                     '               <a href="/report/project/{{project_name}}/build/{{timestamp}}/dependency/{{pk.id}}/{{pk.mainVersion}}/detail" class="list-group-item list-group-item-action">' +
                     '                Project Name: {{pk.id}}\n' +
                     '                <br>\n' +
@@ -37,7 +37,7 @@
                     '                <br>\n' +
                     '                {{#license}}\n'+
                         '                    License Name: {{pk.license.spdxId}} ' +
-                    '                {{/license}}\n' +
+                        '                {{/license}}\n' +
                     '                 <br> ' +
                     '                 Amount of Vulnerabilities: {{vulnerabilitiesCount}}     '+
                     '                <br>\n' +

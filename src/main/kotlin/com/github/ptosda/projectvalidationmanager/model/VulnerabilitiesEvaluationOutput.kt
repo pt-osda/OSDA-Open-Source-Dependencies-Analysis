@@ -6,5 +6,5 @@ data class VulnerabilitiesEvaluationOutput(
         val title: String,
         val mainVersion : String,
         val totalVulnerabilities: Int,
-        val vulnerabilities: List<VulnerabilityOutput>?
+        val vulnerabilities: List<VulnerabilityOutput> = ArrayList()
 ) : Serializable
