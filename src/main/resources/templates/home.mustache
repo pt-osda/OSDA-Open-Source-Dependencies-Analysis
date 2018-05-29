@@ -1,0 +1,26 @@
+
+{{> header}}
+
+<h2 class="text-center">
+    Projects
+</h2>
+
+<br>
+
+<div class="body-container">
+
+    <div id="project-list">
+        <div class="body-container">
+            {{#projects}}
+                <a href="/projs/{{project_name}}" class="list-group-item list-group-item-action">
+                    Name: <b>{{project_name}}</b>
+                </a>
+
+                <br>
+            {{/projects}}
+        </div>
+    </div>
+
+</div>
+
+{{> footer}}

@@ -7,6 +7,8 @@ var successListClass = 'list-group-item list-group-item-success'
 var errorListClass = 'list-group-item list-group-item-danger'
 
 function filterVulnerableDependencies(vulnerabilitiesCount, text) {
+    console.log(vulnerabilitiesCount)
+
     if(vulnerabilitiesCount > 0) {
         var errorList = document.getElementById(errorListId)
 
@@ -21,21 +23,28 @@ function filterVulnerableDependencies(vulnerabilitiesCount, text) {
 var filterTypeId = 'filterTypeSelect'
 var filterTextId = 'filterText'
 
-function filterHomeScreen() {
-    var filterTypeNode = document.getElementById(filterTypeId)
-    var filterType = filterTypeNode.options[filterTypeNode.selectedIndex].text
+function filterHomeScreen(filter) {
 
-    if(filterType === 'None') {
-        location.reload(true)
+    var filterType
+    var filterText
+
+    if(!filter) {
+        var filterTypeNode = document.getElementById(filterTypeId)
+        filterType = filterTypeNode.options[filterTypeNode.selectedIndex].text
+
+        filterText = document.getElementById(filterTextId).value
+
+        if(filterText === '') {
+            var filterError = document.getElementById("filter-error")
+            filterError.innerText = 'Text cannot be empty'
+            return
+        }
+    else {
+           filterType = "None"
+           filterText = "None"
+        }
     }
 
-    var filterText = document.getElementById(filterTextId).value
-
-    if(filterText === '') {
-        var filterError = document.getElementById("filter-error")
-        filterError.innerText = 'Text cannot be empty'
-        return
-    }
 
     httpRequest('GET', 'http://localhost:8080/report/filter/'+filterType+'/'+filterText, null, filterCb)
 }

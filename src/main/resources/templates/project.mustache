@@ -1,0 +1,52 @@
+
+{{> header}}
+
+<br>
+
+<div class="container-fluid">
+
+    <h2 class="text-center">
+        Project {{project_name}}
+    </h2>
+
+    <br>
+
+    <div class="btn-group-toggle text-center" data-toggle="buttons">
+        <label class="btn btn-outline-dark text-center active">
+            <input type="radio" name="options" id="option1" autocomplete="off" checked> Detail
+        </label>
+        <label class="btn btn-outline-dark text-center">
+            <input type="radio" name="options" id="option2" autocomplete="off"> Licenses
+        </label>
+        <label class="btn btn-outline-dark text-center">
+            <input type="radio" name="options" id="option3" autocomplete="off"> Vulnerabilities
+        </label>
+    </div>
+
+    <br>
+
+    <div class="btn-group">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Filter
+        </button>
+        <div class="dropdown-menu btn-group-toggle" aria-labelledby="dropdownMenuButton">
+            <button class="dropdown-item active" >None</button>
+            <button class="dropdown-item">Builds with vulnerable dependencies</button>
+            <button class="dropdown-item">Builds with invalid licenses</button>
+        </div>
+    </div>
+
+    <div>
+
+        {{#repository}}
+            Associated to {{repository.name}} repository
+            {{#organization}}
+                in {{organization.name}}
+            {{/organization}}
+        {{/repository}}
+    </div>
+
+
+</div>
+
+{{> footer}}

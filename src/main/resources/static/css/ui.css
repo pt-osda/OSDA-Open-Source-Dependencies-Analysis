@@ -9,6 +9,16 @@
     text-align: center;
 }
 
+.project-buttons{
+    align-self: center;
+    align-content: center;
+    align-items: center;
+    alignment: center;
+    child-align: auto;
+    alignment-baseline: center;
+    text-align: center;
+}
+
 .body-container{
     extends: container;
     overflow: auto;

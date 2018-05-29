@@ -28,7 +28,6 @@
     Not Vulnerable
     <ul class="list-group" id="dependency-list"></ul>
 
-
     {{#dependencies}}
         <script>
             filterVulnerableDependencies({{vulnerabilitiesCount}},'<li class="%s">' +
@@ -41,7 +40,7 @@
                     '                    License Name: {{pk.license.spdxId}} ' +
                     '                {{/license}}\n' +
                     '                 <br> ' +
-                    '                 Amount of Vulnerabilities: {{vulnerabilitiesCount}}     '+
+                    '                 {{vulnerabilitiesCount}} vulnerabilities found'+
                     '                <br>\n' +
                     '                </a>\n' +
                     '            </li>')
@@ -49,12 +48,5 @@
     {{/dependencies}}
 
 </div>
-
-<!--#vulnerabilities}}
-                    Vulnerability Title: title}}
-                    <br>
-                    Vulnerability Description: description}}
-                /vulnerabilities}}
-                <br> -->
 
 {{> footer}}

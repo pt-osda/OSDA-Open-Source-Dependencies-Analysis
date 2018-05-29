@@ -11,8 +11,36 @@ import java.time.Instant
 import kotlin.collections.set
 
 @Controller
-@RequestMapping("/report")
+@RequestMapping("/")
 class ReportController(val provider: UiProvider, val buildRepo: BuildRepository, val projectRepo: ProjectRepository, val dependencyVulnerabilityRepo: DependencyVulnerabilityRepository, val dependencyRepo: DependencyRepository, val vulnerabilityRepo: VulnerabilityRepository) {
+
+    /**
+     * Get the latest build reports received. Show projects and add a filter ( group, repository )
+     */
+    @GetMapping("/report")
+    fun getIndex(model: HashMap<String, Any>) : String{
+
+        model["page_title"] = "Home"
+
+        val projects = provider.provideLatestProjects()
+
+        val output = ArrayList<ProjectInfo>()
+
+        projects.forEach{
+            val buildInfos = ArrayList<BuildInfo>()
+            val builds = buildRepo.getBuildsFromProject(it.name)
+
+            builds.forEach{
+                buildInfos.add(BuildInfo(it.pk.project.name, it.pk.timestamp!!, it.tag))
+            }
+
+            output.add(ProjectInfo(it.name, output.count(), buildInfos))
+        }
+
+        model["projects"] = output
+
+        return "index"
+    }
 
     /**
      * Get the latest build reports received. Show projects and add a filter ( group, repository )
@@ -39,7 +67,7 @@ class ReportController(val provider: UiProvider, val buildRepo: BuildRepository,
 
         model["projects"] = output
 
-        return "index"
+        return "home"
     }
 
     data class ProjectInfo(val project_name: String = "First Test ReportController", val id: Int, val builds: List<BuildInfo> = ArrayList())
@@ -53,8 +81,25 @@ class ReportController(val provider: UiProvider, val buildRepo: BuildRepository,
 
     /**
      * Tem que se verificar a chave primaria de projecto pois pode haver com nomes iguais
+     * TODO Show all vulnerabilities and licenses in the project
      */
-    @GetMapping("project/{project-name}/build")
+    @GetMapping("projs/{project-name}")
+    fun getProjectDetail(@PathVariable("project-name") projectName: String,
+                         model: HashMap<String, Any>) : String{
+
+        model["page_title"] = "Project Builds"
+
+        model["project_name"] = projectName
+        model["builds"] = projectRepo.findById(projectName).get().build!!
+
+        return "project"
+    }
+
+    /**
+     * Tem que se verificar a chave primaria de projecto pois pode haver com nomes iguais
+     * TODO Show all vulnerabilities and licenses in the project
+     */
+    @GetMapping("report/{project-name}/build")
     fun getProjectBuilds(@PathVariable("project-name") projectName: String,
                          model: HashMap<String, Any>) : String{
 
@@ -72,7 +117,7 @@ class ReportController(val provider: UiProvider, val buildRepo: BuildRepository,
      * TODO Highlight dependencies that have vulnerabilities, by showing them in a different list than the rest for example
      *
      */
-    @GetMapping("project/{project-name}/build/{timestamp}/detail")
+    @GetMapping("report/project/{project-name}/build/{timestamp}/detail")
     fun getBuildDetail(@PathVariable("project-name") projectName: String,
                        @PathVariable("timestamp") timestamp: String,
                        model: HashMap<String, Any?>) : String
@@ -86,11 +131,20 @@ class ReportController(val provider: UiProvider, val buildRepo: BuildRepository,
         }
 
         val build = buildInfo.get()
+        val project = projectRepo.findById(projectName)
 
+        model["organization"] = project.get().repo?.organization
+        model["repository"] = project.get().repo
         model["project_name"] = projectName
         model["timestamp"] = build.pk.timestamp
         model["tag"] = build.tag
         model["dependencies"] = build.dependency!!
+
+        build.dependency.forEach {
+            if(it.vulnerabilitiesCount == null) {
+                val i = 0
+            }
+        }
 
         return "build-detail"
     }

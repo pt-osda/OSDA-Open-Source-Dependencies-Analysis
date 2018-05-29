@@ -2,13 +2,6 @@
 {{> header}}
 
 <div class="body-container">
-
-    <h2>
-        Projects
-    </h2>
-
-    <br>
-
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">Filter</h5>
@@ -31,16 +24,24 @@
                 </div>
                 <p id="filter-error" class="filter-error"></p>
                 <button type="submit" class="btn btn-primary" onclick="filterHomeScreen()">Submit</button>
-                <button type="submit" class="btn btn-primary" onclick="location.reload(true)">Reset</button>
+                <button type="submit" class="btn btn-primary" onclick="filterHomeScreen('None')">Reset</button>
         </div>
     </div>
 
     <br>
 
     <div id="project-list">
-        {{> project-list-filter}}
-    </div>
+        {{#projects}}
+            <a href="/report/{{project_name}}/build" class="list-group-item list-group-item-action">
+                Name: <b>{{project_name}}</b>
+            </a>
 
+            <br>
+        {{/projects}}
+
+    </div>
 </div>
+
+    </div>
 
 {{> footer}}

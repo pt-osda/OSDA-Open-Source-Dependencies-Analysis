@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
+import java.util.regex.Pattern
 
 @Controller
 @RequestMapping("/report")
@@ -68,12 +69,13 @@ class ReportFilterController(val projectRepo: ProjectRepository,
         val validProjects = ArrayList<Any>()
 
         projects.forEach{
-            if(it.name.contains(projectId)) {
+
+            if(it.name.contains(projectId, true)) {
                 val buildInfos = ArrayList<ReportController.BuildInfo>()
                 val builds = buildRepo.getBuildsFromProject(it.name)
 
                 builds.forEach{
-                    buildInfos.add(ReportController.BuildInfo(it.pk.project.name, it.pk.timestamp, it.tag!!))
+                    buildInfos.add(ReportController.BuildInfo(it.pk.project.name, it.pk.timestamp, it.tag))
                 }
 
                 validProjects.add(ReportController.ProjectInfo(it.name, validProjects.count(), buildInfos))
@@ -90,7 +92,7 @@ class ReportFilterController(val projectRepo: ProjectRepository,
         val validProjects = ArrayList<Any>()
 
         organizations.forEach{
-            if(it.name.contains(organizationId)) {
+            if(it.name.contains(organizationId, true)) {
                 it.repo.forEach {
                     it.project.forEach {
                         val buildInfos = ArrayList<ReportController.BuildInfo>()
@@ -116,7 +118,7 @@ class ReportFilterController(val projectRepo: ProjectRepository,
         val validProjects = ArrayList<Any>()
 
         repositories.forEach {
-            if(it.name.contains(repoId)) {
+            if(it.name.contains(repoId, true)) {
                 it.project.forEach {
                     val buildInfos = ArrayList<ReportController.BuildInfo>()
                     val builds = buildRepo.getBuildsFromProject(it.name)
