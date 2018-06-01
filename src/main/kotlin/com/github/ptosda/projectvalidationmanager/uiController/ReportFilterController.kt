@@ -5,7 +5,7 @@ import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
-import java.util.regex.Pattern
+import com.github.ptosda.projectvalidationmanager.database.entities.Dependency
 
 @Controller
 @RequestMapping("/report")
@@ -15,9 +15,10 @@ class ReportFilterController(val projectRepo: ProjectRepository,
                              val dependencyRepo: DependencyRepository,
                              val vulnerabilityRepo: VulnerabilityRepository,
                              val organizationRepository: OrganizationRepository,
-                             val repoRepository: RepoRepository) {
+                             val repoRepository: RepoRepository,
+                             val depVul: DependencyVulnerabilityRepository) {
 
-    val filterFunctions = hashMapOf<String, (String) -> ArrayList<Any>>(
+    /*val filterFunctions = hashMapOf<String, (String) -> ArrayList<Any>>(
             "None" to {_ -> getNoneFilter()},
             "Project" to {projectId -> getProjectFilter(projectId)},
             "Organization" to {organizationId -> getGroupFilter(organizationId)},
@@ -133,6 +134,6 @@ class ReportFilterController(val projectRepo: ProjectRepository,
         }
 
         return validProjects
-    }
+    }*/
 
 }

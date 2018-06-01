@@ -1,11 +1,16 @@
 {{> header}}
 
 <div class="container-fluid">
+    <a class="btn btn-outline-danger text-left" href="/projs/{{project_id}}/report/{{build_id}}">See the report</a>
 
-    <h3>
-        Dependency Name: {{title}}
+    <h3 class="text-center">
+        {{title}}
     </h3>
+
     <br>
+
+    <br>
+
     Main Version: {{main_version}}
     {{#description}}
         <br>
@@ -15,33 +20,26 @@
     <h4>Licenses:</h4>
     <ul class="list-group">
         {{#license}}
-            <li class="list-group-item">
+            <a class="list-group-item list-group-item-action" href="/licenses/{{pk.license.spdxId}}">
                 License Name: {{pk.license.spdxId}}
                 <br>
                 License Source: {{source}}
-            </li>
+            </a>
         {{/license}}
     </ul>
     <br>
     <h4>Vulnerabilities:</h4>
     <ul class="list-group">
         {{#vulnerabilities}}
-            <li class="list-group-item">
+            <a class="list-group-item list-group-item-action" href="/deps/{{title}}/vulnerability/{{pk.vulnerability.id}}">
                 Vulnerability Title: {{pk.vulnerability.title}}
                 <br>
                 Vulnerability Description: {{pk.vulnerability.description}}
-            </li>
+            </a>
         {{/vulnerabilities}}
     </ul>
     <br>
 
 </div>
-
-<!--#vulnerabilities}}
-                    Vulnerability Title: title}}
-                    <br>
-                    Vulnerability Description: description}}
-                /vulnerabilities}}
-                <br> -->
 
 {{> footer}}

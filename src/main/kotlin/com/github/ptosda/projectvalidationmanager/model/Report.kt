@@ -3,7 +3,7 @@ package com.github.ptosda.projectvalidationmanager.model
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class Report (
-        val id : String,
+        val id : String? = "ID",
         val version : String?,
         val name : String,
         val description : String?,
@@ -18,7 +18,7 @@ data class ReportDependency(
         @JsonProperty("main_version") val mainVersion : String,
         @JsonProperty("private_versions") val privateVersions : ArrayList<String>?,
         val licenses : ArrayList<ReportLicense>,
-        @JsonProperty("vulnerabilities_count") val vulnerabilitiesCount : Int?,
+        @JsonProperty("vulnerabilities_count") val vulnerabilitiesCount : Int,
         val vulnerabilities : ArrayList<ReportVulnerability>,
         val parents : ArrayList<String>?
 )

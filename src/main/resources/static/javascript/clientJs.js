@@ -1,23 +1,19 @@
 'use strict'
 
 
-var errorListId = 'error-list'
-var dependencyListId = 'dependency-list'
-var successListClass = 'list-group-item list-group-item-success'
-var errorListClass = 'list-group-item list-group-item-danger'
+$('#options').on('click', function(event) {
+    console.log("hello");
+    var val = $(this).find('input').val();
+    $('#output').html(val);
+});
 
-function filterVulnerableDependencies(vulnerabilitiesCount, text) {
-    console.log(vulnerabilitiesCount)
 
-    if(vulnerabilitiesCount > 0) {
-        var errorList = document.getElementById(errorListId)
+function filterInformation(type) {
 
-        errorList.innerHTML += text.replace('%s', errorListClass)
-    }
-    else {
-        var dependencyList = document.getElementById(dependencyListId)
-        dependencyList.innerHTML += text.replace('%s', successListClass)
-    }
+    $(type).button('toggle')
+
+    $(filterIds[type]).hidden = false
+
 }
 
 var filterTypeId = 'filterTypeSelect'
@@ -53,6 +49,7 @@ function filterCb (err, data) {
     var projectList = document.getElementById("project-list")
     projectList.innerHTML = data
 }
+
 function httpRequest(method, path, data, cb) {
     var xhr = new XMLHttpRequest()
     xhr.open(method, path, true)
@@ -72,4 +69,26 @@ function httpRequest(method, path, data, cb) {
         }
     }
     xhr.send(data);
+}
+
+window.onload = function() {
+
+    var filterIds = {
+        detail: document.getElementById('detail'),
+        licenses: document.getElementById('licenses'),
+        vulnerabilities: document.getElementById('vulnerabilities')
+    }
+
+    document.querySelectorAll('#option-list')
+        .forEach(function (elem) {
+            elem.addEventListener('click', function () {
+                var filter = filterIds[elem.firstElementChild.getAttribute('name')]
+                filter.hidden = false
+                for (var f in filterIds) {
+                    if (filter.id !== f) {
+                        filterIds[f].hidden = true
+                    }
+                }
+            })
+        })
 }
