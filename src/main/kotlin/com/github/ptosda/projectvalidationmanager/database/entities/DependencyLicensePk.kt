@@ -6,11 +6,9 @@ import javax.persistence.ManyToOne
 
 @Embeddable
 class DependencyLicensePk (
-
         @ManyToOne
         val dependency: Dependency,
 
         @ManyToOne
         val license: License
-
 ) : Serializable

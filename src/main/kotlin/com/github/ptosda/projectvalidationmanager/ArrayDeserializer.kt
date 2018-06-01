@@ -5,8 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonNode
 
-class ArrayDeserealizer : JsonDeserializer<ArrayList<String>>() {
-
+class ArrayDeserializer : JsonDeserializer<ArrayList<String>>() {
     override fun deserialize(jsonParser: JsonParser?, ctxt: DeserializationContext?): ArrayList<String> {
         val objCodec = jsonParser?.codec
 
@@ -19,5 +18,4 @@ class ArrayDeserealizer : JsonDeserializer<ArrayList<String>>() {
 
         return list
     }
-
 }

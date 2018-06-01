@@ -7,7 +7,6 @@ import org.springframework.cache.annotation.EnableCaching
 @EnableCaching
 @SpringBootApplication
 class ProjectValidationManagerApplication
-
     fun main(args: Array<String>) {
         runApplication<ProjectValidationManagerApplication>(*args)
     }

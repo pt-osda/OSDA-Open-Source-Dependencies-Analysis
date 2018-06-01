@@ -6,7 +6,6 @@ import javax.persistence.*
 @Entity
 @Table(name = "build")
 data class Build(
-
         @EmbeddedId
         val pk: BuildPk,
 
@@ -14,5 +13,4 @@ data class Build(
 
         @OneToMany(mappedBy = "pk.build")
         val dependency: Set<Dependency>?
-
 ) : Serializable

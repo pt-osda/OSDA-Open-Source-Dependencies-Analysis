@@ -12,6 +12,6 @@ data class Organization(
         @Id
         val name: String,
 
-        @OneToMany(mappedBy = "name")
-        val repo: List<Repo>
+        @OneToMany(mappedBy = "organization")
+        val repo: List<Repo>?
 ) : Serializable

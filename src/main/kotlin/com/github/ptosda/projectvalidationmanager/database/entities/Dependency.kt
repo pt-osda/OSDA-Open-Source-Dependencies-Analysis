@@ -6,7 +6,6 @@ import javax.persistence.*
 @Entity
 @Table(name = "dependency")
 data class Dependency (
-
         @EmbeddedId
         val pk: DependencyPk,
 
@@ -45,6 +44,9 @@ data class Dependency (
         }
 
         override fun toString(): String {
-                return "id:" + pk.id + "; main_version:" + pk.mainVersion + "; description:" + description + "; vulnerabilitiesCount:" + vulnerabilitiesCount
+                return "id:" + pk.id +
+                        "; main_version:" + pk.mainVersion +
+                        "; description:" + description +
+                        "; vulnerabilitiesCount:" + vulnerabilitiesCount
         }
 }

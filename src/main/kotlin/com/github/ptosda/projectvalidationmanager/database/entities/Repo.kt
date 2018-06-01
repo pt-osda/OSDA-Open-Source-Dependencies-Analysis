@@ -14,7 +14,7 @@ data class Repo(
 
         @ManyToOne
         @JoinColumn(name="organization_name", referencedColumnName = "name")
-        val organization: Organization,
+        val organization: Organization?,
 
         @OneToMany(mappedBy = "repo")
         val project: List<Project>

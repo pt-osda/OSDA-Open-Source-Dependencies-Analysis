@@ -9,11 +9,9 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface BuildRepository : PagingAndSortingRepository<Build, BuildPk> {
-
     @Query(value =  "Select name, tag, timestamp " +
             "FROM build " +
             "WHERE name = :project_name",
             nativeQuery = true)
     fun getBuildsFromProject(@Param("project_name") projectName: String) : List<Build>
-
 }

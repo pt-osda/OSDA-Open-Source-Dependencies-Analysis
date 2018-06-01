@@ -14,7 +14,6 @@ import java.nio.file.Paths
 @Configuration
 @EnableCaching
 class CachingConfig {
-
     init{
         initDependenciesCache()
     }
@@ -40,5 +39,4 @@ class CachingConfig {
 
         fun getDependenciesCache() = cacheManager.getCache(dependenciesCache, String::class.java, DependencyInfo::class.java)
     }
-
 }

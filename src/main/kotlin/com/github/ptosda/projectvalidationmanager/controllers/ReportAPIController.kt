@@ -1,49 +1,161 @@
 package com.github.ptosda.projectvalidationmanager.controllers
 
-import com.github.ptosda.projectvalidationmanager.model.Report
-import com.github.ptosda.projectvalidationmanager.model.ReportDependency
+import com.github.ptosda.projectvalidationmanager.model.report.Report
+import com.github.ptosda.projectvalidationmanager.model.report.ReportDependency
 import com.github.ptosda.projectvalidationmanager.database.entities.*
 import com.github.ptosda.projectvalidationmanager.database.repositories.*
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/report")
-class ReportAPIController(val buildRepository : BuildRepository,
-                       val dependencyLicenseRepository : DependencyLicenseRepository,
-                       val dependencyRepository : DependencyRepository,
-                       val dependencyVulnerabilityRepository : DependencyVulnerabilityRepository,
-                       val licenseRepository : LicenseRepository,
-                       val projectRepository: ProjectRepository,
-                       val vulnerabilityRepository: VulnerabilityRepository){
+class ReportAPIController(
+        val organizationRepository: OrganizationRepository,
+        val repoRepository: RepoRepository,
+        val projectRepository: ProjectRepository,
+        val buildRepository : BuildRepository,
+        val dependencyLicenseRepository : DependencyLicenseRepository,
+        val dependencyRepository : DependencyRepository,
+        val dependencyVulnerabilityRepository : DependencyVulnerabilityRepository,
+        val licenseRepository : LicenseRepository,
+        val vulnerabilityRepository: VulnerabilityRepository){
+
+    val logger : Logger = LoggerFactory.getLogger(ReportAPIController::class.java)
 
     @PostMapping
     fun postReport(@RequestBody report: Report) : ResponseEntity<Any> {
-        val project = storeProject(report.name)
+        logger.info("A new report has been received and will be stored in the database. {}", report.toString())
+
+        var organization : Organization? = null
+        var repo : Repo? = null
+
+        if (report.organization != null) {
+            logger.info("The organization {} will be created.", report.organization)
+            organization = storeOrganization(report.organization)
+        }
+
+        if (report.repo != null && report.repoOwner != null) {
+            logger.info("The repository named {} owned by {} will be created.", report.repo, report.repoOwner)
+            repo = storeRepository(report.repo, report.repoOwner, organization)
+        }
+        logger.info("The project {} will be created.", report.name)
+        val project = storeProject(report.name, repo)
+
+        logger.info("The build created at {} and identified by {} corresponding to this report will be created.", report.timestamp, report.buildTag)
         val build = storeBuild(report.timestamp, report.buildTag, project)
+
+        logger.info("The dependencies of the project will be created.")
         storeDependencies(report.dependencies, build)
 
+        logger.info("The information from the report was successfully stored in the database.")
         return ResponseEntity(HttpStatus.CREATED)
     }
 
-    private fun storeProject(projectName: String) : Project {
-        val project: Project
+    /**
+     * Function to create the organization referenced in the report if it didn't already existed.
+     * @param organizationName The name of the organization to create.
+     * @return The newly created organization or if it already existed the previously created one
+     */
+    private fun storeOrganization(organizationName : String): Organization {
+        val organization : Organization
+        val optionalOrganization = organizationRepository.findById(organizationName)
+        if (!optionalOrganization.isPresent) {
+            logger.info("The organization did not existed so a new one will be created.")
+            organization = Organization(organizationName, emptyList())
+            organizationRepository.save(organization)
+        } else {
+            logger.info("The organization already existed in the database.")
+            organization = optionalOrganization.get()
+        }
+
+        logger.info("All the organization regarded information was stored in the database.")
+        return organization
+    }
+
+    /**
+     * Function responsible for creating the repository referenced in the report if it didn't already existed.
+     * <br>
+     * If the repository already existed and it didn't contain an organization and in the current report a organization
+     * was referred, then that repository will be altered to reference the organization it belongs to.
+     * @param repoName The name of the repository to create.
+     * @param repoOwner The owner of the repository.
+     * @param organization The organization to each the repository belongs to.
+     * @return The newly created report or if it already existed the previously created one
+     */
+    private fun storeRepository(repoName: String, repoOwner: String, organization: Organization?): Repo {
+        var repo : Repo
+        val optionalRepo = repoRepository.findById(repoName)
+        if (!optionalRepo.isPresent) {
+            logger.info("The repository did not existed so a new one will be created")
+            repo = Repo(repoName, repoOwner, organization, emptyList())
+            repoRepository.save(repo)
+        } else {
+            logger.info("The repository already existed in the database.")
+            repo = optionalRepo.get()
+            if (repo.organization == null && organization != null){
+                logger.info("The repository did not belonged to a organization but one was referenced in the report.")
+                repo = Repo(repo.name, repo.owner, organization, repo.project)
+                repoRepository.save(repo)
+            }
+        }
+        logger.info("All the repository regarded information was stored in the database.")
+        return repo
+    }
+
+    /**
+     * Function for creating the project referenced in the report if it didn't already existed.
+     * <br>
+     * If the project already existed and it didn't referenced a repository and one was referenced in the report
+     * then the project will be altered to reflect this change.
+     * @param projectName The name of the project the report belongs to.
+     * @param repo The repo to which the project belongs to.
+     * @return The newly created project or if it already existed the previously created one
+     */
+    private fun storeProject(projectName: String, repo: Repo?) : Project {
+        var project: Project
         if (!projectRepository.findById(projectName).isPresent) {
-            project = Project(projectName, null, listOf())
+            logger.info("The project did not existed so a new one will be created.")
+            project = Project(projectName, repo, listOf())
             projectRepository.save(project)
         } else {
+            logger.info("The project already existed in the database.")
             project = projectRepository.findById(projectName).get()
+
+            if (project.repo == null && repo != null){
+                logger.info("The project did not belonged to a repository but one was referenced in the report.")
+                project = Project(project.name, repo, project.build)
+                projectRepository.save(project)
+            }
         }
+        logger.info("All the project regarded information was stored in the database.")
         return project
     }
 
+    /**
+     * Function to created the new build that originated the report. Since every build occurs at a different time, there
+     * is not the possibility to repeat builds.
+     * @param timestamp The moment in time that the build was completed.
+     * @param tag The tag that identifies the build.
+     * @param project The project in which this build occurred.
+     * @return The newly created build.
+     */
     private fun storeBuild(timestamp: String, tag: String?, project: Project): Build {
         val build = Build(BuildPk(timestamp, project), tag, setOf())
         buildRepository.save(build)
+        logger.info("All the build regarded information was stored in the database")
         return build
     }
 
+    /**
+     * Function to create all the dependencies referenced in the report including their licenses and vulnerabilities.
+     * Every dependency will be stored in the database as their are specific to each build.
+     * @param dependencies The list of the dependencies referenced in the report that belong to the project the build
+     * executed to.
+     * @param build The build this dependencies belong to.
+     */
     private fun storeDependencies(dependencies: ArrayList<ReportDependency>, build: Build) {
         dependencies.forEach {
             val dependency = Dependency(
@@ -57,45 +169,74 @@ class ReportAPIController(val buildRepository : BuildRepository,
                     arrayListOf()
             )
             dependencyRepository.save(dependency)
+            logger.info("All the dependency regarded information was stored in the database.")
 
-            val licenses = arrayListOf<DependencyLicense>()
-            it.licenses.forEach {
-                val license: License
-                if (!licenseRepository.findById(it.spdxId).isPresent) {
-                    license = License(it.spdxId, null, listOf())
-                    licenseRepository.save(license)
-                } else {
-                    license = licenseRepository.findById(it.spdxId).get()
-                }
-                licenses.add(DependencyLicense(
-                        DependencyLicensePk(dependency, license),
-                        it.source
-                ))
-            }
-            dependencyLicenseRepository.saveAll(licenses)
+            storeDependencyLicenses(it, dependency)
+            logger.info("All the dependency license regarded information was stored in the database.")
 
-            val vulnerabilities = arrayListOf<DependencyVulnerability>()
-            it.vulnerabilities.forEach {
-                val vulnerability: Vulnerability
-                if (!vulnerabilityRepository.findById(it.id).isPresent) {
-                    vulnerability = Vulnerability(
-                            it.id,
-                            it.title,
-                            it.description,
-                            it.references,
-                            setOf()
-                    )
-                    vulnerabilityRepository.save(vulnerability)
-                } else {
-                    vulnerability = vulnerabilityRepository.findById(it.id).get()
-                }
-                vulnerabilities.add(DependencyVulnerability(
-                        DependencyVulnerabilityPk(dependency, vulnerability),
-                        it.versions.joinToString(separator = ";")
-                ))
-            }
-            dependencyVulnerabilityRepository.saveAll(vulnerabilities)
+            storeDependencyVulnerability(it, dependency)
+            logger.info("All the dependency vulnerability regarded information was stored in the database.")
         }
     }
 
+    /**
+     * Function to create the licenses referenced by the dependency of a project if it didn't already existed.
+     * <br>
+     * Since the same license can be used for different dependencies there is only one entry for each license. So the
+     * license is only created if it does not exist.
+     * @param reportDependency The dependency in the report that contains the licenses from the report
+     * @param dependency The dependency that will receive its licenses.
+     */
+    private fun storeDependencyLicenses(reportDependency: ReportDependency, dependency: Dependency) {
+        val licenses = arrayListOf<DependencyLicense>()
+        reportDependency.licenses.forEach {
+            val license: License
+            if (!licenseRepository.findById(it.spdxId).isPresent) {
+                logger.info("The license did not existed so a new one will be created.")
+                license = License(it.spdxId, null, listOf())    // TODO use errorInfo
+                licenseRepository.save(license)
+            } else {
+                logger.info("The license already existed in the database.")
+                license = licenseRepository.findById(it.spdxId).get()
+            }
+            licenses.add(DependencyLicense(
+                    DependencyLicensePk(dependency, license),
+                    it.source
+            ))
+        }
+        dependencyLicenseRepository.saveAll(licenses)
+    }
+
+    /**
+     * Function to create the vulnerabilities of a dependency of a project if it didn't already existed.
+     * <br>
+     * In case the vulnerability already exists there will not be changed anything.
+     * @param reportDependency The dependency in the report that contains the vulnerabilities.
+     * @param dependency The dependency that will have its vulnerabilities altered.
+     */
+    private fun storeDependencyVulnerability(reportDependency: ReportDependency, dependency: Dependency) {
+        val vulnerabilities = arrayListOf<DependencyVulnerability>()
+        reportDependency.vulnerabilities.forEach {
+            val vulnerability: Vulnerability
+            if (!vulnerabilityRepository.findById(it.id).isPresent) {
+                logger.info("The vulnerability did not existed so a new one will be created.")
+                vulnerability = Vulnerability(
+                        it.id,
+                        it.title,
+                        it.description,
+                        it.references,
+                        setOf()
+                )
+                vulnerabilityRepository.save(vulnerability)
+            } else {
+                logger.info("The vulnerability already existed in the database.")
+                vulnerability = vulnerabilityRepository.findById(it.id).get()   // TODO check if this is needed since a vulnerability is specific to a depenedency
+            }
+            vulnerabilities.add(DependencyVulnerability(
+                    DependencyVulnerabilityPk(dependency, vulnerability),
+                    it.versions.joinToString(separator = ";")
+            ))
+        }
+        dependencyVulnerabilityRepository.saveAll(vulnerabilities)
+    }
 }

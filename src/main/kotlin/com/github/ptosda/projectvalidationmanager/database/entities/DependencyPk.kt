@@ -5,7 +5,6 @@ import javax.persistence.*
 
 @Embeddable
 class DependencyPk (
-
         val id: String,
 
         @ManyToOne
@@ -16,5 +15,4 @@ class DependencyPk (
         val build : Build,
 
         val mainVersion: String
-
 ) : Serializable

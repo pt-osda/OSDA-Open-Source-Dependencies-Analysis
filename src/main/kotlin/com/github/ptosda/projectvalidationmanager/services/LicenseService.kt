@@ -1,14 +1,18 @@
 package com.github.ptosda.projectvalidationmanager.services
 
 import com.github.ptosda.projectvalidationmanager.model.LicenseModel
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import kotlin.math.log
 
 @Service
 class LicenseService {
+    val logger : Logger = LoggerFactory.getLogger(LicenseService::class.java)
     val licensesName : List<String> = listOf(
             "Apache-1.1",
             "Apache-2.0",
@@ -26,7 +30,8 @@ class LicenseService {
             "MIT",
             "MPL-1.1",
             "MPL-2.0",
-            "MICROSOFT SOFTWARE LICENSE")
+            "MICROSOFT SOFTWARE LICENSE"
+    )
 
     val licensesRelatedWords : HashMap<String, String> = hashMapOf(
             Pair("http://www.apache.org/licenses/LICENSE-1.1" , "Apache-1.1"),
@@ -65,7 +70,16 @@ class LicenseService {
             Pair("Mozilla Public License, Version 2.0", "MPL-2.0")
     )
 
+    /**
+     * Will attempt to search for the license of dependencies through an url.
+     * @param id The name of the dependency to search for its license.
+     * @param version The version of the dependency that will have its license searched for.
+     * @param licenseUrl The url where the license will be searched for.
+     * @return All licenses found for the dependency
+     */
     fun findLicense(id: String, version: String, licenseUrl: String): ArrayList<LicenseModel> {
+        logger.info("The license information of {} will be searched for.", id)
+
         val url = URL(licenseUrl)
         val connection = url.openConnection() as HttpURLConnection
         val licenses = arrayListOf<LicenseModel>()
@@ -74,9 +88,11 @@ class LicenseService {
 
         val statusCode = connection.responseCode
         if(statusCode != 200) {
-            throw Exception("Error fetching license") //TODO Make custom exception to use with problem+json
+            logger.warn("The licenses for the dependency was not found.")
+            throw Exception("Error fetching licenses") //TODO Make custom exception to use with problem+json
         }
 
+        logger.info("The licenses of the dependency were found.")
         val input = BufferedReader(InputStreamReader(connection.inputStream))
         val content = StringBuffer()
         while (true) {
@@ -87,33 +103,44 @@ class LicenseService {
         connection.disconnect()
 
         val licenseName = findLicenseNameInFile(content.toString()) ?:
-                            findLicenseUrlInFile(content.toString())
+        findLicenseUrlInFile(content.toString())
         licenseName?.let{
             licenses.add(LicenseModel(licenseName, "Found license in $licenseUrl"))
         }
 
+        logger.info("The license information found was successfully obtained and its information prepared for a response.")
         return licenses
     }
 
+    /**
+     * Attempts to find in the file a url that identifies the license.
+     * @param licenseContent The content of the file to search for.
+     * @return A license found through the url or null if one was not found
+     */
     private fun findLicenseUrlInFile(licenseContent: String): String? {
-        for (url in licensesRelatedWords.keys)
-        {
-            if (licenseContent.contains(url, true))
-            {
+        for (url in licensesRelatedWords.keys) {
+            if (licenseContent.contains(url, true)) {
+                logger.info("A url that identifies the license was successfully found.")
                 return licensesRelatedWords[url]
             }
         }
+        logger.info("The file did not contained a url that identified the license.")
         return null
     }
 
+    /**
+     * Attempts to find in the file a word that identifies the license.
+     * @param licenseContent The content of the file to search for.
+     * @return A license found through a word or null if one was not found
+     */
     private fun findLicenseNameInFile(licenseContent: String): String? {
-        for (name in licensesName)
-        {
-            if (licenseContent.contains(name))
-            {
+        for (name in licensesName) {
+            if (licenseContent.contains(name)) {
+                logger.info("A word that identifies the license was successfully found.")
                 return name
             }
         }
+        logger.info("The file did not contained a word that identified the license.")
         return null
     }
 }
