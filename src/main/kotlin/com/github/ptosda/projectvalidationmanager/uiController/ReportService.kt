@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service
 @Service
 class ReportService
 {
-    fun getBuildDependencies(build: Build): Map<String, Any?> {
-        val vulnerable = arrayListOf<Dependency>()
-        val notVulnerable = arrayListOf<Dependency>()
+    fun getBuildDependencies(build: Build): Map<String, List<Any>> {
+        val vulnerable = arrayListOf<Any>()
+        val notVulnerable = arrayListOf<Any>()
 
         build.dependency?.forEach {
             if(it.vulnerabilitiesCount == 0) {
@@ -33,7 +33,7 @@ class ReportService
         return licenses
     }
 
-    fun getDependencyVulnerabilities(dependencies: Set<Dependency>?): ArrayList<Any> {
+    fun getDependencyVulnerabilities(dependencies: List<Dependency>?): ArrayList<Any> {
         val vulnerabilities = ArrayList<Any>()
 
         dependencies?.forEach {

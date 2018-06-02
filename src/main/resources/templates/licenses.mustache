@@ -1,0 +1,12 @@
+<ul class="list-group">
+    {{#licenses}}
+        <a class="list-group-item list-group-item-action" href="/licenses/{{pk.license.spdxId}}">
+            License Name: {{pk.license.spdxId}}
+            <br>
+            Dependency: {{pk.dependency.pk.id}}
+            <br>
+            Source: {{source}}
+        </a>
+        <br>
+    {{/licenses}}
+</ul>

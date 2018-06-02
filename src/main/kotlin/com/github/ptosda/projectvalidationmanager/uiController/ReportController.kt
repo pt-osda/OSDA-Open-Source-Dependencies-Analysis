@@ -13,7 +13,6 @@ import kotlin.collections.set
 class ReportController(val reportService: ReportService,
                        val buildRepo: BuildRepository,
                        val projectRepo: ProjectRepository,
-                       val dependencyVulnerabilityRepo: DependencyVulnerabilityRepository,
                        val dependencyRepo: DependencyRepository,
                        val vulnerabilityRepo: VulnerabilityRepository,
                        val licenseRepo: LicenseRepository) {
@@ -34,6 +33,32 @@ class ReportController(val reportService: ReportService,
     }
 
     /**
+     * Get the details of a dependency ( Dependencies, Licenses and Vulnerabilities )
+     */
+    @GetMapping("deps")
+    fun getDependencies(model: HashMap<String, Any?>) : String
+    {
+        model["page_title"] = "Dependencies"
+
+        model["dependencies"] = dependencyRepo.findAll()
+
+        return "dependency-list"
+    }
+
+    /**
+     * Get the details of a dependency ( Dependencies, Licenses and Vulnerabilities )
+     */
+    @GetMapping("licenses")
+    fun getLicenses(model: HashMap<String, Any?>) : String
+    {
+        model["page_title"] = "Licenses"
+
+        model["licenses"] = licenseRepo.findAll()
+
+        return "license-list"
+    }
+
+    /**
      * Tem que se verificar a chave primaria de projecto pois pode haver com nomes iguais
      */
     @GetMapping("projs/{project-name}")
@@ -44,7 +69,7 @@ class ReportController(val reportService: ReportService,
 
         val builds = projectRepo.findById(projectName).get().build!!
 
-        model["project_name"] = projectName
+        model["project_id"] = projectName
         model["builds"] = builds
 
         val licenses = ArrayList<Any>()
@@ -52,17 +77,14 @@ class ReportController(val reportService: ReportService,
 
         builds.forEach{
             licenses.addAll(reportService.getBuildLicenses(it))
-            vulnerabilities.addAll(reportService.getDependencyVulnerabilities(it.dependency))
+            vulnerabilities.addAll(reportService.getDependencyVulnerabilities(it.dependency!!.toList()))
         }
-
-        model["licenses"] = licenses
-        model["vulnerabilities"] = vulnerabilities
 
         return "project"
     }
 
     @GetMapping("projs/{project-id}/report/{build-id}")
-    fun getBuildDetail(@PathVariable("project-id") projectId: String,
+    fun getBuild(@PathVariable("project-id") projectId: String,
                  @PathVariable("build-id") buildId: String,
                  model: HashMap<String, Any?>) : String
     {
@@ -83,20 +105,17 @@ class ReportController(val reportService: ReportService,
 
         model.putAll(reportService.getBuildDependencies(build))
 
-        model["licenses"] = reportService.getBuildLicenses(build)
-        model["vulnerabilities"] = reportService.getDependencyVulnerabilities(build.dependency)
-
-        return "build-detail"
+        return "build"
     }
 
     /**
      * Get the details of a dependency ( Dependencies, Licenses and Vulnerabilities )
      */
-    @GetMapping("projs/{project-id}/report/{build-id}/deps/{dependency_id}/version/{dependency_version}")
+    @GetMapping("projs/{project-id}/report/{build-id}/deps/{dependency-id}/version/{dependency-version}")
     fun getDependencyDetail(@PathVariable("project-id") projectId: String,
                             @PathVariable("build-id") buildId: String,
-                            @PathVariable("dependency_id") dependencyId: String,
-                            @PathVariable("dependency_version") version: String,
+                            @PathVariable("dependency-id") dependencyId: String,
+                            @PathVariable("dependency-version") version: String,
                             model: HashMap<String, Any?>) : String
     {
         model["page_title"] = "Dependency Detail"
@@ -111,35 +130,6 @@ class ReportController(val reportService: ReportService,
 
         model["project_id"] = projectId
         model["build_id"] = buildId
-
-        model["title"] = dependency.pk.id
-        model["main_version"] = dependency.pk.mainVersion
-        model["description"] = dependency.description
-        model["license"] = dependency.license
-        model["vulnerabilities"] = dependency.vulnerabilities
-
-        return "dependency-detail"
-    }
-
-    /**
-     * Get the details of a dependency ( Dependencies, Licenses and Vulnerabilities )
-     */
-    @GetMapping("licenses")
-    fun getLicenses(@PathVariable("project-id") projectId: String,
-                            @PathVariable("build-id") buildId: String,
-                            @PathVariable("dependency_id") dependencyId: String,
-                            @PathVariable("dependency_version") version: String,
-                            model: HashMap<String, Any?>) : String
-    {
-        model["page_title"] = "Dependency Detail"
-
-        val dependencyInfo = dependencyRepo.findById(DependencyPk(dependencyId, Build(BuildPk(buildId, Project(projectId, null, null)), null, null), version))
-
-        if(!dependencyInfo.isPresent) {
-            throw Exception("Dependency not found")
-        }
-
-        val dependency = dependencyInfo.get()
 
         model["title"] = dependency.pk.id
         model["main_version"] = dependency.pk.mainVersion
@@ -191,10 +181,7 @@ class ReportController(val reportService: ReportService,
         }
         val vulnerability = vulnerabilityInfo.get()
 
-        //model["project_id"] = dependency.pk.build.pk.project.name
-        //model["build_id"] = dependency.pk.build.pk.timestamp
         model["dependency_id"] = dependencyId
-        //model["dependency_mainVersion"] = dependency.pk.mainVersion
 
         model["vulnerability"] = vulnerability
 

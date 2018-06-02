@@ -1,0 +1,27 @@
+
+{{> header}}
+
+<h2 class="text-center">
+    Dependencies
+</h2>
+
+<br>
+
+<div class="body-container">
+
+    <ul class="list-group" id="dependency-list">
+        {{#dependencies}}
+            <a href="/projs/{{pk.build.pk.project.name}}/report/{{pk.build.pk.timestamp}}/deps/{{pk.id}}/version/{{pk.mainVersion}}" class="list-group-item list-group-item-action">
+                Name: {{pk.id}}
+                <br>
+                Main Version: {{pk.mainVersion}}
+                <br>
+                {{vulnerabilitiesCount}} vulnerabilities found
+            </a>
+            <br>
+        {{/dependencies}}
+    </ul>
+
+</div>
+
+{{> footer}}

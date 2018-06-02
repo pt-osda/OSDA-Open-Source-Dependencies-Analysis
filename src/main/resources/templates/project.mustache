@@ -6,7 +6,7 @@
 <div class="container-fluid">
 
     <h2 class="text-center">
-        {{project_name}}
+        {{project_id}}
     </h2>
 
     <a class="btn btn-outline-danger text-left" href="/">See all projects</a>
@@ -15,103 +15,23 @@
 
     <div class="btn-group-toggle text-center" data-toggle="buttons">
         <label class="btn btn-outline-dark text-center active" id="option-list">
-            <input type="radio" name="detail" autocomplete="off" checked> Detail
+            <input type="radio" name="projs/{{project_id}}/filter/detail" autocomplete="off" checked> Detail
         </label>
         <label class="btn btn-outline-dark text-center" id="option-list">
-            <input type="radio" name="licenses" autocomplete="off"> Licenses
+            <input type="radio" name="projs/{{project_id}}/filter/licenses" autocomplete="off"> Licenses
         </label>
         <label class="btn btn-outline-dark text-center" id="option-list">
-            <input type="radio" name="vulnerabilities" autocomplete="off"> Vulnerabilities
+            <input type="radio" name="projs/{{project_id}}/filter/vulnerabilities" autocomplete="off"> Vulnerabilities
         </label>
     </div>
 
     <br>
 
-    <div class="btn-group">
-        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Filter
-        </button>
-        <div class="dropdown-menu btn-group-toggle" aria-labelledby="dropdownMenuButton">
-            <button class="dropdown-item active" >None</button>
-            <button class="dropdown-item">Builds with vulnerable dependencies</button>
-            <button class="dropdown-item">Builds with invalid licenses</button>
-        </div>
-    </div>
+    <div class="container-fluid" id="show-information">
 
-    <br>
-
-    <div class="container-fluid">
-
-        {{#repository}}
-            Associated to {{repository.name}} repository
-            {{#organization}}
-                in {{organization.name}}
-            {{/organization}}
-        {{/repository}}
-
-        <br>
-
-        <h4>
-            Reports
-        </h4>
-
-        <ul class="list-group" id="detail">
-            <br>
-            {{#builds}}
-                <a href="/projs/{{project_name}}/report/{{pk.timestamp}}" class="list-group-item list-group-item-action">
-                        Timestamp: {{pk.timestamp}}
-                        <br>
-                        {{#tag}}
-                            Tag: {{tag}}
-                            <br>
-                        {{/tag}}
-                </a>
-            {{/builds}}
-            <br>
-        </ul>
-
-        <div id="licenses" hidden>
-            <ul class="list-group" id="dependency-list">
-                {{#licenses}}
-                    <a class="list-group-item list-group-item-action" href="/licenses/{{pk.license.spdxId}}">
-                        License Name: {{pk.license.spdxId}}
-                        <br>
-                        Dependency: {{pk.dependency.pk.id}}
-                        <br>
-                        Source: {{source}}
-                    </a>
-                    <br>
-                {{/licenses}}
-            </ul>
-        </div>
-
-        <div id="vulnerabilities" hidden>
-            <ul class="list-group">
-                {{#vulnerabilities}}
-                    <a class="list-group-item list-group-item-action" href="/dependency/{{pk.dependency.pk.id}}/license/{{pk.vulnerability.id}}">
-                        Vulnerability Title: {{pk.vulnerability.title}}
-                        <br>
-                        Description: {{pk.vulnerability.description}}
-                        <br>
-                        Dependency: {{pk.dependency.pk.id}}
-                        <br>
-                        Version Criteria: {{versionCriteria}}
-                        <br>
-                        References
-                        <ul class="list-group">
-                            {{#pk.vulnerability.info}}
-                                <a class="list-group-item list-group-item-action" href="{{.}}">{{.}}</a>
-                                <br>
-                            {{/pk.vulnerability.info}}
-                        </ul>
-                    </a>
-                    <br>
-                {{/vulnerabilities}}
-            </ul>
-        </div>
+        {{> project-detail}}
 
     </div>
-
 
 </div>
 

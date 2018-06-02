@@ -1,0 +1,45 @@
+
+<div class="btn-group">
+    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Filter
+    </button>
+    <div class="dropdown-menu btn-group-toggle" aria-labelledby="dropdownMenuButton">
+        <button class="dropdown-item active" >None</button>
+        <button class="dropdown-item">Builds with vulnerable dependencies</button>
+        <button class="dropdown-item">Builds with invalid licenses</button>
+    </div>
+</div>
+
+<br>
+
+<div class="container-fluid">
+
+    {{#repository}}
+        Associated to {{repository.name}} repository
+        {{#organization}}
+            in {{organization.name}}
+        {{/organization}}
+    {{/repository}}
+
+    <br>
+
+    <h4>
+        Reports
+    </h4>
+
+    <ul class="list-group">
+        <br>
+        {{#builds}}
+            <a href="/projs/{{project_id}}/report/{{pk.timestamp}}" class="list-group-item list-group-item-action">
+                Timestamp: {{pk.timestamp}}
+                <br>
+                {{#tag}}
+                    Tag: {{tag}}
+                    <br>
+                {{/tag}}
+            </a>
+        {{/builds}}
+        <br>
+    </ul>
+
+</div>

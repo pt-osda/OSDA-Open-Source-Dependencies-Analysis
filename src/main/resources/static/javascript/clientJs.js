@@ -71,24 +71,26 @@ function httpRequest(method, path, data, cb) {
     xhr.send(data);
 }
 
+var projectName
+
+function storeProjectId(projectId) {
+    projectName = projectId
+}
+
 window.onload = function() {
 
-    var filterIds = {
-        detail: document.getElementById('detail'),
-        licenses: document.getElementById('licenses'),
-        vulnerabilities: document.getElementById('vulnerabilities')
-    }
+
+
+    var informationToShow = document.getElementById('show-information')
 
     document.querySelectorAll('#option-list')
         .forEach(function (elem) {
             elem.addEventListener('click', function () {
-                var filter = filterIds[elem.firstElementChild.getAttribute('name')]
-                filter.hidden = false
-                for (var f in filterIds) {
-                    if (filter.id !== f) {
-                        filterIds[f].hidden = true
-                    }
-                }
+                var filter = elem.firstElementChild.getAttribute('name')
+
+                httpRequest('GET', 'http://localhost:8080/' + filter, null, function(err, data) {
+                    informationToShow.innerHTML = data
+                })
             })
         })
 }

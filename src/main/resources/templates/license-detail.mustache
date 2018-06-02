@@ -1,12 +1,27 @@
 
 {{> header}}
 
-    <h2 class="text-center">
-        {{license_id}}
-    </h2>
+<h2 class="text-center">
+    License {{license_id}}
+</h2>
+
+<br>
+
+<div class="container-fluid">
+
+    Used by:
 
     <ul class="list-group">
-
+        {{#dependencies}}
+            <a class="list-group-item list-group-item-action" href="/projs/{{pk.dependency.pk.build.pk.project.name}}/report/{{pk.dependency.pk.build.pk.timestamp}}/deps/{{pk.dependency.pk.id}}/version/{{pk.dependency.pk.mainVersion}}">
+                Dependency Name: {{pk.dependency.pk.id}}
+                <br>
+                Source: {{source}}
+            </a>
+            <br>
+        {{/dependencies}}
     </ul>
+
+</div>
 
 {{> footer}}

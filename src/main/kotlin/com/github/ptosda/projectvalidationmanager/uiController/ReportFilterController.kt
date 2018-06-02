@@ -1,139 +1,59 @@
 package com.github.ptosda.projectvalidationmanager.uiController
 
-import com.github.ptosda.projectvalidationmanager.database.repositories.*
+import com.github.ptosda.projectvalidationmanager.database.entities.Project
+import com.github.ptosda.projectvalidationmanager.database.repositories.ProjectRepository
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
-import com.github.ptosda.projectvalidationmanager.database.entities.Dependency
 
 @Controller
-@RequestMapping("/report")
-class ReportFilterController(val projectRepo: ProjectRepository,
-                             val buildRepo: BuildRepository,
-                             val dependencyVulnerabilityRepo: DependencyVulnerabilityRepository,
-                             val dependencyRepo: DependencyRepository,
-                             val vulnerabilityRepo: VulnerabilityRepository,
-                             val organizationRepository: OrganizationRepository,
-                             val repoRepository: RepoRepository,
-                             val depVul: DependencyVulnerabilityRepository) {
+@RequestMapping("/")
+class ReportFilterController(val reportFilterService: ReportFilterService,
+                             val projectRepo: ProjectRepository) {
 
-    /*val filterFunctions = hashMapOf<String, (String) -> ArrayList<Any>>(
-            "None" to {_ -> getNoneFilter()},
-            "Project" to {projectId -> getProjectFilter(projectId)},
-            "Organization" to {organizationId -> getGroupFilter(organizationId)},
-            "Repo" to {repositoryId -> getRepoFilter(repositoryId)}
-
+    val projectFilterFunctions = hashMapOf<String, (Project) -> HashMap<String, Any?>>(
+            "detail" to { project -> reportFilterService.getProjectDetailView(project) },
+            "licenses" to { project -> reportFilterService.getProjectLicensesView(project) },
+            "vulnerabilities" to { project -> reportFilterService.getProjectVulnerabilitiesView(project) }
     )
 
-    @GetMapping("/filter/{type}/{text}")
-    fun filter(@PathVariable("type") filterType: String,
-               @PathVariable("text") filterText: String,
-               model: HashMap<String, Any>) : String
+    val buildFilterFunctions = hashMapOf<String, (String, String) -> HashMap<String, Any?>>(
+            "detail" to { projectId, buildId -> reportFilterService.getBuildDetailView(projectId, buildId) },
+            "licenses" to { projectId, buildId -> reportFilterService.getBuildLicensesView(projectId, buildId) },
+            "vulnerabilities" to { projectId, buildId -> reportFilterService.getBuildVulnerabilitiesView(projectId, buildId) }
+    )
+
+    @GetMapping("projs/{project-id}/filter/{filter-type}")
+    fun filterProject(@PathVariable("project-id") projectId: String,
+               @PathVariable("filter-type") filterType: String,
+               model: HashMap<String, Any?>) : String
     {
 
-        model["projects"] = filterFunctions[filterType]!!.invoke(filterText)
+        val projectInfo = projectRepo.findById(projectId)
 
-        return "project-list-filter"
-    }
-
-    data class ProjectInfo(val project_name: String = "First Test ReportController", val id: Int, val builds: List<BuildInfo> = ArrayList())
-
-    data class BuildInfo(val project_name: String,
-                         val timestamp: String,
-                         val tag: String,
-                         val dependencies: ArrayList<Dependency>
-    )
-
-    fun getNoneFilter() : ArrayList<Any> {
-        val projects = projectRepo.findAll()
-
-        val validProjects = ArrayList<Any>()
-
-        projects.forEach{
-            val buildInfos = ArrayList<ReportController.BuildInfo>()
-            val builds = buildRepo.getBuildsFromProject(it.name)
-
-            builds.forEach{
-                buildInfos.add(ReportController.BuildInfo(it.pk.project.name, it.pk.timestamp, it.tag!!))
-            }
-
-            validProjects.add(ReportController.ProjectInfo(it.name, validProjects.count(), buildInfos))
+        if(!projectInfo.isPresent) {
+            throw Exception("Project doesn't exist")
         }
 
-        return validProjects
+        val project = projectInfo.get()
+
+
+        model.putAll(projectFilterFunctions[filterType]!!.invoke(project))
+
+        return model["view_name"].toString()
     }
 
-    fun getProjectFilter(projectId: String) : ArrayList<Any>{
-        val projects = projectRepo.findAll()
+    @GetMapping("projs/{project-id}/report/{build-id}/filter/{filter-type}")
+    fun filterBuild(@PathVariable("project-id") projectId: String,
+               @PathVariable("build-id") buildId: String,
+               @PathVariable("filter-type") filterType: String,
+               model: HashMap<String, Any?>) : String
+    {
 
-        val validProjects = ArrayList<Any>()
+        model.putAll(buildFilterFunctions[filterType]!!.invoke(projectId, buildId))
 
-        projects.forEach{
-
-            if(it.name.contains(projectId, true)) {
-                val buildInfos = ArrayList<ReportController.BuildInfo>()
-                val builds = buildRepo.getBuildsFromProject(it.name)
-
-                builds.forEach{
-                    buildInfos.add(ReportController.BuildInfo(it.pk.project.name, it.pk.timestamp, it.tag))
-                }
-
-                validProjects.add(ReportController.ProjectInfo(it.name, validProjects.count(), buildInfos))
-            }
-        }
-
-        return validProjects
+        return model["view_name"].toString()
     }
-
-    fun getGroupFilter(organizationId: String) : ArrayList<Any> {
-
-        val organizations = organizationRepository.findAll()
-
-        val validProjects = ArrayList<Any>()
-
-        organizations.forEach{
-            if(it.name.contains(organizationId, true)) {
-                it.repo.forEach {
-                    it.project.forEach {
-                        val buildInfos = ArrayList<ReportController.BuildInfo>()
-                        val builds = buildRepo.getBuildsFromProject(it.name)
-
-                        builds.forEach {
-                            buildInfos.add(ReportController.BuildInfo(it.pk.project.name, it.pk.timestamp, it.tag!!))
-                        }
-
-                        validProjects.add(ReportController.ProjectInfo(it.name, validProjects.count(), buildInfos))
-                    }
-                }
-            }
-        }
-
-        return validProjects
-    }
-
-    fun getRepoFilter(repoId: String) : ArrayList<Any> {
-
-        val repositories = repoRepository.findAll()
-
-        val validProjects = ArrayList<Any>()
-
-        repositories.forEach {
-            if(it.name.contains(repoId, true)) {
-                it.project.forEach {
-                    val buildInfos = ArrayList<ReportController.BuildInfo>()
-                    val builds = buildRepo.getBuildsFromProject(it.name)
-
-                    builds.forEach {
-                        buildInfos.add(ReportController.BuildInfo(it.pk.project.name, it.pk.timestamp, it.tag!!))
-                    }
-
-                    validProjects.add(ReportController.ProjectInfo(it.name, validProjects.count(), buildInfos))
-                }
-            }
-        }
-
-        return validProjects
-    }*/
 
 }
