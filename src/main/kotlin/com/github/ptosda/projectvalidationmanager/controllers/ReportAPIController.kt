@@ -16,7 +16,7 @@ class ReportAPIController(
         val organizationRepository: OrganizationRepository,
         val repoRepository: RepoRepository,
         val projectRepository: ProjectRepository,
-        val buildRepository : BuildRepository,
+        val reportRepository : ReportRepository,
         val dependencyLicenseRepository : DependencyLicenseRepository,
         val dependencyRepository : DependencyRepository,
         val dependencyVulnerabilityRepository : DependencyVulnerabilityRepository,
@@ -44,7 +44,7 @@ class ReportAPIController(
         logger.info("The project {} will be created.", report.name)
         val project = storeProject(report.name, repo)
 
-        logger.info("The build created at {} and identified by {} corresponding to this report will be created.", report.timestamp, report.buildTag)
+        logger.info("The report created at {} and identified by {} corresponding to this report will be created.", report.timestamp, report.buildTag)
         val build = storeBuild(report.timestamp, report.buildTag, project)
 
         logger.info("The dependencies of the project will be created.")
@@ -126,7 +126,7 @@ class ReportAPIController(
 
             if (project.repo == null && repo != null){
                 logger.info("The project did not belonged to a repository but one was referenced in the report.")
-                project = Project(project.name, repo, project.build)
+                project = Project(project.name, repo, project.report)
                 projectRepository.save(project)
             }
         }
@@ -135,31 +135,31 @@ class ReportAPIController(
     }
 
     /**
-     * Function to created the new build that originated the report. Since every build occurs at a different time, there
+     * Function to created the new report that originated the report. Since every report occurs at a different time, there
      * is not the possibility to repeat builds.
-     * @param timestamp The moment in time that the build was completed.
-     * @param tag The tag that identifies the build.
-     * @param project The project in which this build occurred.
-     * @return The newly created build.
+     * @param timestamp The moment in time that the report was completed.
+     * @param tag The tag that identifies the report.
+     * @param project The project in which this report occurred.
+     * @return The newly created report.
      */
-    private fun storeBuild(timestamp: String, tag: String?, project: Project): Build {
-        val build = Build(BuildPk(timestamp, project), tag, setOf())
-        buildRepository.save(build)
-        logger.info("All the build regarded information was stored in the database")
+    private fun storeBuild(timestamp: String, tag: String?, project: Project): com.github.ptosda.projectvalidationmanager.database.entities.Report {
+        val build = Report(ReportPk(timestamp, project), tag, setOf())
+        reportRepository.save(build)
+        logger.info("All the report regarded information was stored in the database")
         return build
     }
 
     /**
      * Function to create all the dependencies referenced in the report including their licenses and vulnerabilities.
-     * Every dependency will be stored in the database as their are specific to each build.
-     * @param dependencies The list of the dependencies referenced in the report that belong to the project the build
+     * Every dependency will be stored in the database as their are specific to each report.
+     * @param dependencies The list of the dependencies referenced in the report that belong to the project the report
      * executed to.
-     * @param build The build this dependencies belong to.
+     * @param report The report this dependencies belong to.
      */
-    private fun storeDependencies(dependencies: ArrayList<ReportDependency>, build: Build) {
+    private fun storeDependencies(dependencies: ArrayList<ReportDependency>, report: com.github.ptosda.projectvalidationmanager.database.entities.Report) {
         dependencies.forEach {
             val dependency = Dependency(
-                    DependencyPk(it.title, build, it.mainVersion),
+                    DependencyPk(it.title, report, it.mainVersion),
                     it.description,
                     it.vulnerabilitiesCount,
                     //it.privateVersions,

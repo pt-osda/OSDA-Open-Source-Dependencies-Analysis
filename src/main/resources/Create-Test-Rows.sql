@@ -1,6 +1,6 @@
 INSERT INTO project(name) VALUES ('First Project');
 
-INSERT INTO build(name, timestamp, tag) VALUES ('First Project', '2018-01-01T20:00:00+00:00', 'First Tag') , ('First Project', '2018-01-02T20:00:00+00:00', 'Second Tag');
+INSERT INTO report(name, timestamp, tag) VALUES ('First Project', '2018-01-01T20:00:00+00:00', 'First Tag') , ('First Project', '2018-01-02T20:00:00+00:00', 'Second Tag');
 
 INSERT INTO dependency(main_version, id, vulnerabilities_count, description, timestamp, project) VALUES ('1.0.0', 'lodash', 1, 'Lodash modular utilities.','2018-01-01T20:00:00+00:00', 'First Project');
 INSERT INTO dependency(main_version, id, vulnerabilities_count, description, timestamp, project) VALUES ('2.3.3', 'mocha', 0, 'A simple, flexible, fun test framework','2018-01-01T20:00:00+00:00', 'First Project');

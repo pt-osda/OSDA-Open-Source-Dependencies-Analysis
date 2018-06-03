@@ -11,13 +11,13 @@
 
     <div class="btn-group-toggle text-center" data-toggle="buttons">
         <label class="btn btn-outline-dark text-center active" id="option-list">
-            <input type="radio" name="projs/{{project_id}}/report/{{build_id}}/filter/detail" autocomplete="off" checked> Detail
+            <input type="radio" name="projs/{{project_id}}/report/{{report_id}}/filter/detail" autocomplete="off" checked> Detail
         </label>
         <label class="btn btn-outline-dark text-center" id="option-list">
-            <input type="radio" name="projs/{{project_id}}/report/{{build_id}}/filter/licenses" autocomplete="off"> Licenses
+            <input type="radio" name="projs/{{project_id}}/report/{{report_id}}/filter/licenses" autocomplete="off"> Licenses
         </label>
         <label class="btn btn-outline-dark text-center" id="option-list">
-            <input type="radio" name="projs/{{project_id}}/report/{{build_id}}/filter/vulnerabilities" autocomplete="off"> Vulnerabilities
+            <input type="radio" name="projs/{{project_id}}/report/{{report_id}}/filter/vulnerabilities" autocomplete="off"> Vulnerabilities
         </label>
     </div>
 
@@ -25,7 +25,7 @@
 
     <div id="show-information">
 
-        {{> build-detail}}
+        {{> report-detail}}
 
     </div>
 

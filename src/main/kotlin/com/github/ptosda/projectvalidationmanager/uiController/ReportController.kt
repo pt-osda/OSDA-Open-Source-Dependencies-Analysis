@@ -8,17 +8,20 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import kotlin.collections.set
 
+/**
+ * Controller for the UI
+ */
 @Controller
 @RequestMapping("/")
 class ReportController(val reportService: ReportService,
-                       val buildRepo: BuildRepository,
+                       val reportRepo: ReportRepository,
                        val projectRepo: ProjectRepository,
                        val dependencyRepo: DependencyRepository,
                        val vulnerabilityRepo: VulnerabilityRepository,
                        val licenseRepo: LicenseRepository) {
 
     /**
-     * Get the latest build reports received. Show projects and add a filter ( group, repository )
+     * Gets the view for the home page
      */
     @GetMapping
     fun getHome(model: HashMap<String, Any>) : String{
@@ -33,7 +36,8 @@ class ReportController(val reportService: ReportService,
     }
 
     /**
-     * Get the details of a dependency ( Dependencies, Licenses and Vulnerabilities )
+     * Gets the view for the collection of dependencies
+     * TODO need to show generic dependencies when any is clicked and not specific
      */
     @GetMapping("deps")
     fun getDependencies(model: HashMap<String, Any?>) : String
@@ -46,7 +50,7 @@ class ReportController(val reportService: ReportService,
     }
 
     /**
-     * Get the details of a dependency ( Dependencies, Licenses and Vulnerabilities )
+     * Gets the view for the collection of licenses
      */
     @GetMapping("licenses")
     fun getLicenses(model: HashMap<String, Any?>) : String
@@ -59,68 +63,71 @@ class ReportController(val reportService: ReportService,
     }
 
     /**
-     * Tem que se verificar a chave primaria de projecto pois pode haver com nomes iguais
+     * Gets the view for the detail of a project
+     * @param projectId the id of the project to show
      */
-    @GetMapping("projs/{project-name}")
-    fun getProjectDetail(@PathVariable("project-name") projectName: String,
+    @GetMapping("projs/{project-id}")
+    fun getProjectDetail(@PathVariable("project-id") projectId: String,
                          model: HashMap<String, Any>) : String{
 
         model["page_title"] = "Project Builds"
 
-        val builds = projectRepo.findById(projectName).get().build!!
+        val builds = projectRepo.findById(projectId).get().report!!
 
-        model["project_id"] = projectName
-        model["builds"] = builds
-
-        val licenses = ArrayList<Any>()
-        val vulnerabilities = ArrayList<Any>()
-
-        builds.forEach{
-            licenses.addAll(reportService.getBuildLicenses(it))
-            vulnerabilities.addAll(reportService.getDependencyVulnerabilities(it.dependency!!.toList()))
-        }
+        model["project_id"] = projectId
+        model["reports"] = builds
 
         return "project"
     }
 
-    @GetMapping("projs/{project-id}/report/{build-id}")
-    fun getBuild(@PathVariable("project-id") projectId: String,
-                 @PathVariable("build-id") buildId: String,
-                 model: HashMap<String, Any?>) : String
+    /**
+     * Gets the view for the detail of a report from a project
+     * @param projectId the id of the project to search for a report
+     * @param reportId the id of a report to show
+     */
+    @GetMapping("projs/{project-id}/report/{report-id}")
+    fun getReportDetail(@PathVariable("project-id") projectId: String,
+                        @PathVariable("report-id") reportId: String,
+                        model: HashMap<String, Any?>) : String
     {
         model["page_title"] = "Report Detail"
 
-        val buildInfo = buildRepo.findById(BuildPk(buildId, Project(projectId, null, null)))
+        val reportInfo = reportRepo.findById(ReportPk(reportId, Project(projectId, null, null)))
 
-        if(!buildInfo.isPresent) {
-            throw Exception("Build was not found")
+        if(!reportInfo.isPresent) {
+            throw Exception("Report was not found")
         }
 
-        val build = buildInfo.get()
+        val report = reportInfo.get()
 
         model["project_id"] = projectId
 
-        model["build_id"] = buildId
-        model["build_tag"] = build.tag
+        model["report_id"] = reportId
+        model["report_tag"] = report.tag
 
-        model.putAll(reportService.getBuildDependencies(build))
+        model.putAll(reportService.getBuildDependencies(report))
 
-        return "build"
+        return "report"
     }
 
     /**
-     * Get the details of a dependency ( Dependencies, Licenses and Vulnerabilities )
+     * Gets the view for the detail of dependency from a report
+     * @param projectId the id of a project
+     * @param reportId the id of a report
+     * @param dependencyId the id of a dependency
+     * @param dependencyVersion the main version of a dependency
+     * // TODO add transitive dependencies
      */
-    @GetMapping("projs/{project-id}/report/{build-id}/deps/{dependency-id}/version/{dependency-version}")
+    @GetMapping("projs/{project-id}/report/{report-id}/deps/{dependency-id}/version/{dependency-version}")
     fun getDependencyDetail(@PathVariable("project-id") projectId: String,
-                            @PathVariable("build-id") buildId: String,
+                            @PathVariable("report-id") reportId: String,
                             @PathVariable("dependency-id") dependencyId: String,
-                            @PathVariable("dependency-version") version: String,
+                            @PathVariable("dependency-version") dependencyVersion: String,
                             model: HashMap<String, Any?>) : String
     {
         model["page_title"] = "Dependency Detail"
 
-        val dependencyInfo = dependencyRepo.findById(DependencyPk(dependencyId, Build(BuildPk(buildId, Project(projectId, null, null)), null, null), version))
+        val dependencyInfo = dependencyRepo.findById(DependencyPk(dependencyId, Report(ReportPk(reportId, Project(projectId, null, null)), null, null), dependencyVersion))
 
         if(!dependencyInfo.isPresent) {
             throw Exception("Dependency not found")
@@ -129,7 +136,7 @@ class ReportController(val reportService: ReportService,
         val dependency = dependencyInfo.get()
 
         model["project_id"] = projectId
-        model["build_id"] = buildId
+        model["report_id"] = reportId
 
         model["title"] = dependency.pk.id
         model["main_version"] = dependency.pk.mainVersion
@@ -141,11 +148,12 @@ class ReportController(val reportService: ReportService,
     }
 
     /**
-     * Get the details of a dependency ( Dependencies, Licenses and Vulnerabilities )
+     * Gets the view for the detail of a license
+     * @param licenseId the id of a license
      */
     @GetMapping("licenses/{license-id}")
-    fun getLicense(@PathVariable("license-id") licenseId: String,
-                            model: HashMap<String, Any?>) : String
+    fun getLicenseDetail(@PathVariable("license-id") licenseId: String,
+                         model: HashMap<String, Any?>) : String
     {
         model["page_title"] = "Dependency Detail"
 
@@ -165,12 +173,14 @@ class ReportController(val reportService: ReportService,
     }
 
     /**
-     * Get the details of a dependency ( Dependencies, Licenses and Vulnerabilities )
+     * Gets the view for the detail of a vulnerability
+     * @param dependencyId the id of a dependency
+     * @param vulnerabilityId the id of a vulnerability
      */
     @GetMapping("deps/{dependency-id}/vulnerability/{vulnerability-id}")
-    fun getVulnerability(@PathVariable("dependency-id") dependencyId: String,
-                         @PathVariable("vulnerability-id") vulnerabilityId: Long,
-                   model: HashMap<String, Any?>) : String
+    fun getVulnerabilityDetail(@PathVariable("dependency-id") dependencyId: String,
+                               @PathVariable("vulnerability-id") vulnerabilityId: Long,
+                               model: HashMap<String, Any?>) : String
     {
         model["page_title"] = "Vulnerability Detail"
 

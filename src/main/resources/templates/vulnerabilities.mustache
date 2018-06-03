@@ -4,12 +4,11 @@
             Vulnerability Title: {{pk.vulnerability.title}}
             <br>
             Dependency: {{pk.dependency.pk.id}}
-
-           <!-- Description: {pk.vulnerability.description}}
-            <br>
-            <br>-->
             <!--Version Criteria: {versionCriteria}}-->
         </a>
         <br>
+    {{/vulnerabilities}}
+    {{^vulnerabilities}}
+        There are no vulnerabilities for the current context
     {{/vulnerabilities}}
 </ul>

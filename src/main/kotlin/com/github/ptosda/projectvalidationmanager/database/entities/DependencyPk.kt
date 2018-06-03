@@ -12,7 +12,7 @@ class DependencyPk (
             JoinColumn(referencedColumnName = "timestamp", name = "timestamp"),
             JoinColumn(referencedColumnName = "name", name = "project")
         ])
-        val build : Build,
+        val report : Report,
 
         val mainVersion: String
 ) : Serializable

@@ -6,7 +6,7 @@
         {{title}}
     </h3>
 
-    <a class="btn btn-outline-danger text-left" href="/projs/{{project_id}}/report/{{build_id}}">See the report</a>
+    <a class="btn btn-outline-danger text-left" href="/projs/{{project_id}}/report/{{report_id}}">See the report</a>
 
     <br>
 
@@ -27,6 +27,9 @@
                 License Source: {{source}}
             </a>
         {{/license}}
+        {{^license}}
+            No licenses were found for this dependency
+        {{/license}}
     </ul>
     <br>
     <h4>Vulnerabilities:</h4>
@@ -36,7 +39,12 @@
                 Vulnerability Title: {{pk.vulnerability.title}}
                 <br>
                 Vulnerability Description: {{pk.vulnerability.description}}
+                <br>
+                Affected Versions: {{versionCriteria}}
             </a>
+        {{/vulnerabilities}}
+        {{^vulnerabilities}}
+            No vulnerabilities were found for this dependency
         {{/vulnerabilities}}
     </ul>
     <br>

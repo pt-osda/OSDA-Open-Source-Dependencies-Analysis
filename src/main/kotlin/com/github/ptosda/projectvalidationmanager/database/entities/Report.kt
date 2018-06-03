@@ -4,13 +4,13 @@ import java.io.Serializable
 import javax.persistence.*
 
 @Entity
-@Table(name = "build")
-data class Build(
+@Table(name = "report")
+data class Report(
         @EmbeddedId
-        val pk: BuildPk,
+        val pk: ReportPk,
 
         val tag: String?,
 
-        @OneToMany(mappedBy = "pk.build")
+        @OneToMany(mappedBy = "pk.report")
         val dependency: Set<Dependency>?
 ) : Serializable

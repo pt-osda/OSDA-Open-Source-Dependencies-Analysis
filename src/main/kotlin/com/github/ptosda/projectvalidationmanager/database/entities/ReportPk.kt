@@ -6,7 +6,7 @@ import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
 
 @Embeddable
-class BuildPk(
+class ReportPk(
         val timestamp: String,
 
         @ManyToOne
