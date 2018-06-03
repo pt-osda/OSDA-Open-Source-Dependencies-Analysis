@@ -1,0 +1,67 @@
+{{> header}}
+
+<div class="container-fluid">
+
+    <h3 class="text-center">
+        {{title}}
+    </h3>
+
+    <a class="btn btn-outline-danger text-left" href="/deps">See All Dependencies</a>
+
+    <br>
+
+    <br>
+
+    Version: {{main_version}}
+    {{#description}}
+        <br>
+        Description: {{description}}
+        <br>
+    {{/description}}
+    <h4>Licenses:</h4>
+    <ul class="list-group">
+        {{#license}}
+            <a class="list-group-item list-group-item-action" href="/licenses/{{pk.license.spdxId}}">
+                License Name: {{pk.license.spdxId}}
+                <br>
+                License Source: {{source}}
+            </a>
+        {{/license}}
+        {{^license}}
+            No licenses were found for this dependency
+        {{/license}}
+    </ul>
+    <br>
+    <h4>Vulnerabilities:</h4>
+    <ul class="list-group">
+        {{#vulnerabilities}}
+            <a class="list-group-item list-group-item-action" href="/deps/{{title}}/vulnerability/{{pk.vulnerability.id}}">
+                Vulnerability Title: {{pk.vulnerability.title}}
+                <br>
+                Vulnerability Description: {{pk.vulnerability.description}}
+                <br>
+                Affected Versions: {{versionCriteria}}
+            </a>
+        {{/vulnerabilities}}
+        {{^vulnerabilities}}
+            No vulnerabilities were found for this dependency
+        {{/vulnerabilities}}
+    </ul>
+    <br>
+    <h4>Projects:</h4>
+        <ul class="list-group">
+            {{#projects}}
+                <a class="list-group-item list-group-item-action" href="/projs/{{name}}">
+                    Project Name: {{name}}
+                    <br>
+                </a>
+            {{/projects}}
+            {{^projects}}
+                No projects are currently using this dependency
+            {{/projects}}
+        </ul>
+        <br>
+
+</div>
+
+{{> footer}}

@@ -45,22 +45,38 @@ class ReportController(val reportService: ReportService,
         model["page_title"] = "Dependencies"
 
         model["dependencies"] = dependencyRepo.findAll()
+            .groupBy { it.pk.id + it.pk.mainVersion }
+            .values
+            .map { it.last() }
+            .sortedBy{ it.pk.id }
 
         return "dependency-list"
     }
 
     /**
-     * Gets the view for the collection of dependencies
-     * TODO need to show generic dependencies when any is clicked and not specific
+     * Gets the view of a dependency
+     * @param dependencyId the id of the dependency to show
+     * @param dependencyVersion the version of the dependency to show
      */
     @GetMapping("deps/{dep-id}/version/{dep-version}")
-    fun getDependencyGeneric(model: HashMap<String, Any?>) : String
+    fun getDependencyGeneric(@PathVariable("dep-id") dependencyId : String,
+                             @PathVariable("dep-version") dependencyVersion : String,
+                             model: HashMap<String, Any?>) : String
     {
-        model["page_title"] = "Dependencies"
+        model["page_title"] = "Dependency Detail"
 
-        model["dependencies"] = dependencyRepo.findAll()
+        val dependency = dependencyRepo.findAll()
+            .last { it.pk.mainVersion == dependencyVersion && it.pk.id == dependencyId }
 
-        return "dependency-list"
+        model["title"] = dependency.pk.id
+        model["main_version"] = dependency.pk.mainVersion
+        model["description"] = dependency.description
+        model["license"] = dependency.license
+        model["vulnerabilities"] = dependency.vulnerabilities
+        model["projects"] = projectRepo.findAll()
+            .filter { it.report?.last()?.dependency?.contains(dependency)!! }
+
+        return "dependency-generic-detail"
     }
 
     /**
@@ -82,8 +98,8 @@ class ReportController(val reportService: ReportService,
      */
     @GetMapping("projs/{project-id}")
     fun getProjectDetail(@PathVariable("project-id") projectId: String,
-                         model: HashMap<String, Any>) : String{
-
+                         model: HashMap<String, Any>) : String
+    {
         model["page_title"] = "Project Builds"
 
         val builds = projectRepo.findById(projectId).get().report!!

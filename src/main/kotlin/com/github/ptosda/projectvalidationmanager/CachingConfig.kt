@@ -14,6 +14,7 @@ import java.nio.file.Paths
 @Configuration
 @EnableCaching
 class CachingConfig {
+    //TODO Tornar Cache persistente
     init{
         initDependenciesCache()
     }
