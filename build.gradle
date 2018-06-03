@@ -50,7 +50,6 @@ configurations {
 	all*.exclude module : 'spring-boot-starter-logging'
 }
 
-
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-data-jpa')
 	compile('net.ossindex:ossindex-api:2.5.2')

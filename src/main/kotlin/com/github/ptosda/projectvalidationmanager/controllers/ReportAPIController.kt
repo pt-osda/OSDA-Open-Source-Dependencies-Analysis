@@ -45,10 +45,10 @@ class ReportAPIController(
         val project = storeProject(report.name, repo)
 
         logger.info("The report created at {} and identified by {} will be created.", report.timestamp, report.buildTag)
-        val build = storeBuild(report.timestamp, report.buildTag, project)
+        val generatedReport = storeReport(report.timestamp, report.buildTag, project)
 
         logger.info("The dependencies of the project will be created.")
-        storeDependencies(report.dependencies, build)
+        storeDependencies(report.dependencies, generatedReport)
 
         logger.info("The information from the report was successfully stored in the database.")
         return ResponseEntity(HttpStatus.CREATED)
@@ -142,16 +142,16 @@ class ReportAPIController(
      * @param project The project in which this report occurred.
      * @return The newly created report.
      */
-    private fun storeBuild(timestamp: String, tag: String?, project: Project): com.github.ptosda.projectvalidationmanager.database.entities.Report {
-        val build = Report(ReportPk(timestamp, project), tag, setOf())
-        reportRepository.save(build)
+    private fun storeReport(timestamp: String, tag: String?, project: Project): com.github.ptosda.projectvalidationmanager.database.entities.Report {
+        val report = Report(ReportPk(timestamp, project), tag, setOf())
+        reportRepository.save(report)
         logger.info("All the report regarded information was stored in the database")
-        return build
+        return report
     }
 
     /**
      * Function to create all the dependencies referenced in the report including their licenses and vulnerabilities.
-     * Every dependency will be stored in the database as their are specific to each report.
+     * Every dependency will be stored in the database as they are specific to each report.
      * @param dependencies The list of the dependencies referenced in the report that belong to the project
      * @param report The report this dependencies belong to.
      */

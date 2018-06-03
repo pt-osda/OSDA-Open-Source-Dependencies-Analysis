@@ -56,7 +56,7 @@ class ReportFilterController(val reportFilterService: ReportFilterService,
     }
 
     /**
-     * Gets the view for either of three elements of a Report. These are its detail, licenses or vulnerabilities
+     * Gets the view for either three elements of a Report. These are its detail, licenses or vulnerabilities
      * @param projectId the if of the project that the report belongs
      * @param buildId the if of the report to filter
      * @param filterType the type of filtering to be done (detail, licenses or vulnerabilities)
@@ -72,5 +72,4 @@ class ReportFilterController(val reportFilterService: ReportFilterService,
 
         return model["view_name"].toString()
     }
-
 }

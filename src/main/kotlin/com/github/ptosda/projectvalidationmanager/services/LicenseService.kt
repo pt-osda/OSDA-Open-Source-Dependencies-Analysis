@@ -70,7 +70,7 @@ class LicenseService {
     )
 
     /**
-     * Will attempt to search for the license of dependencies through an url.
+     * Will attempt to search for the license of dependencies through an identifier be it an url or word.
      * @param id The name of the dependency to search for its license.
      * @param version The version of the dependency that will have its license searched for.
      * @param licenseUrl The url where the license will be searched for.
@@ -115,7 +115,7 @@ class LicenseService {
     }
 
     /**
-     * Attempts to find in the file a word that identifies the license.
+     * Attempts to find in the file a identifier that identifies the license.
      * @param licenseContent The content of the file to search for.
      * @return A license found through a word or null if one was not found
      */
