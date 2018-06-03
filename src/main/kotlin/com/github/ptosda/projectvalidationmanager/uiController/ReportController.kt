@@ -50,6 +50,20 @@ class ReportController(val reportService: ReportService,
     }
 
     /**
+     * Gets the view for the collection of dependencies
+     * TODO need to show generic dependencies when any is clicked and not specific
+     */
+    @GetMapping("deps/{dep-id}/version/{dep-version}")
+    fun getDependencyGeneric(model: HashMap<String, Any?>) : String
+    {
+        model["page_title"] = "Dependencies"
+
+        model["dependencies"] = dependencyRepo.findAll()
+
+        return "dependency-list"
+    }
+
+    /**
      * Gets the view for the collection of licenses
      */
     @GetMapping("licenses")

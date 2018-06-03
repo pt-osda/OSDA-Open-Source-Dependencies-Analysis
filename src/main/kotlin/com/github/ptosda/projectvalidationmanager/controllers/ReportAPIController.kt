@@ -44,7 +44,7 @@ class ReportAPIController(
         logger.info("The project {} will be created.", report.name)
         val project = storeProject(report.name, repo)
 
-        logger.info("The report created at {} and identified by {} corresponding to this report will be created.", report.timestamp, report.buildTag)
+        logger.info("The report created at {} and identified by {} will be created.", report.timestamp, report.buildTag)
         val build = storeBuild(report.timestamp, report.buildTag, project)
 
         logger.info("The dependencies of the project will be created.")
@@ -135,8 +135,8 @@ class ReportAPIController(
     }
 
     /**
-     * Function to created the new report that originated the report. Since every report occurs at a different time, there
-     * is not the possibility to repeat builds.
+     * Function to create the new report. Since every report occurs at a different time, there
+     * is not the possibility to repeat reports.
      * @param timestamp The moment in time that the report was completed.
      * @param tag The tag that identifies the report.
      * @param project The project in which this report occurred.
@@ -152,8 +152,7 @@ class ReportAPIController(
     /**
      * Function to create all the dependencies referenced in the report including their licenses and vulnerabilities.
      * Every dependency will be stored in the database as their are specific to each report.
-     * @param dependencies The list of the dependencies referenced in the report that belong to the project the report
-     * executed to.
+     * @param dependencies The list of the dependencies referenced in the report that belong to the project
      * @param report The report this dependencies belong to.
      */
     private fun storeDependencies(dependencies: ArrayList<ReportDependency>, report: com.github.ptosda.projectvalidationmanager.database.entities.Report) {

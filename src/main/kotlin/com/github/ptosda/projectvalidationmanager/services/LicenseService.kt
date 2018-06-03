@@ -1,6 +1,8 @@
 package com.github.ptosda.projectvalidationmanager.services
 
 import com.github.ptosda.projectvalidationmanager.model.LicenseModel
+import org.apache.http.entity.ContentType
+import org.jsoup.Jsoup
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -13,45 +15,42 @@ import kotlin.math.log
 @Service
 class LicenseService {
     val logger : Logger = LoggerFactory.getLogger(LicenseService::class.java)
-    val licensesName : List<String> = listOf(
-            "Apache-1.1",
-            "Apache-2.0",
-            "BSD-2-Clause",
-            "BSD-3-Clause",
-            "CC0-1.0",
-            "CPL-1.0",
-            "EPL-1.0",
-            "EPL-2.0",
-            "GPL-1.0",
-            "GPL-2.0",
-            "GPL-3.0",
-            "LGPL-2.1",
-            "LGPL-3.0",
-            "MIT",
-            "MPL-1.1",
-            "MPL-2.0",
-            "MICROSOFT SOFTWARE LICENSE"
-    )
 
     val licensesRelatedWords : HashMap<String, String> = hashMapOf(
             Pair("http://www.apache.org/licenses/LICENSE-1.1" , "Apache-1.1"),
+            Pair("Apache-1.1" , "Apache-1.1"),
             Pair("http://www.apache.org/licenses/LICENSE-2.0" , "Apache-2.0"),
+            Pair("Apache-2.0" , "Apache-2.0"),
             Pair("https://opensource.org/licenses/BSD-2-Clause", "BSD-2-Clause"),
+            Pair("BSD-2-Clause", "BSD-2-Clause"),
             Pair("https://opensource.org/licenses/BSD-3-Clause", "BSD-3-Clause"),
+            Pair("BSD-3-Clause", "BSD-3-Clause"),
             Pair("The BSD License", "BSD-3-Clause"),
             Pair("http://repository.jboss.org/licenses/cc0-1.0.txt", "CC0-1.0"),
+            Pair("CC0-1.0", "CC0-1.0"),
             Pair("https://www.eclipse.org/legal/epl-v10.html", "EPL-1.0"),
+            Pair("EPL-1.0", "EPL-1.0"),
             Pair("https://www.eclipse.org/legal/cpl-v10.html", "CPL-1.0"),
+            Pair("CPL-1.0", "CPL-1.0"),
             Pair("https://www.eclipse.org/org/documents/epl-2.0/EPL-2.0.txt", "EPL-2.0"),
+            Pair("EPL-2.0", "EPL-2.0"),
             Pair("https://www.gnu.org/licenses/gpl-1.0", "GPL-1.0"),
+            Pair("GPL-1.0", "GPL-1.0"),
             Pair("https://www.gnu.org/licenses/gpl-2.0", "GPL-2.0"),
+            Pair("GPL-2.0", "GPL-2.0"),
             Pair("https://www.gnu.org/licenses/gpl-3.0", "GPL-3.0"),
+            Pair("GPL-3.0", "GPL-3.0"),
             Pair("https://www.gnu.org/licenses/lgpl-2.1", "LGPL-2.1"),
+            Pair("LGPL-2.1", "LGPL-2.1"),
             Pair("https://www.gnu.org/licenses/lgpl-3.0", "LGPL-3.0"),
+            Pair("LGPL-3.0", "LGPL-3.0"),
             Pair("https://opensource.org/licenses/MIT", "MIT"),
             Pair("https://www.mozilla.org/en-US/MPL/1.1", "MPL-1.1"),
+            Pair("MPL-1.1", "MPL-1.1"),
             Pair("https://www.mozilla.org/en-US/MPL/2.0", "MPL-2.0"),
+            Pair("MPL-2.0", "MPL-2.0"),
             Pair("Microsoft .NET Library", "MICROSOFT SOFTWARE LICENSE"),
+            Pair("MICROSOFT SOFTWARE LICENSE", "MICROSOFT SOFTWARE LICENSE"),
             Pair("Apache Software License, Version 1.1", "Apache-1.1"),
             Pair("Apache License, Version 2.0", "Apache-2.0"),
             Pair("The 2-Clause BSD License", "BSD-2-Clause"),
@@ -88,22 +87,25 @@ class LicenseService {
 
         val statusCode = connection.responseCode
         if(statusCode != 200) {
-            logger.warn("The licenses for the dependency was not found.")
+            logger.warn("The license for the dependency was not found.")
             throw Exception("Error fetching licenses") //TODO Make custom exception to use with problem+json
         }
 
         logger.info("The licenses of the dependency were found.")
         val input = BufferedReader(InputStreamReader(connection.inputStream))
-        val content = StringBuffer()
+        val contentBuffer = StringBuffer()
         while (true) {
             val inputLine = input.readLine() ?: break
-            content.append(inputLine)
+            contentBuffer.append(inputLine)
         }
         input.close()
         connection.disconnect()
 
-        val licenseName = findLicenseNameInFile(content.toString()) ?:
-        findLicenseUrlInFile(content.toString())
+        var content = contentBuffer.toString()
+        if(connection.contentType == ContentType.TEXT_HTML.mimeType){
+            content = Jsoup.parse(content).text()
+        }
+        val licenseName = findLicenseInFile(content)
         licenseName?.let{
             licenses.add(LicenseModel(licenseName, "Found license in $licenseUrl"))
         }
@@ -113,34 +115,11 @@ class LicenseService {
     }
 
     /**
-     * Attempts to find in the file a url that identifies the license.
-     * @param licenseContent The content of the file to search for.
-     * @return A license found through the url or null if one was not found
-     */
-    private fun findLicenseUrlInFile(licenseContent: String): String? {
-        for (url in licensesRelatedWords.keys) {
-            if (licenseContent.contains(url, true)) {
-                logger.info("A url that identifies the license was successfully found.")
-                return licensesRelatedWords[url]
-            }
-        }
-        logger.info("The file did not contained a url that identified the license.")
-        return null
-    }
-
-    /**
      * Attempts to find in the file a word that identifies the license.
      * @param licenseContent The content of the file to search for.
      * @return A license found through a word or null if one was not found
      */
-    private fun findLicenseNameInFile(licenseContent: String): String? {
-        for (name in licensesName) {
-            if (licenseContent.contains(name)) {
-                logger.info("A word that identifies the license was successfully found.")
-                return name
-            }
-        }
-        logger.info("The file did not contained a word that identified the license.")
-        return null
+    private fun findLicenseInFile(licenseContent: String): String? {
+        return licensesRelatedWords[licenseContent.findAnyOf(licensesRelatedWords.keys, 0, true)?.second]
     }
 }
