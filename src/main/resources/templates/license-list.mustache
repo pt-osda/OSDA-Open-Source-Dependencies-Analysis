@@ -5,15 +5,18 @@
         Licenses
     </h2>
 
+    <br>
+
     <div class="container-fluid">
-        <ul class="list-group">
-            {{#licenses}}
-                <a class="list-group-item list-group-item-action" href="/licenses/{{spdxId}}">
-                    License Name: {{spdxId}}
-                </a>
-                <br>
-            {{/licenses}}
-        </ul>
+        <p>
+            <input type="text" id="search-license" name="search" placeholder="License Name">
+            <br>
+            <button class="btn btn-outline-dark" onclick="search('search-license', 'search/licenses', 'licenses-list')">Search</button>
+        </p>
+
+        <div id="licenses-list">
+            {{> generic-licenses}}
+        </div>
     </div>
 
 {{> footer}}

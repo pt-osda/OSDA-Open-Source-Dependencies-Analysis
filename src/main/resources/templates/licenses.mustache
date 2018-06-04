@@ -3,9 +3,13 @@
         <a class="list-group-item list-group-item-action" href="/licenses/{{pk.license.spdxId}}">
             License Name: {{pk.license.spdxId}}
             <br>
-            Dependency: {{pk.dependency.pk.id}}
-            <br>
-            Source: {{source}}
+            {{#pk.dependency.pk.id}}
+                Dependency: {{pk.dependency.pk.id}}
+                <br>
+            {{/pk.dependency.pk.id}}
+            {{#source}}
+                Source: {{source}}
+            {{/source}}
         </a>
         <br>
     {{/licenses}}

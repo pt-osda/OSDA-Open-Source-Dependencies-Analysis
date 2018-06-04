@@ -1,0 +1,12 @@
+<ul class="list-group" id="dependency-list">
+    {{#dependencies}}
+        <a href="/deps/{{pk.id}}/version/{{pk.mainVersion}}" class="list-group-item list-group-item-action">
+            Name: {{pk.id}}
+            <br>
+            Main Version: {{pk.mainVersion}}
+            <br>
+            {{vulnerabilitiesCount}} vulnerabilities found
+        </a>
+        <br>
+    {{/dependencies}}
+</ul>

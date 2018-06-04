@@ -1,26 +1,23 @@
 
 {{> header}}
 
-<h2 class="text-center">
-    Projects
-</h2>
+    <h2 class="text-center">
+        Projects
+    </h2>
 
-<br>
+    <br>
 
-<div class="body-container">
+    <div class="container-fluid">
+        <p>
+            <input type="text" id="search-project" name="search" placeholder="Project Name">
+            <br>
+            <button class="btn btn-outline-dark" onclick="search('search-project', 'search/projs', 'project-list')">Search</button>
+        </p>
 
-    <div id="project-list">
-        <div class="body-container">
-            {{#projects}}
-                <a href="/projs/{{name}}" class="list-group-item list-group-item-action">
-                    Name: <b>{{name}}</b>
-                </a>
-
-                <br>
-            {{/projects}}
+        <div id="project-list">
+            {{> projects}}
         </div>
-    </div>
 
-</div>
+    </div>
 
 {{> footer}}

@@ -1,7 +1,8 @@
-package com.github.ptosda.projectvalidationmanager.uiController
+package com.github.ptosda.projectvalidationmanager.webapp.controller
 
 import com.github.ptosda.projectvalidationmanager.database.entities.*
 import com.github.ptosda.projectvalidationmanager.database.repositories.*
+import com.github.ptosda.projectvalidationmanager.webapp.service.ReportService
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import kotlin.collections.set
 
 /**
- * Controller for the UI
+ * Controller for the WebApp
  */
 @Controller
 @RequestMapping("/")
@@ -36,7 +37,6 @@ class ReportController(val reportService: ReportService,
 
     /**
      * Gets the view for the collection of dependencies
-     * TODO need to show generic dependencies when any is clicked and not specific
      */
     @GetMapping("deps")
     fun getDependencies(model: HashMap<String, Any?>) : String
@@ -56,6 +56,7 @@ class ReportController(val reportService: ReportService,
      * Gets the view of a dependency
      * @param dependencyId the id of the dependency to show
      * @param dependencyVersion the version of the dependency to show
+     * TODO differentiate projects and detail of dependency
      */
     @GetMapping("deps/{dep-id}/version/{dep-version}")
     fun getDependencyGeneric(@PathVariable("dep-id") dependencyId : String,
@@ -134,7 +135,7 @@ class ReportController(val reportService: ReportService,
         model["report_id"] = reportId
         model["report_tag"] = report.tag
 
-        model.putAll(reportService.getBuildDependencies(report))
+        model.putAll(reportService.getReportDependencies(report))
 
         return "report"
     }

@@ -21,6 +21,15 @@ function httpRequest(method, path, data, cb) {
     xhr.send(data);
 }
 
+function search(searchElemId, searchRelUrl, searchOutputElemId) {
+    var searchValue = document.getElementById(searchElemId).value
+    var outputElement = document.getElementById(searchOutputElemId)
+
+    httpRequest('GET', `/${searchRelUrl}?value=${searchValue}`, null, function(err, data) {
+        outputElement.innerHTML = data
+    })
+}
+
 window.onload = function() {
 
     var informationToShow = document.getElementById('show-information')
@@ -29,8 +38,7 @@ window.onload = function() {
         .forEach(function (elem) {
             elem.addEventListener('click', function () {
                 var filter = elem.firstElementChild.getAttribute('name')
-
-                httpRequest('GET', 'http://localhost:8080/' + filter, null, function(err, data) {
+                httpRequest('GET', `/${filter}`, null, function(err, data) {
                     informationToShow.innerHTML = data
                 })
             })

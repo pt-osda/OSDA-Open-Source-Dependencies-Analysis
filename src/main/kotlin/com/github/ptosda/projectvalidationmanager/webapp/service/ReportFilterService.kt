@@ -1,4 +1,4 @@
-package com.github.ptosda.projectvalidationmanager.uiController
+package com.github.ptosda.projectvalidationmanager.webapp.service
 
 import com.github.ptosda.projectvalidationmanager.database.entities.*
 import com.github.ptosda.projectvalidationmanager.database.repositories.ReportRepository
@@ -30,23 +30,23 @@ class ReportFilterService(private val reportService: ReportService,
      * @param projectId the id of the project
      * @param reportId the id of the report to filter
      */
-    fun getBuildDetailView(projectId: String, reportId: String) : HashMap<String, Any?> {
+    fun getReportDetailView(projectId: String, reportId: String) : HashMap<String, Any?> {
         val model = hashMapOf<String, Any?>()
 
-        val buildInfo = reportRepo.findById(ReportPk(reportId, Project(projectId, null, null)))
+        val reportInfo = reportRepo.findById(ReportPk(reportId, Project(projectId, null, null)))
 
-        if(!buildInfo.isPresent) {
+        if(!reportInfo.isPresent) {
             throw Exception("Report was not found")
         }
 
-        val build = buildInfo.get()
+        val report = reportInfo.get()
 
         model["project_id"] = projectId
 
         model["report_id"] = reportId
-        model["report_tag"] = build.tag
+        model["report_tag"] = report.tag
 
-        model.putAll(reportService.getBuildDependencies(build))
+        model.putAll(reportService.getReportDependencies(report))
 
         model["view_name"] = "report-detail"
 
@@ -80,9 +80,9 @@ class ReportFilterService(private val reportService: ReportService,
         val model = hashMapOf<String, Any?>()
         val licenses = ArrayList<DependencyLicense>()
 
-        val build = getProjectLatestBuild(project)
+        val report = getProjectLatestBuild(project)
 
-        build.dependency?.forEach {
+        report.dependency?.forEach {
             licenses.addAll(it.license)
         }
 
@@ -97,20 +97,20 @@ class ReportFilterService(private val reportService: ReportService,
      * @param projectId the id of the project
      * @param reportId the id of the report to filter
      */
-    fun getBuildLicensesView(projectId: String, reportId: String) : HashMap<String, Any?> {
+    fun getReportLicensesView(projectId: String, reportId: String) : HashMap<String, Any?> {
         val model = hashMapOf<String, Any?>()
 
-        val buildInfo = reportRepo.findById(ReportPk(reportId, Project(projectId, null, null)))
+        val reportInfo = reportRepo.findById(ReportPk(reportId, Project(projectId, null, null)))
 
-        if(!buildInfo.isPresent) {
+        if(!reportInfo.isPresent) {
             throw Exception("Report was not found")
         }
 
-        val build = buildInfo.get()
+        val report = reportInfo.get()
 
         val licenses = ArrayList<DependencyLicense>()
 
-        build.dependency!!.forEach {
+        report.dependency!!.forEach {
             licenses.addAll(it.license)
         }
 
@@ -129,9 +129,9 @@ class ReportFilterService(private val reportService: ReportService,
         val model = hashMapOf<String, Any?>()
         val vulnerabilities = ArrayList<DependencyVulnerability>()
 
-        val build = getProjectLatestBuild(project)
+        val report = getProjectLatestBuild(project)
 
-        build.dependency?.forEach {
+        report.dependency?.forEach {
             vulnerabilities.addAll(it.vulnerabilities)
         }
 
@@ -146,20 +146,20 @@ class ReportFilterService(private val reportService: ReportService,
      * @param projectId the id of the project
      * @param reportId the id of the report to filter
      */
-    fun getBuildVulnerabilitiesView(projectId: String, reportId: String) : HashMap<String, Any?> {
+    fun getReportVulnerabilitiesView(projectId: String, reportId: String) : HashMap<String, Any?> {
         val model = hashMapOf<String, Any?>()
 
-        val buildInfo = reportRepo.findById(ReportPk(reportId, Project(projectId, null, null)))
+        val reportInfo = reportRepo.findById(ReportPk(reportId, Project(projectId, null, null)))
 
-        if(!buildInfo.isPresent) {
+        if(!reportInfo.isPresent) {
             throw Exception("Report was not found")
         }
 
-        val build = buildInfo.get()
+        val report = reportInfo.get()
 
         val vulnerabilities = ArrayList<DependencyVulnerability>()
 
-        build.dependency!!.forEach {
+        report.dependency!!.forEach {
             vulnerabilities.addAll(it.vulnerabilities)
         }
 

@@ -1,27 +1,23 @@
 
 {{> header}}
 
-<h2 class="text-center">
-    Dependencies
-</h2>
+    <h2 class="text-center">
+        Dependencies
+    </h2>
 
-<br>
+    <br>
 
-<div class="body-container">
-
-    <ul class="list-group" id="dependency-list">
-        {{#dependencies}}
-            <a href="/deps/{{pk.id}}/version/{{pk.mainVersion}}" class="list-group-item list-group-item-action">
-                Name: {{pk.id}}
-                <br>
-                Main Version: {{pk.mainVersion}}
-                <br>
-                {{vulnerabilitiesCount}} vulnerabilities found
-            </a>
+    <div class="container-fluid">
+        <p>
+            <input type="text" id="search-dependency" name="search" placeholder="Dependency Name">
             <br>
-        {{/dependencies}}
-    </ul>
+            <button class="btn btn-outline-dark" onclick="search('search-dependency', 'search/dependencies', 'dependencies-list')">Search</button>
+        </p>
 
-</div>
+        <div id="dependencies-list">
+            {{> dependencies}}
+        </div>
+
+    </div>
 
 {{> footer}}
