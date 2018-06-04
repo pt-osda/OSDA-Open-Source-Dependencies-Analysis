@@ -10,4 +10,16 @@ data class DependencyLicense(
         val pk: DependencyLicensePk,
 
         val source: String
-) : Serializable
+) : Serializable {
+    override fun equals(other: Any?): Boolean {
+            if (other is DependencyLicense){
+                    val dependencyLicense = other as DependencyLicense?
+                    return dependencyLicense!!.pk.license.spdxId.equals(this.pk.license.spdxId)
+            }
+            return false
+    }
+
+    override fun hashCode(): Int {
+        return this.pk.license.spdxId.hashCode() * 17
+    }
+}

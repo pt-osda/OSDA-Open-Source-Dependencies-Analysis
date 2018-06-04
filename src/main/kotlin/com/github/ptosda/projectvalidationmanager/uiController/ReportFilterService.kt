@@ -4,6 +4,7 @@ import com.github.ptosda.projectvalidationmanager.database.entities.*
 import com.github.ptosda.projectvalidationmanager.database.repositories.ReportRepository
 import org.springframework.stereotype.Service
 import java.time.ZonedDateTime
+import java.util.stream.Collectors
 
 @Service
 class ReportFilterService(private val reportService: ReportService,
@@ -113,7 +114,8 @@ class ReportFilterService(private val reportService: ReportService,
             licenses.addAll(it.license)
         }
 
-        model["licenses"] = licenses
+        val newLicenses = licenses.stream().distinct().collect(Collectors.toList())
+        model["licenses"] = newLicenses
         model["view_name"] = "licenses"
 
         return model
@@ -166,6 +168,4 @@ class ReportFilterService(private val reportService: ReportService,
 
         return model
     }
-
-
 }

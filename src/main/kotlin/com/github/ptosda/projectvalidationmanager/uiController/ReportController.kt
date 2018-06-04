@@ -19,13 +19,12 @@ class ReportController(val reportService: ReportService,
                        val dependencyRepo: DependencyRepository,
                        val vulnerabilityRepo: VulnerabilityRepository,
                        val licenseRepo: LicenseRepository) {
-
     /**
      * Gets the view for the home page
      */
     @GetMapping
-    fun getHome(model: HashMap<String, Any>) : String{
-
+    fun getHome(model: HashMap<String, Any>) : String
+    {
         model["page_title"] = "Home"
 
         val projects = projectRepo.findAll()
