@@ -50,26 +50,26 @@ class DependencyController(private val licenseService: LicenseService, private v
     @PostMapping("/vulnerabilities")
     fun getDependencyVulnerabilities(resp: HttpServletResponse,
                                      @PathVariable("manager") manager: String,
-                                     @RequestBody artifacts: ArrayList<Artifacts>) : ResponseEntity<ArrayList<VulnerabilitiesEvaluationOutput>>
+                                     @RequestBody artifacts: ArrayList<Artifacts>) : ResponseEntity<ArrayList<VulnerabilitiesEvaluationOutput?>>
     {
         val dependenciesCache = CachingConfig.getDependenciesCache()
-        val inCache = ArrayList<Artifacts>()
-        val vulnerabilities = ArrayList<VulnerabilitiesEvaluationOutput>()
+        val vulnerabilities = arrayOfNulls<VulnerabilitiesEvaluationOutput>(artifacts.size).toCollection(ArrayList())
 
-        artifacts.forEach {
-            val dependencyName = if(it.group != null) "${it.name}:${it.group}" else it.name
-            val cacheKey = "$manager:$dependencyName:${it.version}"
+        artifacts.forEachIndexed { index, artifact ->
+            val dependencyName = if(artifact.group != null) "${artifact.name}:${artifact.group}" else artifact.name
+            val cacheKey = "$manager:$dependencyName:${artifact.version}"
             val cacheEntry = dependenciesCache.get(cacheKey)
             if(cacheEntry?.vulnerabilities != null){
-                logger.info("The dependency {} already had its vulnerabilities in cache", "$dependencyName:${it.version}")
-                vulnerabilities.add(cacheEntry.vulnerabilities!!)
-                inCache.add(it)
+                logger.info("The dependency {} already had its vulnerabilities in cache", "$dependencyName:${artifact.version}")
+                vulnerabilities[index] = cacheEntry.vulnerabilities!!
+                artifact.inCache = true
             }
+            artifact.index = index
         }
 
-        artifacts.removeAll(inCache)
+        artifacts.removeIf { it.inCache }
         if(!artifacts.isEmpty()) {
-            logger.info("The are dependencies that need to search for vulnerabilities.")
+            logger.info("There are dependencies that need to search for vulnerabilities.")
             val vulnerabilitySearchResult = vulnerabilityService.getVulnerabilities(artifacts)
 
             if(vulnerabilitySearchResult == null) {
@@ -78,22 +78,20 @@ class DependencyController(private val licenseService: LicenseService, private v
             }
             else {
                 logger.info("The external API was successfully queried.")
-                vulnerabilities.addAll(vulnerabilitySearchResult)
 
-                vulnerabilitySearchResult.forEach {
-                    val cacheKey = "$manager:${it.title}:${it.mainVersion}"
+                vulnerabilitySearchResult.forEachIndexed { index, vulnerabilityEvaluation ->
+                    vulnerabilities[artifacts[index].index] = vulnerabilityEvaluation
+                    val cacheKey = "$manager:${vulnerabilityEvaluation.title}:${vulnerabilityEvaluation.mainVersion}"
                     val cacheEntry = dependenciesCache.get(cacheKey)
                     if (cacheEntry == null) {
                         logger.info("The dependency was not in cache and it will be added.")
-                        dependenciesCache.put(cacheKey, DependencyInfo(null, it))   // TODO check if this is needed
+                        dependenciesCache.put(cacheKey, DependencyInfo(null, vulnerabilityEvaluation))   // TODO check if this is needed
                     } else {
                         logger.info("The dependency was in cache and it vulnerability information will be updated.")
-                        cacheEntry.vulnerabilities = it
+                        cacheEntry.vulnerabilities = vulnerabilityEvaluation
                         dependenciesCache.put(cacheKey, cacheEntry)
                     }
-                }
-                logger.info("The vulnerabilities search was successfully completed.")
-                return ResponseEntity(vulnerabilities, HttpStatus.OK)
+                 }
             }
         }
         logger.info("The vulnerabilities search was successfully completed.")
