@@ -4,12 +4,10 @@ import com.github.ptosda.projectvalidationmanager.database.entities.*
 import com.github.ptosda.projectvalidationmanager.database.repositories.ReportRepository
 import org.springframework.stereotype.Service
 import java.time.ZonedDateTime
-import java.util.stream.Collectors
 
 @Service
 class ReportFilterService(private val reportService: ReportService,
                           private val reportRepo: ReportRepository) {
-
     /**
      * Gets the model for the detail of a project
      * @param project the project to filter
