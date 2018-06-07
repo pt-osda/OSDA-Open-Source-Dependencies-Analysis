@@ -6,7 +6,7 @@ import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
 
 @Embeddable
-class ReportPk(
+data class ReportPk(
         val timestamp: String,  // TODO Edit to a human readable DateTime
 
         @ManyToOne

@@ -8,7 +8,7 @@
 
 <br>
 
-Vulnerable
+Vulnerable Dependencies
 <ul class="list-group" id="error-list">
     {{#vulnerable_dependencies}}
         <li class="list-group-item list-group-item-danger">
@@ -25,25 +25,4 @@ Vulnerable
     {{^vulnerable_dependencies}}
         No vulnerabilities were found for any of this reports dependencies
     {{/vulnerable_dependencies}}
-</ul>
-
-<br>
-
-Not Vulnerable
-<ul class="list-group" id="dependency-list">
-    {{#dependencies}}
-        <li class="list-group-item list-group-item-success">
-            <a href="/projs/{{project_id}}/report/{{report_id}}/deps/{{pk.id}}/version/{{pk.mainVersion}}" class="list-group-item list-group-item-action">
-                Name: {{pk.id}}
-                <br>
-                Main Version: {{pk.mainVersion}}
-                <br>
-                {{vulnerabilitiesCount}} vulnerabilities found
-            </a>
-        </li>
-        <br>
-    {{/dependencies}}
-    {{^dependencies}}
-        This report has no dependencies
-    {{/dependencies}}
 </ul>

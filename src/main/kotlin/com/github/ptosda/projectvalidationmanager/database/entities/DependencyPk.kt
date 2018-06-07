@@ -4,7 +4,7 @@ import java.io.Serializable
 import javax.persistence.*
 
 @Embeddable
-class DependencyPk (
+data class DependencyPk (
         val id: String,
 
         @ManyToOne

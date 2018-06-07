@@ -102,10 +102,10 @@ class ReportController(val reportService: ReportService,
     {
         model["page_title"] = "Project Reports"
 
-        val builds = projectRepo.findById(projectId).get().report!!
+        val reports = projectRepo.findById(projectId).get().report!!
 
         model["project_id"] = projectId
-        model["reports"] = builds
+        model["reports"] = reports
 
         return "project"
     }
@@ -135,7 +135,12 @@ class ReportController(val reportService: ReportService,
         model["report_id"] = reportId
         model["report_tag"] = report.tag
 
-        model.putAll(reportService.getReportDependencies(report))
+        model["vulnerable_dependencies"] = report.dependency!!.filter {
+            if(it.vulnerabilitiesCount == null)
+                false
+            else
+                it.vulnerabilitiesCount > 0
+        }
 
         return "report"
     }

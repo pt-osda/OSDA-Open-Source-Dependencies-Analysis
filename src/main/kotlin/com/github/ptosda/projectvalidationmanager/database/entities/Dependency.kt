@@ -5,7 +5,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "dependency")
-data class Dependency (
+data class Dependency ( // TODO In case a specific dependency has new vulnerabilities, add these to the corresponding dependency
         @EmbeddedId
         val pk: DependencyPk,
 

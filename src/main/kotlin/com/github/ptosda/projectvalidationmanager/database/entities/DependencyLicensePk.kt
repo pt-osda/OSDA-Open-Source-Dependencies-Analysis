@@ -5,7 +5,7 @@ import javax.persistence.Embeddable
 import javax.persistence.ManyToOne
 
 @Embeddable
-class DependencyLicensePk (
+data class DependencyLicensePk (
         @ManyToOne
         val dependency: Dependency,
 

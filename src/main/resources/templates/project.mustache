@@ -14,23 +14,25 @@
     <br>
 
     <div class="btn-group-toggle text-center" data-toggle="buttons">
-        <label class="btn btn-outline-dark text-center active" id="option-list">
-            <input type="radio" name="projs/{{project_id}}/filter/detail" autocomplete="off" checked> Detail
+        <label class="btn btn-outline-dark text-center active" id="detail" onclick="filter('projs/{{project_id}}/filter/detail', '#detail')">
+            <input type="radio" name="projs/{{project_id}}/filter/detail" autocomplete="off"> Detail
         </label>
-        <label class="btn btn-outline-dark text-center" id="option-list">
+        <label class="btn btn-outline-dark text-center" id="licenses" onclick="filter('projs/{{project_id}}/filter/licenses', '#licenses')">
             <input type="radio" name="projs/{{project_id}}/filter/licenses" autocomplete="off"> Licenses
         </label>
-        <label class="btn btn-outline-dark text-center" id="option-list">
+        <label class="btn btn-outline-dark text-center" id="vulnerabilities" onclick="filter('projs/{{project_id}}/filter/vulnerabilities', '#vulnerabilities')">
             <input type="radio" name="projs/{{project_id}}/filter/vulnerabilities" autocomplete="off"> Vulnerabilities
         </label>
     </div>
 
+    <script>
+        initializeFragments()
+    </script>
+
     <br>
 
     <div class="container-fluid" id="show-information">
-
         {{> project-detail}}
-
     </div>
 
 </div>

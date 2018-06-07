@@ -10,16 +10,20 @@
     <a class="btn btn-outline-danger text-left" href="/projs/{{project_id}}">See the project</a>
 
     <div class="btn-group-toggle text-center" data-toggle="buttons">
-        <label class="btn btn-outline-dark text-center active" id="option-list">
-            <input type="radio" name="projs/{{project_id}}/report/{{report_id}}/filter/detail" autocomplete="off" checked> Detail
+        <label class="btn btn-outline-dark text-center active" id="detail" onclick="filter('projs/{{project_id}}/report/{{report_id}}/filter/detail', '#detail')">
+            <input type="radio" autocomplete="off"> Detail
         </label>
-        <label class="btn btn-outline-dark text-center" id="option-list">
-            <input type="radio" name="projs/{{project_id}}/report/{{report_id}}/filter/licenses" autocomplete="off"> Licenses
+        <label class="btn btn-outline-dark text-center" id="licenses" onclick="filter('projs/{{project_id}}/report/{{report_id}}/filter/licenses', '#licenses')">
+            <input type="radio" autocomplete="off"> Licenses
         </label>
-        <label class="btn btn-outline-dark text-center" id="option-list">
-            <input type="radio" name="projs/{{project_id}}/report/{{report_id}}/filter/vulnerabilities" autocomplete="off"> Vulnerabilities
+        <label class="btn btn-outline-dark text-center" id="vulnerabilities" onclick="filter('projs/{{project_id}}/report/{{report_id}}/filter/vulnerabilities', '#vulnerabilities')">
+            <input type="radio" autocomplete="off"> Vulnerabilities
         </label>
     </div>
+
+    <script>
+        initializeFragments()
+    </script>
 
     <br>
 
