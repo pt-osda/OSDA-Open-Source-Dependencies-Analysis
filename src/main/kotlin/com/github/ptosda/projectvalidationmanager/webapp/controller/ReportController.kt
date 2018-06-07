@@ -47,7 +47,7 @@ class ReportController(val reportService: ReportService,
             .groupBy { it.pk.id + it.pk.mainVersion }
             .values
             .map { it.last() }
-            .sortedBy{ it.pk.id }
+            .sortedBy{ it.pk.id.toLowerCase() }
 
         return "dependency-list"
     }
@@ -100,7 +100,7 @@ class ReportController(val reportService: ReportService,
     fun getProjectDetail(@PathVariable("project-id") projectId: String,
                          model: HashMap<String, Any>) : String
     {
-        model["page_title"] = "Project Builds"
+        model["page_title"] = "Project Reports"
 
         val builds = projectRepo.findById(projectId).get().report!!
 
@@ -178,6 +178,36 @@ class ReportController(val reportService: ReportService,
     }
 
     /**
+     * Gets the view for the detail of a license from a report
+     * @param projectId the id of a project
+     * @param reportId the id of a report
+     * @param licenseId the id of a license
+     */
+    @GetMapping("projs/{project-id}/report/{report-id}/licenses/{license-id}")
+    fun getReportLicenseDetail(@PathVariable("project-id") projectId: String,
+                               @PathVariable("report-id") reportId: String,
+                               @PathVariable("license-id") licenseId: String,
+                               model: HashMap<String, Any?>) : String
+    {
+        model["page_title"] = "License Detail"
+
+        val licenseInfo = licenseRepo.findById(licenseId)
+        if(!licenseInfo.isPresent) {
+            throw Exception("License not found")
+        }
+        val license = licenseInfo.get()
+
+        model["license_id"] = license.spdxId
+        model["dependencies"] = license.dependencies
+                .filter{
+                    it.pk.dependency.pk.report.pk.project.name == projectId && it.pk.dependency.pk.report.pk.timestamp == reportId
+                }
+        model["error_info"] = license.errorInfo
+
+        return "license-detail"
+    }
+
+    /**
      * Gets the view for the detail of a license
      * @param licenseId the id of a license
      */
@@ -185,7 +215,7 @@ class ReportController(val reportService: ReportService,
     fun getLicenseDetail(@PathVariable("license-id") licenseId: String,
                          model: HashMap<String, Any?>) : String
     {
-        model["page_title"] = "Dependency Detail"
+        model["page_title"] = "License Detail"
 
         val licenseInfo = licenseRepo.findById(licenseId)
 

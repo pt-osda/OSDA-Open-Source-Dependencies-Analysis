@@ -86,6 +86,8 @@ class ReportFilterService(private val reportService: ReportService,
             licenses.addAll(it.license)
         }
 
+        model["report"] = report.pk.timestamp
+        model["project"] = report.pk.project.name
         model["licenses"] = licenses
         model["view_name"] = "licenses"
 
@@ -115,6 +117,8 @@ class ReportFilterService(private val reportService: ReportService,
         }
 
         val newLicenses = licenses.stream().distinct().collect(Collectors.toList())
+        model["report"] = reportId
+        model["project"] = projectId
         model["licenses"] = newLicenses
         model["view_name"] = "licenses"
 
