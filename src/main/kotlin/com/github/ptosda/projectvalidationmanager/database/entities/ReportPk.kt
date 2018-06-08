@@ -7,9 +7,11 @@ import javax.persistence.ManyToOne
 
 @Embeddable
 data class ReportPk(
-        val timestamp: String,  // TODO Edit to a human readable DateTime
-
+        val timestamp: String,
+        val readableTimeStamp: String,
         @ManyToOne
         @JoinColumn(name = "name")
         val project: Project
-) : Serializable
+) : Serializable{
+        //var readableTimeStamp: String = DatatypeConverter.parseDateTime(timestamp).time.toString()// TODO Edit to a human readable DateTime
+}

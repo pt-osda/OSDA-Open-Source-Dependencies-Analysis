@@ -4,10 +4,13 @@ import com.github.ptosda.projectvalidationmanager.database.entities.*
 import com.github.ptosda.projectvalidationmanager.database.repositories.*
 import com.github.ptosda.projectvalidationmanager.webapp.service.ReportService
 import org.springframework.stereotype.Controller
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
+import java.util.*
 import kotlin.collections.set
+import javax.xml.bind.DatatypeConverter
 
 /**
  * Controller for the WebApp
@@ -96,6 +99,7 @@ class ReportController(val reportService: ReportService,
      * Gets the view for the detail of a project
      * @param projectId the id of the project to show
      */
+    @Transactional
     @GetMapping("projs/{project-id}")
     fun getProjectDetail(@PathVariable("project-id") projectId: String,
                          model: HashMap<String, Any>) : String
@@ -105,7 +109,7 @@ class ReportController(val reportService: ReportService,
         val reports = projectRepo.findById(projectId).get().report!!
 
         model["project_id"] = projectId
-        model["reports"] = reports
+        model["reports"] = reports.toList()
 
         return "project"
     }
@@ -122,7 +126,7 @@ class ReportController(val reportService: ReportService,
     {
         model["page_title"] = "Report Detail"
 
-        val reportInfo = reportRepo.findById(ReportPk(reportId, Project(projectId, null, null)))
+        val reportInfo = reportRepo.findById(ReportPk(reportId, DatatypeConverter.parseDateTime(reportId).time.toString(), Project(projectId, null, null)))
 
         if(!reportInfo.isPresent) {
             throw Exception("Report was not found")
@@ -133,6 +137,7 @@ class ReportController(val reportService: ReportService,
         model["project_id"] = projectId
 
         model["report_id"] = reportId
+        model["readable_time"] = report.pk.readableTimeStamp
         model["report_tag"] = report.tag
 
         model["vulnerable_dependencies"] = report.dependency!!.filter {
@@ -162,7 +167,7 @@ class ReportController(val reportService: ReportService,
     {
         model["page_title"] = "Dependency Detail"
 
-        val dependencyInfo = dependencyRepo.findById(DependencyPk(dependencyId, Report(ReportPk(reportId, Project(projectId, null, null)), null, null), dependencyVersion))
+        val dependencyInfo = dependencyRepo.findById(DependencyPk(dependencyId, Report(ReportPk(reportId, DatatypeConverter.parseDateTime(reportId).time.toString(), Project(projectId, null, null)), null, null), dependencyVersion))
 
         if(!dependencyInfo.isPresent) {
             throw Exception("Dependency not found")
@@ -262,5 +267,4 @@ class ReportController(val reportService: ReportService,
 
         return "vulnerability-detail"
     }
-
 }

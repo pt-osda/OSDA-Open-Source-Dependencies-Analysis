@@ -74,7 +74,6 @@ class ReportFilterController(val reportFilterService: ReportFilterService,
                       @PathVariable("filter-type") filterType: String,
                       model: HashMap<String, Any?>) : String
     {
-
         val projectInfo = projectRepo.findById(projectId)
 
         if(!projectInfo.isPresent) {
@@ -102,7 +101,6 @@ class ReportFilterController(val reportFilterService: ReportFilterService,
                     @PathVariable("filter-type") filterType: String,
                     model: HashMap<String, Any?>) : String
     {
-
         model.putAll(buildFilterFunctions[filterType]!!.invoke(projectId, buildId))
 
         return model["view_name"].toString()
@@ -119,7 +117,6 @@ class ReportFilterController(val reportFilterService: ReportFilterService,
                @RequestParam("value") searchValue: String,
                model: HashMap<String, Any?>) : String
     {
-
         model.putAll(searchFilterFunctions[searchType]!!.invoke(searchValue))
 
         return model["view_name"].toString()

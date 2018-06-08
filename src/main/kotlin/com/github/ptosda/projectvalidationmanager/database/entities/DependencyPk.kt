@@ -10,6 +10,7 @@ data class DependencyPk (
         @ManyToOne
         @JoinColumns(foreignKey = ForeignKey(name = "FK_Dependency_Build"), value = [
             JoinColumn(referencedColumnName = "timestamp", name = "timestamp"),
+            JoinColumn(referencedColumnName = "readableTimeStamp", name = "readableTimeStamp"),
             JoinColumn(referencedColumnName = "name", name = "project")
         ])
         val report : Report,
