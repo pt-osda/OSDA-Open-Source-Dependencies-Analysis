@@ -144,7 +144,7 @@ class ReportAPIController(
      * @return The newly created report.
      */
     private fun storeReport(timestamp: String, tag: String?, project: Project): com.github.ptosda.projectvalidationmanager.database.entities.Report {
-        val report = Report(ReportPk(timestamp, DatatypeConverter.parseDateTime(timestamp).time.toString(), project), tag, setOf())
+        val report = Report(ReportPk(timestamp, project), tag, setOf())
         reportRepository.save(report)
         logger.info("All the report regarded information was stored in the database")
         return report

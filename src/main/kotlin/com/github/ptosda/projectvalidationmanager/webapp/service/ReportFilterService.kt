@@ -4,7 +4,6 @@ import com.github.ptosda.projectvalidationmanager.database.entities.*
 import com.github.ptosda.projectvalidationmanager.database.repositories.ReportRepository
 import org.springframework.stereotype.Service
 import java.time.ZonedDateTime
-import javax.xml.bind.DatatypeConverter
 
 @Service
 class ReportFilterService(private val reportService: ReportService,
@@ -32,7 +31,7 @@ class ReportFilterService(private val reportService: ReportService,
     fun getReportDetailView(projectId: String, reportId: String) : HashMap<String, Any?> {
         val model = hashMapOf<String, Any?>()
 
-        val reportInfo = reportRepo.findById(ReportPk(reportId, DatatypeConverter.parseDateTime(reportId).time.toString(), Project(projectId, null, null)))
+        val reportInfo = reportRepo.findById(ReportPk(reportId, Project(projectId, null, null)))
 
         if(!reportInfo.isPresent) {
             throw Exception("Report was not found")
@@ -44,7 +43,7 @@ class ReportFilterService(private val reportService: ReportService,
 
         model["report_id"] = reportId
         model["report_tag"] = report.tag
-        model["readable_time"] = report.pk.readableTimeStamp
+        model["readable_time"] = report.readableTimeStamp
 
         model.putAll(reportService.getReportDependencies(report))
 
@@ -104,7 +103,7 @@ class ReportFilterService(private val reportService: ReportService,
     fun getReportLicensesView(projectId: String, reportId: String) : HashMap<String, Any?> {
         val model = hashMapOf<String, Any?>()
 
-        val reportInfo = reportRepo.findById(ReportPk(reportId, DatatypeConverter.parseDateTime(reportId).time.toString(), Project(projectId, null, null)))
+        val reportInfo = reportRepo.findById(ReportPk(reportId, Project(projectId, null, null)))
 
         if(!reportInfo.isPresent) {
             throw Exception("Report was not found")
@@ -156,7 +155,7 @@ class ReportFilterService(private val reportService: ReportService,
     fun getReportVulnerabilitiesView(projectId: String, reportId: String) : HashMap<String, Any?> {
         val model = hashMapOf<String, Any?>()
 
-        val reportInfo = reportRepo.findById(ReportPk(reportId, DatatypeConverter.parseDateTime(reportId).time.toString(), Project(projectId, null, null)))
+        val reportInfo = reportRepo.findById(ReportPk(reportId, Project(projectId, null, null)))
 
         if(!reportInfo.isPresent) {
             throw Exception("Report was not found")

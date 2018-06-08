@@ -119,14 +119,14 @@ class ReportController(val reportService: ReportService,
      * @param projectId the id of the project to search for a report
      * @param reportId the id of a report to show
      */
-    @GetMapping("projs/{project-id}/report/{report-id}")
+    @GetMapping("projs/{project-id}/report/{report-id}")    // TODO avoid repeated request while selecting detail
     fun getReportDetail(@PathVariable("project-id") projectId: String,
                         @PathVariable("report-id") reportId: String,
                         model: HashMap<String, Any?>) : String
     {
         model["page_title"] = "Report Detail"
 
-        val reportInfo = reportRepo.findById(ReportPk(reportId, DatatypeConverter.parseDateTime(reportId).time.toString(), Project(projectId, null, null)))
+        val reportInfo = reportRepo.findById(ReportPk(reportId, Project(projectId, null, null)))
 
         if(!reportInfo.isPresent) {
             throw Exception("Report was not found")
@@ -137,7 +137,7 @@ class ReportController(val reportService: ReportService,
         model["project_id"] = projectId
 
         model["report_id"] = reportId
-        model["readable_time"] = report.pk.readableTimeStamp
+        model["readable_time"] = report.readableTimeStamp
         model["report_tag"] = report.tag
 
         model["vulnerable_dependencies"] = report.dependency!!.filter {
@@ -167,7 +167,7 @@ class ReportController(val reportService: ReportService,
     {
         model["page_title"] = "Dependency Detail"
 
-        val dependencyInfo = dependencyRepo.findById(DependencyPk(dependencyId, Report(ReportPk(reportId, DatatypeConverter.parseDateTime(reportId).time.toString(), Project(projectId, null, null)), null, null), dependencyVersion))
+        val dependencyInfo = dependencyRepo.findById(DependencyPk(dependencyId, Report(ReportPk(reportId, Project(projectId, null, null)), null, null), dependencyVersion))
 
         if(!dependencyInfo.isPresent) {
             throw Exception("Dependency not found")
