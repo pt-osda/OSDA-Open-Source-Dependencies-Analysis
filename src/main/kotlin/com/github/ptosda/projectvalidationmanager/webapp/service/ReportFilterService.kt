@@ -88,7 +88,9 @@ class ReportFilterService(private val reportService: ReportService,
 
         model["report"] = report.pk.timestamp
         model["project"] = report.pk.project.name
-        model["licenses"] = licenses.distinct()
+        model["licenses"] = licenses
+                .groupBy { it.pk.license.spdxId }
+                .map { Pair(it.value[0], it.value.size) }
         model["view_name"] = "licenses"
 
         return model
@@ -118,7 +120,9 @@ class ReportFilterService(private val reportService: ReportService,
 
         model["report"] = reportId
         model["project"] = projectId
-        model["licenses"] = licenses.distinct()
+        model["licenses"] = licenses
+                .groupBy { it.pk.license.spdxId }
+                .map { Pair(it.value[0], it.value.size) }
         model["view_name"] = "licenses"
 
         return model

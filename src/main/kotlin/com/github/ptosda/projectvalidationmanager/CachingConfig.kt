@@ -20,21 +20,14 @@ class CachingConfig {
     }
 
     private final fun initDependenciesCache() {
-        val cacheDirectory = File(Paths.get("src","main","resources","cache").toString()).absolutePath
         cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
-            .with(CacheManagerBuilder.persistence(cacheDirectory))
             .withCache(dependenciesCache,
-                    CacheConfigurationBuilder.newCacheConfigurationBuilder(
-                            String::class.java,
-                            DependencyInfo::class.java,
-                            ResourcePoolsBuilder.newResourcePoolsBuilder().disk(50, MemoryUnit.MB, true)
-                    )
-            )
-            .build(true)
+                    CacheConfigurationBuilder.newCacheConfigurationBuilder(String::class.java, DependencyInfo::class.java, ResourcePoolsBuilder.heap(2000)))
+            .build()
     }
 
     companion object {
-        const val dependenciesCache = "dependenciesCache.txt"
+        const val dependenciesCache = "dependenciesCache"
 
         lateinit var cacheManager : CacheManager
 

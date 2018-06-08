@@ -1,15 +1,15 @@
 <ul class="list-group">
     {{#licenses}}
-        <a class="list-group-item list-group-item-action" href="/projs/{{project}}/report/{{report}}/licenses/{{pk.license.spdxId}}">
-            License Name: {{pk.license.spdxId}}
+        <a class="list-group-item list-group-item-action" href="/projs/{{project}}/report/{{report}}/licenses/{{first.pk.license.spdxId}}">
+            License Name: {{first.pk.license.spdxId}}
             <br>
-            {{#pk.dependency.pk.id}}
-                Dependency: {{pk.dependency.pk.id}}
+            {{#second}}
+                Number Of Dependencies: {{second}}
                 <br>
-            {{/pk.dependency.pk.id}}
-            {{#source}}
-                Source: {{source}}
-            {{/source}}
+            {{/second}}
+            {{#first.source}}
+                Source: {{first.source}}
+            {{/first.source}}
         </a>
         <br>
     {{/licenses}}
