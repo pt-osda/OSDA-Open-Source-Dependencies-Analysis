@@ -8,14 +8,8 @@ function httpRequest(method, path, data, cb) {
 
     xhr.onreadystatechange = function() {
         if(xhr.readyState === XMLHttpRequest.DONE) {
-            if(xhr.status === 200){
+            if(xhr.status === 200)
                 cb( null, xhr.response )
-            }
-            else{
-                document.open()
-                document.write(xhr.response)
-                document.close()
-            }
         }
     }
     xhr.send(data);
