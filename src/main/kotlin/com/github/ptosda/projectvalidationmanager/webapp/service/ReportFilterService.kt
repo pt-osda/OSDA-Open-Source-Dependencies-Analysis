@@ -16,7 +16,7 @@ class ReportFilterService(private val reportService: ReportService,
         val model = hashMapOf<String, Any?>()
 
         model["project_id"] = project.name
-        model["reports"] = project.report
+        model["reports"] = project.report?.sortedByDescending{ ZonedDateTime.parse(it.pk.timestamp) }
 
         model["view_name"] = "project-detail"
 
@@ -90,6 +90,7 @@ class ReportFilterService(private val reportService: ReportService,
         model["licenses"] = licenses
                 .groupBy { it.pk.license.spdxId }
                 .map { Pair(it.value[0], it.value.size) }
+                .sortedByDescending { it.second }
         model["view_name"] = "licenses"
 
         return model
@@ -122,6 +123,7 @@ class ReportFilterService(private val reportService: ReportService,
         model["licenses"] = licenses
                 .groupBy { it.pk.license.spdxId }
                 .map { Pair(it.value[0], it.value.size) }
+                .sortedByDescending { it.second }
         model["view_name"] = "licenses"
 
         return model

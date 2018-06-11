@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
+import java.time.ZonedDateTime
 import java.util.*
 import kotlin.collections.set
 import javax.xml.bind.DatatypeConverter
@@ -32,6 +33,7 @@ class ReportController(val reportService: ReportService,
         model["page_title"] = "Home"
 
         val projects = projectRepo.findAll()
+            .sortedBy{ it.name}
 
         model["projects"] = projects
 
@@ -91,6 +93,7 @@ class ReportController(val reportService: ReportService,
         model["page_title"] = "Licenses"
 
         model["licenses"] = licenseRepo.findAll()
+            .sortedBy { it.spdxId }
 
         return "license-list"
     }
@@ -110,6 +113,7 @@ class ReportController(val reportService: ReportService,
 
         model["project_id"] = projectId
         model["reports"] = reports.toList()
+            .sortedByDescending{ ZonedDateTime.parse(it.pk.timestamp) }
 
         return "project"
     }

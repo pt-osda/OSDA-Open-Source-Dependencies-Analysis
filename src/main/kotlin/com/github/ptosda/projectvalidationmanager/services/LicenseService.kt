@@ -5,6 +5,7 @@ import org.apache.http.entity.ContentType
 import org.jsoup.Jsoup
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -78,14 +79,15 @@ class LicenseService {
      */
     fun findLicense(id: String, version: String, licenseUrl: String): ArrayList<LicenseModel> {
         logger.info("The license information of {} will be searched for.", id)
-
-        val url = URL(licenseUrl)
-        val connection = url.openConnection() as HttpURLConnection
         val licenses = arrayListOf<LicenseModel>()
-        connection.requestMethod = "GET"
-        connection.setRequestProperty("User-Agent", "dependency validation server")
 
-        val statusCode = connection.responseCode
+        var connection = openHttpConnection(licenseUrl, HttpMethod.GET.name)
+        var statusCode = connection.responseCode
+
+        if(statusCode == 301){
+            connection = openHttpConnection(connection.getHeaderField("Location"), HttpMethod.GET.name)
+            statusCode = connection.responseCode
+        }
         if(statusCode != 200) {
             logger.warn("The license for the dependency was not found.")
             throw Exception("Error fetching licenses") //TODO Make custom exception to use with problem+json
@@ -112,6 +114,14 @@ class LicenseService {
 
         logger.info("The license information found was successfully obtained and its information prepared for a response.")
         return licenses
+    }
+
+    private fun openHttpConnection(licenseUrl: String, requestMethod: String): HttpURLConnection {
+        val url = URL(licenseUrl)
+        val connection = url.openConnection() as HttpURLConnection
+        connection.requestMethod = requestMethod
+        connection.setRequestProperty("User-Agent", "dependency validation server")
+        return connection
     }
 
     /**
