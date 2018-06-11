@@ -1,13 +1,17 @@
 package com.github.ptosda.projectvalidationmanager.webapp.service
 
 import com.github.ptosda.projectvalidationmanager.database.entities.*
+import com.github.ptosda.projectvalidationmanager.database.repositories.DependencyRepository
+import com.github.ptosda.projectvalidationmanager.database.repositories.ProjectRepository
 import com.github.ptosda.projectvalidationmanager.database.repositories.ReportRepository
 import org.springframework.stereotype.Service
 import java.time.ZonedDateTime
 
-@Service
-class ReportFilterService(private val reportService: ReportService,
-                          private val reportRepo: ReportRepository) {
+@Service // TODO add filters for generic dependency
+class ReportFilterService(private val projectRepo: ProjectRepository,
+                          private val reportService: ReportService,
+                          private val reportRepo: ReportRepository,
+                          private val dependencyRepo: DependencyRepository) {
     /**
      * Gets the model for the detail of a project
      * @param project the project to filter
@@ -18,7 +22,7 @@ class ReportFilterService(private val reportService: ReportService,
         model["project_id"] = project.name
         model["reports"] = project.report?.sortedByDescending{ ZonedDateTime.parse(it.pk.timestamp) }
 
-        model["view_name"] = "project-detail"
+        model["view_name"] = "project/project-detail-partial"
 
         return model
     }
@@ -47,7 +51,7 @@ class ReportFilterService(private val reportService: ReportService,
 
         model.putAll(reportService.getReportDependencies(report))
 
-        model["view_name"] = "report-detail"
+        model["view_name"] = "report/report-detail-partial"
 
         return model
     }
@@ -91,7 +95,7 @@ class ReportFilterService(private val reportService: ReportService,
                 .groupBy { it.pk.license.spdxId }
                 .map { Pair(it.value[0], it.value.size) }
                 .sortedByDescending { it.second }
-        model["view_name"] = "licenses"
+        model["view_name"] = "license/license-list-partial"
 
         return model
     }
@@ -124,7 +128,7 @@ class ReportFilterService(private val reportService: ReportService,
                 .groupBy { it.pk.license.spdxId }
                 .map { Pair(it.value[0], it.value.size) }
                 .sortedByDescending { it.second }
-        model["view_name"] = "licenses"
+        model["view_name"] = "license/license-list-partial"
 
         return model
     }
@@ -144,7 +148,7 @@ class ReportFilterService(private val reportService: ReportService,
         }
 
         model["vulnerabilities"] = vulnerabilities
-        model["view_name"] = "vulnerabilities"
+        model["view_name"] = "vulnerability/vulnerability-list-partial"
 
         return model
     }
@@ -172,7 +176,52 @@ class ReportFilterService(private val reportService: ReportService,
         }
 
         model["vulnerabilities"] = vulnerabilities
-        model["view_name"] = "vulnerabilities"
+        model["view_name"] = "vulnerability/vulnerability-list-partial"
+
+        return model
+    }
+
+    /**
+     * Gets the model for the vulnerabilities of a report
+     * @param dependencyId the id of the dependency
+     * @param dependencyVersion the version of the dependency
+     */
+    fun getGenericDependencyDetailView(dependencyId: String, dependencyVersion: String) : HashMap<String, Any?> {
+        val model = hashMapOf<String, Any?>()
+
+        val decodedDepencencyId = dependencyId.replace(':', '/')
+
+        val dependency = dependencyRepo.findAll()
+                .last { it.pk.mainVersion == dependencyVersion && it.pk.id == decodedDepencencyId }
+
+        model["title"] = dependency.pk.id
+        model["main_version"] = dependency.pk.mainVersion
+        model["description"] = dependency.description
+        model["license"] = dependency.license
+        model["vulnerabilities"] = dependency.vulnerabilities
+
+        model["view_name"] = "dependency/generic-dependency-detail-partial"
+
+        return model
+    }
+
+    /**
+     * Gets the model for the vulnerabilities of a report
+     * @param dependencyId the id of the project
+     * @param dependencyVersion the id of the report to filter
+     */
+    fun getGenericDependencyProjectsView(dependencyId: String, dependencyVersion: String) : HashMap<String, Any?> {
+        val model = hashMapOf<String, Any?>()
+
+        val decodedDepencencyId = dependencyId.replace(':', '/')
+
+        val dependency = dependencyRepo.findAll()
+                .last { it.pk.mainVersion == dependencyVersion && it.pk.id == decodedDepencencyId }
+
+        model["projects"] = projectRepo.findAll()
+                .filter { it.report?.last()?.dependency?.contains(dependency)!! }
+
+        model["view_name"] = "project/project-list-partial"
 
         return model
     }

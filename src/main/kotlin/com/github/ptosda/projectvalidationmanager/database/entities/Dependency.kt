@@ -1,7 +1,11 @@
 package com.github.ptosda.projectvalidationmanager.database.entities
 
+import antlr.StringUtils
 import java.io.Serializable
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import javax.persistence.*
+import kotlin.jvm.Transient
 
 @Entity
 @Table(name = "dependency")
@@ -49,4 +53,8 @@ data class Dependency ( // TODO In case a specific dependency has new vulnerabil
                         "; description:" + description +
                         "; vulnerabilitiesCount:" + vulnerabilitiesCount
         }
+
+        @Transient
+        var title = ""
+        get() = pk.id.replace('/',':')
 }

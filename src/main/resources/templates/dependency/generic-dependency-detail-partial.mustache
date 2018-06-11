@@ -1,18 +1,5 @@
-{{> header}}
 
-<div class="container-fluid">
-
-    <h3 class="text-center">
-        {{title}}
-    </h3>
-
-    <a class="btn btn-outline-danger text-left" href="/projs/{{project_id}}/report/{{report_id}}">See the report</a>
-
-    <br>
-
-    <br>
-
-    Main Version: {{main_version}}
+    Version: {{main_version}}
     {{#description}}
         <br>
         Description: {{description}}
@@ -35,7 +22,7 @@
     <h4>Vulnerabilities:</h4>
     <ul class="list-group">
         {{#vulnerabilities}}
-            <a class="list-group-item list-group-item-action" href="/deps/{{title}}/vulnerability/{{pk.vulnerability.id}}">
+            <a class="list-group-item list-group-item-action" href="/deps/{{dependency_id}}/vulnerability/{{pk.vulnerability.id}}">
                 Vulnerability Title: {{pk.vulnerability.title}}
                 <br>
                 Vulnerability Description: {{pk.vulnerability.description}}
@@ -47,8 +34,3 @@
             No vulnerabilities were found for this dependency
         {{/vulnerabilities}}
     </ul>
-    <br>
-
-</div>
-
-{{> footer}}

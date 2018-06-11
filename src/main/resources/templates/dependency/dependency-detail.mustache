@@ -6,13 +6,13 @@
         {{title}}
     </h3>
 
-    <a class="btn btn-outline-danger text-left" href="/deps">See All Dependencies</a>
+    <a class="btn btn-outline-danger text-left" href="/projs/{{project_id}}/report/{{report_id}}">See the report</a>
 
     <br>
 
     <br>
 
-    Version: {{main_version}}
+    Main Version: {{main_version}}
     {{#description}}
         <br>
         Description: {{description}}
@@ -35,7 +35,7 @@
     <h4>Vulnerabilities:</h4>
     <ul class="list-group">
         {{#vulnerabilities}}
-            <a class="list-group-item list-group-item-action" href="/deps/{{title}}/vulnerability/{{pk.vulnerability.id}}">
+            <a class="list-group-item list-group-item-action" href="/deps/{{dependency_id}}/vulnerability/{{pk.vulnerability.id}}">
                 Vulnerability Title: {{pk.vulnerability.title}}
                 <br>
                 Vulnerability Description: {{pk.vulnerability.description}}
@@ -48,19 +48,6 @@
         {{/vulnerabilities}}
     </ul>
     <br>
-    <h4>Projects:</h4>
-        <ul class="list-group">
-            {{#projects}}
-                <a class="list-group-item list-group-item-action" href="/projs/{{name}}">
-                    Project Name: {{name}}
-                    <br>
-                </a>
-            {{/projects}}
-            {{^projects}}
-                No projects are currently using this dependency
-            {{/projects}}
-        </ul>
-        <br>
 
 </div>
 

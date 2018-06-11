@@ -8,6 +8,9 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
+import java.net.URLDecoder
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import java.time.ZonedDateTime
 import java.util.*
 import kotlin.collections.set
@@ -54,7 +57,7 @@ class ReportController(val reportService: ReportService,
             .map { it.last() }
             .sortedBy{ it.pk.id.toLowerCase() }
 
-        return "dependency-list"
+        return "dependency/dependency-list"
     }
 
     /**
@@ -70,10 +73,13 @@ class ReportController(val reportService: ReportService,
     {
         model["page_title"] = "Dependency Detail"
 
+        val decodedDepencencyId = dependencyId.replace(':', '/')
+
         val dependency = dependencyRepo.findAll()
-            .last { it.pk.mainVersion == dependencyVersion && it.pk.id == dependencyId }
+            .last { it.pk.mainVersion == dependencyVersion && it.pk.id == decodedDepencencyId }
 
         model["title"] = dependency.pk.id
+        model["dependency_id"] = dependency.title
         model["main_version"] = dependency.pk.mainVersion
         model["description"] = dependency.description
         model["license"] = dependency.license
@@ -81,7 +87,7 @@ class ReportController(val reportService: ReportService,
         model["projects"] = projectRepo.findAll()
             .filter { it.report?.last()?.dependency?.contains(dependency)!! }
 
-        return "dependency-generic-detail"
+        return "dependency/generic-dependency-detail"
     }
 
     /**
@@ -95,7 +101,7 @@ class ReportController(val reportService: ReportService,
         model["licenses"] = licenseRepo.findAll()
             .sortedBy { it.spdxId }
 
-        return "license-list"
+        return "license/generic-license-list"
     }
 
     /**
@@ -115,7 +121,7 @@ class ReportController(val reportService: ReportService,
         model["reports"] = reports.toList()
             .sortedByDescending{ ZonedDateTime.parse(it.pk.timestamp) }
 
-        return "project"
+        return "project/project-detail"
     }
 
     /**
@@ -151,7 +157,7 @@ class ReportController(val reportService: ReportService,
                 it.vulnerabilitiesCount > 0
         }
 
-        return "report"
+        return "report/report-detail"
     }
 
     /**
@@ -183,12 +189,13 @@ class ReportController(val reportService: ReportService,
         model["report_id"] = reportId
 
         model["title"] = dependency.pk.id
+        model["dependency_id"] = dependency.title
         model["main_version"] = dependency.pk.mainVersion
         model["description"] = dependency.description
         model["license"] = dependency.license
         model["vulnerabilities"] = dependency.vulnerabilities
 
-        return "dependency-detail"
+        return "dependency/dependency-detail"
     }
 
     /**
@@ -218,7 +225,7 @@ class ReportController(val reportService: ReportService,
                 }
         model["error_info"] = license.errorInfo
 
-        return "license-detail"
+        return "license/license-detail"
     }
 
     /**
@@ -243,7 +250,7 @@ class ReportController(val reportService: ReportService,
         model["dependencies"] = license.dependencies
         model["error_info"] = license.errorInfo
 
-        return "license-detail"
+        return "license/license-detail"
     }
 
     /**
@@ -269,6 +276,6 @@ class ReportController(val reportService: ReportService,
 
         model["vulnerability"] = vulnerability
 
-        return "vulnerability-detail"
+        return "vulnerability/vulnerability-detail"
     }
 }

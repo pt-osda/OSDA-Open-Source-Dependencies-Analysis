@@ -1,0 +1,35 @@
+
+{{> header}}
+
+<div class="container-fluid">
+
+    <h2 class="text-center" id="test">
+        {{project_id}}
+    </h2>
+
+    <p>
+        <a class="btn btn-outline-danger text-left" href="/projs/{{project_id}}">See the project</a>
+    </p>
+
+    <div class="nav nav-pills nav-justified">
+        <a class="nav-item nav-link btn-outline-dark  active" id="detail" href="#detail" onfocus="filterElementToShow('projs/{{project_id}}/report/{{report_id}}/filter/detail', 'show-information', 'detail')">
+            Detail
+        </a>
+        <a class="nav-item nav-link btn-outline-dark " id="licenses" href="#licenses" onfocus="filterElementToShow('projs/{{project_id}}/report/{{report_id}}/filter/licenses', 'show-information', 'licenses')">
+            Licenses
+        </a>
+        <a class="nav-item nav-link btn-outline-dark " id="vulnerabilities" href="#vulnerabilities" onfocus="filterElementToShow('projs/{{project_id}}/report/{{report_id}}/filter/vulnerabilities', 'show-information', 'vulnerabilities')">
+            Vulnerabilities
+        </a>
+    </div>
+
+    <br>
+
+    <div id="show-information">
+        {{> report/report-detail-partial}}
+    </div>
+
+</div>
+
+
+{{> footer}}

@@ -1,0 +1,45 @@
+{{> header}}
+
+<div class="container-fluid">
+
+    <h3 class="text-center">
+        {{title}}
+    </h3>
+
+    <p>
+        <a class="btn btn-outline-danger text-left" href="/deps">See All Dependencies</a>
+    </p>
+
+    <div class="nav nav-pills nav-justified">
+        <a class="nav-item nav-link btn-outline-dark active" id="detail" href="#detail" onfocus="filterElementToShow('deps/{{dependency_id}}/version/{{main_version}}/filter/detail', 'show-information', 'detail')">
+            Detail
+        </a>
+        <a class="nav-item nav-link btn-outline-dark" id="projects" href="#projects" onfocus="filterElementToShow('deps/{{dependency_id}}/version/{{main_version}}/filter/projects', 'show-information', 'projects')">
+            Related Projects
+        </a>
+    </div>
+
+    <br>
+
+    <div class="container-fluid" id="show-information">
+        {{> dependency/generic-dependency-detail-partial}}
+    </div>
+
+    <!--
+
+    <br>
+        <ul class="list-group">
+            {#projects}}
+                <a class="list-group-item list-group-item-action" href="/projs/{name}}">
+                    Project Name: {name}}
+                    <br>
+                </a>
+            {/projects}}
+            {^projects}}
+                No projects are currently using this dependency
+            {/projects}}
+        </ul>
+-->
+</div>
+
+{{> footer}}

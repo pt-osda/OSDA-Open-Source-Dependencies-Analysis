@@ -26,8 +26,6 @@ spring:
     username: osda
     password: osda
     driver-class-name: org.postgresql.Driver
-  resources:
-    static-locations: ["classpath:/META-INF/resources/", "classpath:/resources/", "classpath:/static/", "classpath:/public/", "classpath:/resources/static/javascript"]
 logging:
   level:
     org:
@@ -59,8 +57,6 @@ spring:
     username: osda
     password: osda
     driver-class-name: org.postgresql.Driver
-  resources:
-    static-locations: ["classpath:/META-INF/resources/", "classpath:/resources/", "classpath:/static/", "classpath:/public/", "classpath:/resources/static/javascript"]
 logging:
   level:
     org:

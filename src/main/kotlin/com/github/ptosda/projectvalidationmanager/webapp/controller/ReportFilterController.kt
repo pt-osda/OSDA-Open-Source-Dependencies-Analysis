@@ -38,12 +38,20 @@ class ReportFilterController(val reportFilterService: ReportFilterService,
     )
 
     /**
+     * HashMap with all generic dependency filter types and corresponding functions
+     */
+    val genericDependencyFilterFunctions = hashMapOf<String, (String, String) -> HashMap<String, Any?>>(
+            "detail" to { dependencyId, dependencyVersion -> reportFilterService.getGenericDependencyDetailView(dependencyId, dependencyVersion) },
+            "projects" to { dependencyId, dependencyVersion -> reportFilterService.getGenericDependencyProjectsView(dependencyId, dependencyVersion) }
+    )
+
+    /**
      * HashMap with all report search functions
      */
     val searchFilterFunctions = hashMapOf<String, (String) -> HashMap<String, Any?>>(
             "projs" to { searchText ->
                 hashMapOf( "projects" to projectRepo.findAll().filter { it.name.startsWith(searchText, true) },
-                        "view_name" to "projects"
+                        "view_name" to "project/project-list-partial"
                 )
             },
             "dependencies" to { searchText ->
@@ -53,12 +61,12 @@ class ReportFilterController(val reportFilterService: ReportFilterService,
                         .map { it.last() }
                         .sortedBy{ it.pk.id }
                         .filter { it.pk.id.startsWith(searchText, true) },
-                        "view_name" to "dependencies"
+                        "view_name" to "dependency/dependency-list-partial"
                 )
             },
             "licenses" to { searchText ->
                 hashMapOf( "licenses" to licenseRepo.findAll().filter { it.spdxId.trimStart('(').startsWith(searchText, true) },
-                        "view_name" to "generic-licenses"
+                        "view_name" to "license/generic-license-list-partial"
                 )
             }
     )
@@ -102,6 +110,24 @@ class ReportFilterController(val reportFilterService: ReportFilterService,
                     model: HashMap<String, Any?>) : String
     {
         model.putAll(buildFilterFunctions[filterType]!!.invoke(projectId, buildId))
+
+        return model["view_name"].toString()
+    }
+
+    /**
+     * Gets the view for any of two possible elements of a Generic Dependency. These are its detail or projects
+     * @param projectId the if of the project that the report belongs
+     * @param buildId the if of the report to filter
+     * @param filterType the type of filtering to be done (detail, licenses or vulnerabilities)
+     * @param model hash map to store all view related information
+     */
+    @GetMapping("deps/{dependency-id}/version/{version}/filter/{filter-type}")
+    fun filterGenericDependency(@PathVariable("dependency-id") dependencyId: String,
+                    @PathVariable("version") dependencyVersion: String,
+                    @PathVariable("filter-type") filterType: String,
+                    model: HashMap<String, Any?>) : String
+    {
+        model.putAll(genericDependencyFilterFunctions[filterType]!!.invoke(dependencyId, dependencyVersion))
 
         return model["view_name"].toString()
     }
