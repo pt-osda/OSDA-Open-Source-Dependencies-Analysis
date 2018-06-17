@@ -1,17 +1,17 @@
 
-    Version: {{main_version}}
+    <b>Version:</b> {{main_version}}
     {{#description}}
         <br>
-        Description: {{description}}
+        <b>Description:</b> {{description}}
         <br>
     {{/description}}
     <h4>Licenses:</h4>
     <ul class="list-group">
         {{#license}}
             <a class="list-group-item list-group-item-action" href="/licenses/{{pk.license.spdxId}}">
-                License Name: {{pk.license.spdxId}}
+                <b>License Name:</b> {{pk.license.spdxId}}
                 <br>
-                License Source: {{source}}
+                <b>License Source:</b> {{source}}
             </a>
         {{/license}}
         {{^license}}
@@ -23,11 +23,13 @@
     <ul class="list-group">
         {{#vulnerabilities}}
             <a class="list-group-item list-group-item-action" href="/deps/{{dependency_id}}/vulnerability/{{pk.vulnerability.id}}">
-                Vulnerability Title: {{pk.vulnerability.title}}
+                <b>Vulnerability Title:</b> {{pk.vulnerability.title}}
                 <br>
-                Vulnerability Description: {{pk.vulnerability.description}}
+                <b>Vulnerability Description:</b> {{pk.vulnerability.description}}
                 <br>
-                Affected Versions: {{versionCriteria}}
+                <b>Affected Versions:</b> {{versionCriteria}}
+                <br>
+                <b>Source:</b> {{sourceDependency}}
             </a>
         {{/vulnerabilities}}
         {{^vulnerabilities}}

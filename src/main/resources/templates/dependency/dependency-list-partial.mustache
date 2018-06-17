@@ -2,9 +2,9 @@
     <ul class="list-group" id="dependency-list">
         {{#dependencies}}
             <a href="/deps/{{title}}/version/{{pk.mainVersion}}" class="list-group-item list-group-item-action">
-                Name: {{pk.id}}
+                <b>Name:</b> {{pk.id}}
                 <br>
-                Main Version: {{pk.mainVersion}}
+                <b>Main Version:</b> {{pk.mainVersion}}
                 <br>
                 {{vulnerabilitiesCount}} vulnerabilities found
             </a>

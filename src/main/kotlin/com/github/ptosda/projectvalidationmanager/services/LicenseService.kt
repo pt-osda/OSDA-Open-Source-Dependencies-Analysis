@@ -11,7 +11,6 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
-import kotlin.math.log
 
 @Service
 class LicenseService {

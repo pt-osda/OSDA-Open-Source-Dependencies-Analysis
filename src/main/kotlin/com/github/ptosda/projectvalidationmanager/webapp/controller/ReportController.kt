@@ -8,13 +8,9 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
-import java.net.URLDecoder
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 import java.time.ZonedDateTime
 import java.util.*
 import kotlin.collections.set
-import javax.xml.bind.DatatypeConverter
 
 /**
  * Controller for the WebApp
@@ -36,7 +32,7 @@ class ReportController(val reportService: ReportService,
         model["page_title"] = "Home"
 
         val projects = projectRepo.findAll()
-            .sortedBy{ it.name}
+                .sortedBy{ it.name}
 
         model["projects"] = projects
 
@@ -51,11 +47,11 @@ class ReportController(val reportService: ReportService,
     {
         model["page_title"] = "Dependencies"
 
-        model["dependencies"] = dependencyRepo.findAll()
-            .groupBy { it.pk.id + it.pk.mainVersion }
-            .values
-            .map { it.last() }
-            .sortedBy{ it.pk.id.toLowerCase() }
+        model["dependencies"] = dependencyRepo.findAll().filter { it.direct }
+                .groupBy { it.pk.id + it.pk.mainVersion }
+                .values
+                .map { it.last() }
+                .sortedBy{ it.pk.id.toLowerCase() }
 
         return "dependency/dependency-list"
     }
@@ -73,10 +69,11 @@ class ReportController(val reportService: ReportService,
     {
         model["page_title"] = "Dependency Detail"
 
-        val decodedDepencencyId = dependencyId.replace(':', '/')
+        //val decodedDepencencyId = dependencyId.replace(':', '/')
 
-        val dependency = dependencyRepo.findAll()
-            .last { it.pk.mainVersion == dependencyVersion && it.pk.id == decodedDepencencyId }
+        val dependencies = dependencyRepo.findAll()
+        val dependency = dependencies
+                .last { it.pk.mainVersion == dependencyVersion && it.pk.id == dependencyId }
 
         model["title"] = dependency.pk.id
         model["dependency_id"] = dependency.title
@@ -85,7 +82,7 @@ class ReportController(val reportService: ReportService,
         model["license"] = dependency.license
         model["vulnerabilities"] = dependency.vulnerabilities
         model["projects"] = projectRepo.findAll()
-            .filter { it.report?.last()?.dependency?.contains(dependency)!! }
+                .filter { it.report?.last()?.dependency?.contains(dependency)!! }
 
         return "dependency/generic-dependency-detail"
     }
@@ -118,8 +115,18 @@ class ReportController(val reportService: ReportService,
         val reports = projectRepo.findById(projectId).get().report!!
 
         model["project_id"] = projectId
+
+        reports.toList().forEach {
+            val vulnerabilities = mutableListOf<Vulnerability>()
+            it.dependency?.forEach { it.vulnerabilities.forEach {
+                if (!vulnerabilities.contains(it.pk.vulnerability))
+                    vulnerabilities.add(it.pk.vulnerability!!)
+            } }
+            it.vulnerabilitiesCount = vulnerabilities.size
+        }
+
         model["reports"] = reports.toList()
-            .sortedByDescending{ ZonedDateTime.parse(it.pk.timestamp) }
+                .sortedByDescending{ ZonedDateTime.parse(it.pk.timestamp) }
 
         return "project/project-detail"
     }
@@ -150,11 +157,12 @@ class ReportController(val reportService: ReportService,
         model["readable_time"] = report.readableTimeStamp
         model["report_tag"] = report.tag
 
+
         model["vulnerable_dependencies"] = report.dependency!!.filter {
             if(it.vulnerabilitiesCount == null)
                 false
             else
-                it.vulnerabilitiesCount > 0
+                it.vulnerabilitiesCount!! > 0 && it.direct
         }
 
         return "report/report-detail"
@@ -221,7 +229,9 @@ class ReportController(val reportService: ReportService,
         model["license_id"] = license.spdxId
         model["dependencies"] = license.dependencies
                 .filter{
-                    it.pk.dependency.pk.report.pk.project.name == projectId && it.pk.dependency.pk.report.pk.timestamp == reportId
+                    it.pk.dependency.pk.report.pk.project.name == projectId &&
+                            it.pk.dependency.pk.report.pk.timestamp == reportId &&
+                            it.pk.dependency.direct
                 }
         model["error_info"] = license.errorInfo
 
@@ -247,7 +257,7 @@ class ReportController(val reportService: ReportService,
         val license = licenseInfo.get()
 
         model["license_id"] = license.spdxId
-        model["dependencies"] = license.dependencies
+        model["dependencies"] = license.dependencies.filter { it.pk.dependency.direct }
         model["error_info"] = license.errorInfo
 
         return "license/license-detail"

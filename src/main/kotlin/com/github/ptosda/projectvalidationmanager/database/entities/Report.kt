@@ -18,9 +18,17 @@ data class Report(
 {
     @Transient
     var vulnerabilitiesCount = 0
-        get() = dependency!!.sumBy {
-            it.vulnerabilitiesCount ?: 0
+        get() = {
+            val vulnerabilities = mutableListOf<Vulnerability>()
+            dependency?.forEach {
+                it.vulnerabilities.forEach {
+                    if (!vulnerabilities.contains(it.pk.vulnerability))
+                        vulnerabilities.add(it.pk.vulnerability!!)
+                }
             }
+            val size = vulnerabilities.size
+            size
+        }.invoke()
 
     @Transient
     var vulnerableDependencies = 0
@@ -28,7 +36,7 @@ data class Report(
             if(it.vulnerabilitiesCount == null)
                     false
                     else
-                    it.vulnerabilitiesCount > 0
+                    it.vulnerabilitiesCount!! > 0
             }
 
     @Transient

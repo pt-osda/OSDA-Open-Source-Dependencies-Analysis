@@ -4,12 +4,13 @@ import com.github.ptosda.projectvalidationmanager.model.report.Report
 import com.github.ptosda.projectvalidationmanager.model.report.ReportDependency
 import com.github.ptosda.projectvalidationmanager.database.entities.*
 import com.github.ptosda.projectvalidationmanager.database.repositories.*
+import com.github.ptosda.projectvalidationmanager.model.report.ReportVulnerability
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import javax.xml.bind.DatatypeConverter
+import java.util.stream.Collectors
 
 @RestController
 @RequestMapping("/report")
@@ -78,7 +79,7 @@ class ReportAPIController(
 
     /**
      * Function responsible for creating the repository referenced in the report if it didn't already existed.
-     * <br>
+     *
      * If the repository already existed and it didn't contain an organization and in the current report a organization
      * was referred, then that repository will be altered to reference the organization it belongs to.
      * @param repoName The name of the repository to create.
@@ -108,7 +109,7 @@ class ReportAPIController(
 
     /**
      * Function for creating the project referenced in the report if it didn't already existed.
-     * <br>
+     *
      * If the project already existed and it didn't referenced a repository and one was referenced in the report
      * then the project will be altered to reflect this change.
      * @param projectName The name of the project the report belongs to.
@@ -152,36 +153,55 @@ class ReportAPIController(
 
     /**
      * Function to create all the dependencies referenced in the report including their licenses and vulnerabilities.
+     *
      * Every dependency will be stored in the database as they are specific to each report.
      * @param dependencies The list of the dependencies referenced in the report that belong to the project
      * @param report The report this dependencies belong to.
      */
     private fun storeDependencies(dependencies: ArrayList<ReportDependency>, report: com.github.ptosda.projectvalidationmanager.database.entities.Report) {
         dependencies.forEach {
+            val childrenSet : MutableSet<Dependency> = mutableSetOf()
+            if (it.children!!.size > 0) {
+                val children = it.children
+
+                for (dependency in dependencies){
+                    if (children.contains(dependency.title + ":" + dependency.mainVersion))
+                        childrenSet.add(Dependency(DependencyPk(dependency.title, report, dependency.mainVersion),
+                                dependency.description,
+                                0,  // Children don't have vulnerabilities their parents do.
+                                null,
+                                emptySet(),
+                                emptyList(),
+                                arrayListOf(),
+                                dependency.direct!!))
+                }
+            }
+
             val dependency = Dependency(
                     DependencyPk(it.title, report, it.mainVersion),
                     it.description,
-                    it.vulnerabilitiesCount,
+                    0,
                     //it.privateVersions,
                     null,
-                    setOf(),
+                    childrenSet,
                     arrayListOf(),
-                    arrayListOf()
+                    arrayListOf(),
+                    it.direct!!
             )
+
             dependencyRepository.save(dependency)
             logger.info("All the dependency regarded information was stored in the database.")
 
             storeDependencyLicenses(it, dependency)
             logger.info("All the dependency license regarded information was stored in the database.")
-
-            storeDependencyVulnerability(it, dependency)
-            logger.info("All the dependency vulnerability regarded information was stored in the database.")
         }
+
+        updateVulnerabilities(dependencies, report)
     }
 
     /**
      * Function to create the licenses referenced by the dependency of a project if it didn't already existed.
-     * <br>
+     *
      * Since the same license can be used for different dependencies there is only one entry for each license. So the
      * license is only created if it does not exist.
      * @param reportDependency The dependency in the report that contains the licenses from the report
@@ -207,36 +227,97 @@ class ReportAPIController(
         dependencyLicenseRepository.saveAll(licenses)
     }
 
+    // TODO add multiple sources
     /**
-     * Function to create the vulnerabilities of a dependency of a project if it didn't already existed.
-     * <br>
-     * In case the vulnerability already exists there will not be changed anything.
-     * @param reportDependency The dependency in the report that contains the vulnerabilities.
-     * @param dependency The dependency that will have its vulnerabilities altered.
+     * Function responsible for finding the vulnerabilities that the direct dependencies should have because of their
+     * children.
+     *
+     * Here the dependencies graph will be traveled in order to find the direct dependency that needs the
+     * vulnerable dependency.
+     * @param dependencies The dependencies received from the report of the plugin.
+     * @param report The report send by the plugin.
      */
-    private fun storeDependencyVulnerability(reportDependency: ReportDependency, dependency: Dependency) {
-        val vulnerabilities = arrayListOf<DependencyVulnerability>()
-        reportDependency.vulnerabilities.forEach {
-            val vulnerability: Vulnerability
-            if (!vulnerabilityRepository.findById(it.id).isPresent) {
-                logger.info("The vulnerability did not existed so a new one will be created.")
-                vulnerability = Vulnerability(
-                        it.id,
-                        it.title,
-                        it.description,
-                        it.references,
-                        setOf()
-                )
-                vulnerabilityRepository.save(vulnerability)
-            } else {
-                logger.info("The vulnerability already existed in the database.")
-                vulnerability = vulnerabilityRepository.findById(it.id).get()   // TODO check if this is needed since a vulnerability is specific to a depenedency
-            }
-            vulnerabilities.add(DependencyVulnerability(
-                    DependencyVulnerabilityPk(dependency, vulnerability),
-                    it.versions.joinToString(separator = ";")
-            ))
+    private fun updateVulnerabilities(dependencies: ArrayList<ReportDependency>, report: com.github.ptosda.projectvalidationmanager.database.entities.Report) {
+        val vulnerableDependencies = dependencies.filter { it.vulnerabilitiesCount > 0 }
+
+        val directDependencies = dependencyRepository.getDirectDependenciesFromReport(report.pk.project.name, report.pk.timestamp)
+
+        vulnerableDependencies.forEach {
+            val dependencyId = it.title + ":" + it.mainVersion
+            val upperDependencies = dependencies.filter { it.children!!.contains(dependencyId) }
+            val parentDependency = upperDependencies.stream().filter { it.direct!! }.collect(Collectors.toList())
+
+            parentDependency.addAll(findDirectParent(upperDependencies, dependencies, parentDependency))
+
+            saveParentsVulnerabilities(parentDependency.distinct(), directDependencies, it.vulnerabilitiesCount, it.vulnerabilities, dependencyId)
         }
-        dependencyVulnerabilityRepository.saveAll(vulnerabilities)
+    }
+
+    /**
+     * Function that will recursively travel through the dependency graph beginning in the vulnerable dependencies until
+     * it is found the direct dependency that uses the vulnerable one.
+     *
+     * @param upperDependencies The list of dependencies that have as children the vulnerable dependency.
+     * @param dependencies The dependencies received from the report of the plugin.
+     * @param parentDependency The list of direct dependencies that have as children the vulnerable one.
+     * @return The list of direct dependencies that have as children the vulnerable one.
+     */
+    private fun findDirectParent(upperDependencies: List<ReportDependency>, dependencies: ArrayList<ReportDependency>, parentDependency: MutableList<ReportDependency>): MutableList<ReportDependency> {
+        upperDependencies.stream().filter { !it.direct!! }.forEach {
+            val dependencyId = it.title + ":" + it.mainVersion
+            val dependencyParents = dependencies.filter { it.children!!.contains(dependencyId) }
+            parentDependency.addAll(dependencyParents.stream().filter { it.direct!! && !parentDependency.contains(it) }.collect(Collectors.toList()))
+
+            parentDependency.addAll(findDirectParent(dependencies.filter { it.children!!.contains(dependencyId) }, dependencies, parentDependency))
+        }
+        return parentDependency
+    }
+
+    /**
+     * Saves in the database the vulnerabilities received in the report from the plugin.
+     *
+     * Saves the connection between the vulnerabilities and the direct dependencies that brought them.
+     *
+     * @param parents The list of parents that are vulnerable either directly or because one of their dependency.
+     * @param directDependencies The list of direct dependencies refereed in the report.
+     * @param vulnerabilitiesCount The number of vulnerabilities found.
+     * @param vulnerabilities The list of vulnerabilities found.
+     * @param vulnerableDependencyId The vulnerable dependency.
+     */
+    private fun saveParentsVulnerabilities(parents: List<ReportDependency>, directDependencies: List<Dependency>, vulnerabilitiesCount: Int, vulnerabilities: ArrayList<ReportVulnerability>, vulnerableDependencyId: String) {
+        parents.forEach {
+            val parent = it
+            val direct = directDependencies.filter { it.pk.id == parent.title && it.pk.mainVersion == parent.mainVersion }[0]
+
+            direct.vulnerabilitiesCount = direct.vulnerabilitiesCount?.plus(vulnerabilitiesCount)
+
+            val toAddVulnerabilities = arrayListOf<DependencyVulnerability>()
+
+            vulnerabilities.forEach {
+                val vulnerability: Vulnerability
+                if (!vulnerabilityRepository.findById(it.id).isPresent) {
+                    logger.info("The vulnerability did not existed so a new one will be created.")
+                    vulnerability = Vulnerability(
+                            it.id,
+                            it.title,
+                            it.description,
+                            it.references,
+                            setOf()
+                    )
+                    vulnerabilityRepository.save(vulnerability)
+                } else {
+                    logger.info("The vulnerability already existed in the database.")
+                    vulnerability = vulnerabilityRepository.findById(it.id).get()   // TODO check if this is needed since a vulnerability is specific to a depenedency
+                }
+
+                toAddVulnerabilities.add(DependencyVulnerability(
+                        DependencyVulnerabilityPk(direct, vulnerability),
+                        it.versions.joinToString(separator = ";"),
+                        vulnerableDependencyId
+                ))
+            }
+
+            dependencyVulnerabilityRepository.saveAll(toAddVulnerabilities)
+        }
     }
 }

@@ -92,6 +92,7 @@ class ReportFilterService(private val projectRepo: ProjectRepository,
         model["report"] = report.pk.timestamp
         model["project"] = report.pk.project.name
         model["licenses"] = licenses
+                .filter { it.pk.dependency.direct }
                 .groupBy { it.pk.license.spdxId }
                 .map { Pair(it.value[0], it.value.size) }
                 .sortedByDescending { it.second }
@@ -189,10 +190,10 @@ class ReportFilterService(private val projectRepo: ProjectRepository,
     fun getGenericDependencyDetailView(dependencyId: String, dependencyVersion: String) : HashMap<String, Any?> {
         val model = hashMapOf<String, Any?>()
 
-        val decodedDepencencyId = dependencyId.replace(':', '/')
+        //val decodedDepencencyId = dependencyId.replace(':', '/')
 
         val dependency = dependencyRepo.findAll()
-                .last { it.pk.mainVersion == dependencyVersion && it.pk.id == decodedDepencencyId }
+                .last { it.pk.mainVersion == dependencyVersion && it.pk.id == dependencyId }
 
         model["title"] = dependency.pk.id
         model["main_version"] = dependency.pk.mainVersion
@@ -213,10 +214,10 @@ class ReportFilterService(private val projectRepo: ProjectRepository,
     fun getGenericDependencyProjectsView(dependencyId: String, dependencyVersion: String) : HashMap<String, Any?> {
         val model = hashMapOf<String, Any?>()
 
-        val decodedDepencencyId = dependencyId.replace(':', '/')
+        //val decodedDepencencyId = dependencyId.replace(':', '/')
 
         val dependency = dependencyRepo.findAll()
-                .last { it.pk.mainVersion == dependencyVersion && it.pk.id == decodedDepencencyId }
+                .last { it.pk.mainVersion == dependencyVersion && it.pk.id == dependencyId }
 
         model["projects"] = projectRepo.findAll()
                 .filter { it.report?.last()?.dependency?.contains(dependency)!! }

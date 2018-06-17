@@ -18,10 +18,10 @@
             <br>
             {{#reports}}
                 <a href="/projs/{{project_id}}/report/{{pk.timestamp}}" class="list-group-item list-group-item-action">
-                    Timestamp: {{readableTimeStamp}}
+                    <b>Timestamp:</b> {{readableTimeStamp}}
                     <br>
                     {{#tag}}
-                        Tag: {{tag}}
+                        <b>Tag:</b> {{tag}}
                         <br>
                     {{/tag}}
                     Out of {{dependency.size}} dependencies, {{vulnerableDependencies}} are vulnerable

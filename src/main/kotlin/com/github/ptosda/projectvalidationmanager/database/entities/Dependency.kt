@@ -1,9 +1,6 @@
 package com.github.ptosda.projectvalidationmanager.database.entities
 
-import antlr.StringUtils
 import java.io.Serializable
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 import javax.persistence.*
 import kotlin.jvm.Transient
 
@@ -16,7 +13,7 @@ data class Dependency ( // TODO In case a specific dependency has new vulnerabil
         @Column(columnDefinition = "TEXT")
         val description: String?,
 
-        val vulnerabilitiesCount: Int?,
+        var vulnerabilitiesCount: Int?,
 
         val error_info: String?,
 
@@ -27,7 +24,9 @@ data class Dependency ( // TODO In case a specific dependency has new vulnerabil
         val license: List<DependencyLicense>,
 
         @OneToMany(mappedBy = "pk.dependency", cascade = [CascadeType.ALL])
-        val vulnerabilities: List<DependencyVulnerability>
+        val vulnerabilities: MutableList<DependencyVulnerability>,
+
+        val direct : Boolean
 ) : Serializable
 {
         override fun equals(other: Any?): Boolean {

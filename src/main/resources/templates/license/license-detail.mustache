@@ -14,9 +14,9 @@
     <ul class="list-group">
         {{#dependencies}}
             <a class="list-group-item list-group-item-action" href="/projs/{{pk.dependency.pk.report.pk.project.name}}/report/{{pk.dependency.pk.report.pk.timestamp}}/deps/{{pk.dependency.pk.id}}/version/{{pk.dependency.pk.mainVersion}}">
-                Dependency Name: {{pk.dependency.pk.id}}
+                <b>Dependency Name:</b> {{pk.dependency.pk.id}}
                 <br>
-                Source: {{source}}
+                <b>Source:</b> {{source}}
             </a>
             <br>
         {{/dependencies}}

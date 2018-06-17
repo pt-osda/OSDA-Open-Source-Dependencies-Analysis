@@ -90,7 +90,6 @@ class ReportFilterController(val reportFilterService: ReportFilterService,
 
         val project = projectInfo.get()
 
-
         model.putAll(projectFilterFunctions[filterType]!!.invoke(project))
 
         return model["view_name"].toString()

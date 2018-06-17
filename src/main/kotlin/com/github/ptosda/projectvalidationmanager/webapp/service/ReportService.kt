@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service
 
 @Service
 class ReportService {
-
     /**
      * Gets an HashMap with both vulnerable and not vulnerable dependencies
      * @param report the report to search for dependencies
@@ -26,5 +25,4 @@ class ReportService {
         return hashMapOf("vulnerable_dependencies" to vulnerable,
                          "dependencies" to notVulnerable)
     }
-
 }

@@ -18,5 +18,19 @@ data class ReportDependency(
         val vulnerabilitiesCount : Int,
 
         val vulnerabilities : ArrayList<ReportVulnerability>,
-        val parents : ArrayList<String>?
-)
+        val children : ArrayList<String>?,
+        val direct : Boolean?
+) {
+        override fun equals(other: Any?): Boolean {
+                if (other is ReportDependency) {
+                        return this.title == other.title &&
+                                this.mainVersion === other.mainVersion
+                }
+                return false
+        }
+
+        override fun hashCode(): Int {
+                return this.title.hashCode() * 3 +
+                        this.mainVersion.hashCode() * 5
+        }
+}
