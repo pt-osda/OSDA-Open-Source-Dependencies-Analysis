@@ -16,6 +16,14 @@
 
         <div id="project-list">
             {{> project/project-list-partial}}
+
+            {{#previous}}
+                <a class='navbar-brand' href="/?page={{.}}"> Previous </a>
+            {{/previous}}
+
+            {{#next}}
+                <a class='navbar-brand' href="/?page={{.}}"> Next </a>
+            {{/next}}
         </div>
 
     </div>

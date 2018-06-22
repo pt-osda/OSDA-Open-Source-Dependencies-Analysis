@@ -3,11 +3,13 @@ package com.github.ptosda.projectvalidationmanager.webapp.controller
 import com.github.ptosda.projectvalidationmanager.database.entities.*
 import com.github.ptosda.projectvalidationmanager.database.repositories.*
 import com.github.ptosda.projectvalidationmanager.webapp.service.ReportService
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Controller
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import java.time.ZonedDateTime
 import java.util.*
 import kotlin.collections.set
@@ -22,19 +24,31 @@ class ReportController(val reportService: ReportService,
                        val projectRepo: ProjectRepository,
                        val dependencyRepo: DependencyRepository,
                        val vulnerabilityRepo: VulnerabilityRepository,
-                       val licenseRepo: LicenseRepository) {
+                       val licenseRepo: LicenseRepository)
+{
+
+    private final val PAGE_SIZE = 10
+
     /**
      * Gets the view for the home page
      */
     @GetMapping
-    fun getHome(model: HashMap<String, Any>) : String
+    fun getHome(@RequestParam(value = "page", defaultValue = "0") page: Int, model: HashMap<String, Any>) : String
     {
+        val currentPage = projectRepo.findAll(PageRequest.of(page, PAGE_SIZE))
+
         model["page_title"] = "Home"
 
-        val projects = projectRepo.findAll()
+        val projects = currentPage
                 .sortedBy{ it.name}
 
         model["projects"] = projects
+
+        if (currentPage.hasNext())
+            model["next"] = currentPage.number + 1
+
+        if (currentPage.hasPrevious())
+            model["previous"] = currentPage.number - 1
 
         return "home"
     }
@@ -43,15 +57,23 @@ class ReportController(val reportService: ReportService,
      * Gets the view for the collection of dependencies
      */
     @GetMapping("deps")
-    fun getDependencies(model: HashMap<String, Any?>) : String
+    fun getDependencies(@RequestParam(value = "page", defaultValue = "0") page: Int,  model: HashMap<String, Any?>) : String
     {
+        val currentPage = dependencyRepo.findAllByDirect(true, PageRequest.of(page, PAGE_SIZE))
+
         model["page_title"] = "Dependencies"
 
-        model["dependencies"] = dependencyRepo.findAll().filter { it.direct }
+        model["dependencies"] = currentPage
                 .groupBy { it.pk.id + it.pk.mainVersion }
                 .values
                 .map { it.last() }
                 .sortedBy{ it.pk.id.toLowerCase() }
+
+        if (currentPage.hasNext())
+            model["next"] = currentPage.number + 1
+
+        if (currentPage.hasPrevious())
+            model["previous"] = currentPage.number - 1
 
         return "dependency/dependency-list"
     }
@@ -91,12 +113,20 @@ class ReportController(val reportService: ReportService,
      * Gets the view for the collection of licenses
      */
     @GetMapping("licenses")
-    fun getLicenses(model: HashMap<String, Any?>) : String
+    fun getLicenses(@RequestParam(value = "page", defaultValue = "0") page: Int, model: HashMap<String, Any?>) : String
     {
+        val currentPage = licenseRepo.findAll(PageRequest.of(page, PAGE_SIZE))
+
         model["page_title"] = "Licenses"
 
-        model["licenses"] = licenseRepo.findAll()
+        model["licenses"] = currentPage
             .sortedBy { it.spdxId }
+
+        if (currentPage.hasNext())
+            model["next"] = currentPage.number + 1
+
+        if (currentPage.hasPrevious())
+            model["previous"] = currentPage.number - 1
 
         return "license/generic-license-list"
     }

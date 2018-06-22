@@ -5,6 +5,7 @@ import com.github.ptosda.projectvalidationmanager.database.repositories.Dependen
 import com.github.ptosda.projectvalidationmanager.database.repositories.LicenseRepository
 import com.github.ptosda.projectvalidationmanager.database.repositories.ProjectRepository
 import com.github.ptosda.projectvalidationmanager.webapp.service.ReportFilterService
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -19,6 +20,7 @@ class ReportFilterController(val reportFilterService: ReportFilterService,
                              val licenseRepo: LicenseRepository)
 {
 
+    private final val PAGE_SIZE = 1
     /**
      * HashMap with all project filter types and corresponding functions
      */
@@ -48,7 +50,7 @@ class ReportFilterController(val reportFilterService: ReportFilterService,
     /**
      * HashMap with all report search functions
      */
-    val searchFilterFunctions = hashMapOf<String, (String) -> HashMap<String, Any?>>(
+    val searchFilterFunctions = hashMapOf<String, (String) -> HashMap<String, Any>>(
             "projs" to { searchText ->
                 hashMapOf( "projects" to projectRepo.findAll().filter { it.name.startsWith(searchText, true) },
                         "view_name" to "project/project-list-partial"
