@@ -56,6 +56,38 @@ class ReportAPIController(
         return ResponseEntity(HttpStatus.CREATED)
     }
 
+    data class DependencyVulnerabilityInputModel(val projectId: String, val reportId: String,
+                                                 val dependencyId:String, val dependencyVersion: String,
+                                                 val vulnerabilityId: Long)
+
+    @PutMapping("dependency/vulnerability/edit")
+    fun alterDependencyVulnerabilityState(@RequestBody dependencyVulnerabilityInput: DependencyVulnerabilityInputModel){
+        val vulnerabilityInfo = vulnerabilityRepository.findById(dependencyVulnerabilityInput.vulnerabilityId)
+        val dependencyInfo = dependencyRepository.findById(DependencyPk(dependencyVulnerabilityInput.dependencyId, Report(ReportPk(dependencyVulnerabilityInput.reportId, Project(dependencyVulnerabilityInput.projectId, null, null)), null, null), dependencyVulnerabilityInput.dependencyVersion))
+
+        if(!dependencyInfo.isPresent) {
+            throw Exception("Dependency not found")
+        }
+
+        if(!vulnerabilityInfo.isPresent) {
+            throw Exception("Vulnerability not found")
+        }
+
+        val dependency = dependencyInfo.get()
+        val vulnerability = vulnerabilityInfo.get()
+
+        val dependencyVulnerabilityInfo = dependencyVulnerabilityRepository.findById(DependencyVulnerabilityPk(dependency, vulnerability))
+
+        if(!dependencyVulnerabilityInfo.isPresent) {
+            throw Exception("Dependency Vulnerability not found")
+        }
+
+        val dependencyVulnerability = dependencyVulnerabilityInfo.get()
+        dependencyVulnerability.ignored = !dependencyVulnerability.ignored
+
+        dependencyVulnerabilityRepository.save(dependencyVulnerability)
+    }
+
     /**
      * Function to create the organization referenced in the report if it didn't already existed.
      * @param organizationName The name of the organization to create.

@@ -3,9 +3,9 @@
 
         {{#repository}}
             Associated to {{repository.name}} repository
-            {{#organization}}
-                in {{organization.name}}
-            {{/organization}}
+            {{#repository.organization}}
+                in {{repository.organization.name}}
+            {{/repository.organization}}
         {{/repository}}
 
         <br>
@@ -26,9 +26,8 @@
                     {{/tag}}
                     Out of {{dependency.size}} dependencies, {{vulnerableDependencies}} are vulnerable
                     <br>
-                    In total, {{vulnerabilitiesCount}} vulnerabilities were found
+                    In total, {{vulnerabilitiesCount}} vulnerabilities were found. Of these, {{ignoredVulnerabilitiesCount}} are being ignored.
                     <br>
-                    <!-- TODO TO IMPLEMENT -- Number of vulnerabilities ignored -->
                 </a>
             {{/reports}}
             <br>

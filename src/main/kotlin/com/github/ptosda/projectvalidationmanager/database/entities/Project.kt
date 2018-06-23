@@ -15,3 +15,8 @@ data class Project(
         @OneToMany(mappedBy = "pk.project")
         val report: List<Report>? = arrayListOf()
 ) : Serializable
+{
+        override fun toString(): String {
+                return "name:$name"
+        }
+}

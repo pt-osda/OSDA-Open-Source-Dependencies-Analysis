@@ -19,7 +19,7 @@ import kotlin.collections.set
  */
 @Controller
 @RequestMapping("/")
-class ReportController(val reportService: ReportService,
+class ReportController(val reportService: ReportService, //TODO meter a negrito os titulos das propriedades como por exemplo na lista de licenças : "License Name", etc
                        val reportRepo: ReportRepository,
                        val projectRepo: ProjectRepository,
                        val dependencyRepo: DependencyRepository,
@@ -138,24 +138,23 @@ class ReportController(val reportService: ReportService,
     @Transactional
     @GetMapping("projs/{project-id}")
     fun getProjectDetail(@PathVariable("project-id") projectId: String,
-                         model: HashMap<String, Any>) : String
+                         model: HashMap<String, Any?>) : String
     {
         model["page_title"] = "Project Reports"
 
-        val reports = projectRepo.findById(projectId).get().report!!
+        val projectInfo = projectRepo.findById(projectId)
 
-        model["project_id"] = projectId
-
-        reports.toList().forEach {
-            val vulnerabilities = mutableListOf<Vulnerability>()
-            it.dependency?.forEach { it.vulnerabilities.forEach {
-                if (!vulnerabilities.contains(it.pk.vulnerability))
-                    vulnerabilities.add(it.pk.vulnerability!!)
-            } }
-            it.vulnerabilitiesCount = vulnerabilities.size
+        if(!projectInfo.isPresent) {
+            throw Exception("Project not found")
         }
 
-        model["reports"] = reports.toList()
+        val project = projectInfo.get()
+        val reports = projectInfo.get().report
+
+        model["project_id"] = project.name
+        model["repository"] = project.repo
+
+        model["reports"] = reports!!.toList()
                 .sortedByDescending{ ZonedDateTime.parse(it.pk.timestamp) }
 
         return "project/project-detail"
@@ -204,7 +203,7 @@ class ReportController(val reportService: ReportService,
      * @param reportId the id of a report
      * @param dependencyId the id of a dependency
      * @param dependencyVersion the main version of a dependency
-     * // TODO add transitive dependencies
+     * // TODO add transitive dependencies. Add button to insert a new license to the specific dependency
      */
     @GetMapping("projs/{project-id}/report/{report-id}/deps/{dependency-id}/version/{dependency-version}")
     fun getDependencyDetail(@PathVariable("project-id") projectId: String,
@@ -308,7 +307,7 @@ class ReportController(val reportService: ReportService,
         val vulnerabilityInfo = vulnerabilityRepo.findById(vulnerabilityId)
 
         if(!vulnerabilityInfo.isPresent ) {
-            throw Exception("License not found")
+            throw Exception("Vulnerability not found")
         }
         val vulnerability = vulnerabilityInfo.get()
 

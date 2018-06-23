@@ -19,3 +19,9 @@ data class Repo(
         @OneToMany(mappedBy = "repo")
         val project: List<Project>
 ) : Serializable
+{
+        override fun toString(): String {
+                return "name:" + name +
+                        "; owner:" + owner
+        }
+}

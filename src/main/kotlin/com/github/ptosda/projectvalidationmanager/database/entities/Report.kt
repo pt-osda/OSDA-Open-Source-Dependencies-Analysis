@@ -18,7 +18,7 @@ data class Report(
 {
     @Transient
     var vulnerabilitiesCount = 0
-        get() = {
+        get() {
             val vulnerabilities = mutableListOf<Vulnerability>()
             dependency?.forEach {
                 it.vulnerabilities.forEach {
@@ -26,9 +26,8 @@ data class Report(
                         vulnerabilities.add(it.pk.vulnerability!!)
                 }
             }
-            val size = vulnerabilities.size
-            size
-        }.invoke()
+            return vulnerabilities.size
+        }
 
     @Transient
     var vulnerableDependencies = 0
@@ -42,6 +41,12 @@ data class Report(
     @Transient
     var dependenciesCount = 0
         get() = dependency!!.size
+
+    @Transient
+    var ignoredVulnerabilitiesCount = 0
+        get() = dependency!!.sumBy {
+            it.vulnerabilities.count{ it.ignored }
+        }
 
     @Transient
     var readableTimeStamp = ""

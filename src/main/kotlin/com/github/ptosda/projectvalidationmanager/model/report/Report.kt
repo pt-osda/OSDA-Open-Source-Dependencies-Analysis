@@ -13,7 +13,10 @@ data class Report (
         val buildTag : String?,
 
         val organization: String?,
+
         val repo: String?,   // Indicates the name of the repository
+
+        @JsonProperty("repo_owner")
         val repoOwner: String?,  // Indicates the owner of the repository
 
         val dependencies : ArrayList<ReportDependency>

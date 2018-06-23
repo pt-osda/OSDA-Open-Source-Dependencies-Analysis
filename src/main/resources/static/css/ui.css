@@ -9,6 +9,11 @@
     text-align: center;
 }
 
+.disabled-link {
+    pointer-events: none;
+    text-decoration: line-through;
+}
+
 .project-buttons{
     align-self: center;
     align-content: center;

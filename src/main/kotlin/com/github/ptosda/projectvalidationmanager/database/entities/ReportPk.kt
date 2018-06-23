@@ -13,3 +13,8 @@ data class ReportPk(
         @JoinColumn(name = "name")
         val project: Project
 ) : Serializable
+{
+        override fun toString(): String {
+                return "timestamp:" + timestamp
+        }
+}

@@ -9,8 +9,9 @@
         </p>
 
 
-            {{#vulnerable_dependencies.size}}
-                Vulnerable Dependencies
+            {{#vulnerable_dependencies.0}}
+                    Vulnerable Dependencies
+            {{/vulnerable_dependencies.0}}
                 <ul class="list-group" id="error-list">
                     {{#vulnerable_dependencies}}
                         <li class="list-group-item list-group-item-danger">
@@ -24,7 +25,7 @@
                         </li>
                         <br>
                     {{/vulnerable_dependencies}}
-            {{/vulnerable_dependencies.size}}
+                </ul>
             {{^vulnerable_dependencies}}
                 No vulnerabilities were found for any of this reports dependencies
             {{/vulnerable_dependencies}}

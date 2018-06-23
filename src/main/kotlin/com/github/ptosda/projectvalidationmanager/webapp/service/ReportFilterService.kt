@@ -7,7 +7,7 @@ import com.github.ptosda.projectvalidationmanager.database.repositories.ReportRe
 import org.springframework.stereotype.Service
 import java.time.ZonedDateTime
 
-@Service // TODO add filters for generic dependency
+@Service
 class ReportFilterService(private val projectRepo: ProjectRepository,
                           private val reportService: ReportService,
                           private val reportRepo: ReportRepository,
@@ -20,6 +20,7 @@ class ReportFilterService(private val projectRepo: ProjectRepository,
         val model = hashMapOf<String, Any?>()
 
         model["project_id"] = project.name
+        model["repository"] = project.repo
         model["reports"] = project.report?.sortedByDescending{ ZonedDateTime.parse(it.pk.timestamp) }
 
         model["view_name"] = "project/project-detail-partial"
