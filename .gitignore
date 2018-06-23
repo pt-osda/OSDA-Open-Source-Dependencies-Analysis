@@ -2,7 +2,6 @@
 /build/
 !gradle/wrapper/gradle-wrapper.jar
 /src/main/resources/cache/
-/src/main/resources/application.yml
 
 #Mac files
 .DS_Store

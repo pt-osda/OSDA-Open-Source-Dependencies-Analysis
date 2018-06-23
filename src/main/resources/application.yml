@@ -1,0 +1,64 @@
+spring:
+  profiles.active: deploy
+
+---
+
+spring:
+  profiles: local
+  jpa:
+    database: POSTGRESQL
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        hbm2ddl:
+          auto: update
+        ejb:
+          naming_strategy: org.hibernate.cfg.DefaultNamingStrategy
+        show_sql: true
+        format_sql: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
+    generate-ddl: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/Reports
+    username: osda
+    password: osda
+    driver-class-name: org.postgresql.Driver
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG
+
+---
+
+spring:
+  profiles: deploy
+  jpa:
+    database: POSTGRESQL
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        hbm2ddl:
+          auto: update
+        ejb:
+          naming_strategy: org.hibernate.cfg.DefaultNamingStrategy
+        show_sql: true
+        format_sql: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
+    generate-ddl: true
+  datasource:
+    url: jdbc:postgresql://35.197.235.220/Reports
+    username: osda
+    password: ${REPORTS_DB_PWD}
+    driver-class-name: org.postgresql.Driver
+logging:
+  level:
+    org:
+      springframework:
+web: DEBUG
