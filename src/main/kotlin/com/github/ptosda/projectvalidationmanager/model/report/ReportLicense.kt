@@ -6,5 +6,7 @@ data class ReportLicense(
         @JsonProperty("spdx_id")
         val spdxId : String,
 
-        val source : String
+        val source : String,
+
+        val valid : Boolean
 )

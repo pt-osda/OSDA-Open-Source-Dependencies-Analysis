@@ -9,7 +9,9 @@ data class DependencyLicense(
         @EmbeddedId
         val pk: DependencyLicensePk,
 
-        val source: String
+        val source: String,
+
+        val valid: Boolean
 ) : Serializable {
     override fun equals(other: Any?): Boolean {
             if (other is DependencyLicense){

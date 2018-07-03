@@ -193,7 +193,8 @@ class ReportAPIController(
     private fun storeDependencies(dependencies: ArrayList<ReportDependency>, report: com.github.ptosda.projectvalidationmanager.database.entities.Report) {
         dependencies.forEach {
             val childrenSet : MutableSet<Dependency> = mutableSetOf()
-            if (it.children!!.size > 0) {
+
+            if (it.children != null && it.children.size > 0) {
                 val children = it.children
 
                 for (dependency in dependencies){
@@ -253,7 +254,8 @@ class ReportAPIController(
             }
             licenses.add(DependencyLicense(
                     DependencyLicensePk(dependency, license),
-                    it.source
+                    it.source,
+                    it.valid
             ))
         }
         dependencyLicenseRepository.saveAll(licenses)
@@ -276,9 +278,12 @@ class ReportAPIController(
 
         vulnerableDependencies.forEach {
             val dependencyId = it.title + ":" + it.mainVersion
-            val upperDependencies = dependencies.filter { it.children!!.contains(dependencyId) }
+            val upperDependencies = dependencies.filter { it.children != null && it.children.contains(dependencyId) }
             val parentDependency = upperDependencies.stream().filter { it.direct!! }.collect(Collectors.toList())
 
+            if(it.direct!!){
+                parentDependency.add(it)
+            }
             parentDependency.addAll(findDirectParent(upperDependencies, dependencies, parentDependency))
 
             saveParentsVulnerabilities(parentDependency.distinct(), directDependencies, it.vulnerabilitiesCount, it.vulnerabilities, dependencyId)
