@@ -9,6 +9,9 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.sql.Timestamp
+import java.time.Instant
+import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @RestController
@@ -17,16 +20,21 @@ class DependencyController(private val licenseService: LicenseService, private v
     val logger : Logger = LoggerFactory.getLogger(DependencyController::class.java)
 
     @GetMapping("/{id}/{version}/licenses", produces = ["application/json"])
-    fun getDependencyLicenses(@PathVariable("manager") manager: String,
+    fun getDependencyLicenses(req: HttpServletRequest,
+                              @PathVariable("manager") manager: String,
                               @PathVariable("id") id: String,
                               @PathVariable("version") version: String,
                               @RequestParam(value="licenseUrl", required = true) licenseUrl: String): List<LicenseModel>
     {
+        val maxAge = req.getHeader("Cache-Control")
+                .split(",")
+                .first { it.contains("max-age") }
+                .replace("max-age=","")
         val cacheKey = "$manager:$id:$version"
         val dependenciesCache = CachingConfig.getDependenciesCache()
         val cacheEntry = dependenciesCache.get(cacheKey)
 
-        if(cacheEntry?.licenses != null) {
+        if(cacheEntry?.licenses != null  && isCacheEntryAgeValid(cacheEntry.licensesTimestamp!!, maxAge)) {
             logger.info("The licenses of this dependency were already searched and are contained in cache.")
             return cacheEntry.licenses!!
         }
@@ -36,10 +44,11 @@ class DependencyController(private val licenseService: LicenseService, private v
         if(!licenses.isEmpty()) {
             if (cacheEntry == null) {
                 logger.info("The licenses found will be added to the cache")
-                dependenciesCache.put(cacheKey, DependencyInfo(licenses, null))
+                dependenciesCache.put(cacheKey, DependencyInfo(licenses, getCurrentInstant().epochSecond, null, null))
             } else {
                 logger.info("The licenses were already present in cache")
                 cacheEntry.licenses = licenses
+                cacheEntry.licensesTimestamp = getCurrentInstant().epochSecond
                 dependenciesCache.put(cacheKey, cacheEntry)
             }
         }
@@ -48,10 +57,15 @@ class DependencyController(private val licenseService: LicenseService, private v
     }
 
     @PostMapping("/vulnerabilities")
-    fun getDependencyVulnerabilities(resp: HttpServletResponse,
+    fun getDependencyVulnerabilities(req: HttpServletRequest,
+                                     resp: HttpServletResponse,
                                      @PathVariable("manager") manager: String,
                                      @RequestBody artifacts: ArrayList<Artifacts>) : ResponseEntity<ArrayList<VulnerabilitiesEvaluationOutput?>>
     {
+        val maxAge = req.getHeader("Cache-Control")
+                .split(",")
+                .first { it.contains("max-age") }
+                .replace("max-age=","")
         val dependenciesCache = CachingConfig.getDependenciesCache()
         val vulnerabilities = arrayOfNulls<VulnerabilitiesEvaluationOutput>(artifacts.size).toCollection(ArrayList())
 
@@ -59,7 +73,7 @@ class DependencyController(private val licenseService: LicenseService, private v
             val dependencyName = if(artifact.group != null) "${artifact.name}:${artifact.group}" else artifact.name
             val cacheKey = "$manager:$dependencyName:${artifact.version}"
             val cacheEntry = dependenciesCache.get(cacheKey)
-            if(cacheEntry?.vulnerabilities != null){
+            if(cacheEntry?.vulnerabilities != null && isCacheEntryAgeValid(cacheEntry.vulnerabilitiesTimestamp!!, maxAge)){
                 logger.info("The dependency {} already had its vulnerabilities in cache", "$dependencyName:${artifact.version}")
                 vulnerabilities[index] = cacheEntry.vulnerabilities!!
                 artifact.inCache = true
@@ -85,10 +99,11 @@ class DependencyController(private val licenseService: LicenseService, private v
                     val cacheEntry = dependenciesCache.get(cacheKey)
                     if (cacheEntry == null) {
                         logger.info("The dependency was not in cache and it will be added.")
-                        dependenciesCache.put(cacheKey, DependencyInfo(null, vulnerabilityEvaluation))   // TODO check if this is needed
+                        dependenciesCache.put(cacheKey, DependencyInfo(null, null, vulnerabilityEvaluation, getCurrentInstant().epochSecond))
                     } else {
                         logger.info("The dependency was in cache and it vulnerability information will be updated.")
                         cacheEntry.vulnerabilities = vulnerabilityEvaluation
+                        cacheEntry.vulnerabilitiesTimestamp = getCurrentInstant().epochSecond
                         dependenciesCache.put(cacheKey, cacheEntry)
                     }
                  }
@@ -97,4 +112,16 @@ class DependencyController(private val licenseService: LicenseService, private v
         logger.info("The vulnerabilities search was successfully completed.")
         return ResponseEntity(vulnerabilities, HttpStatus.OK)
     }
+
+    private fun isCacheEntryAgeValid(entryTimestamp: Long, maxAge: String): Boolean {
+        if(maxAge == ""){
+            return true
+        }
+        val parsedMaxAge = maxAge.toLongOrNull() ?: return true
+
+        val currTimestamp = getCurrentInstant().epochSecond
+        return (currTimestamp - entryTimestamp) <= parsedMaxAge
+    }
+
+    private fun getCurrentInstant() = Timestamp(System.currentTimeMillis()).toInstant()
 }
