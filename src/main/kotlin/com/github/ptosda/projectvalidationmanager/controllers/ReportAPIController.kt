@@ -11,9 +11,11 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.util.stream.Collectors
+import javax.swing.Action
 
 @RestController
 @RequestMapping("/report")
+// TODO validate private versions on npm and return error
 class ReportAPIController(
         val organizationRepository: OrganizationRepository,
         val repoRepository: RepoRepository,
@@ -277,7 +279,23 @@ class ReportAPIController(
         val directDependencies = dependencyRepository.getDirectDependenciesFromReport(report.pk.project.name, report.pk.timestamp)
 
         vulnerableDependencies.forEach {
-            val dependencyId = it.title + ":" + it.mainVersion
+            val reportDependency = it
+            val dependencyTitle = it.title
+            val vulnerableVersions = getVulnerableDependency(reportDependency, it.mainVersion, it.privateVersions)
+
+            vulnerableVersions.forEach {
+                val dependencyId = "$dependencyTitle:$it"
+                val upperDependencies = dependencies.filter { it.children != null && it.children.contains(dependencyId) }
+                val parentDependency = upperDependencies.stream().filter { it.direct!! }.collect(Collectors.toList())
+
+                if(reportDependency.direct!!){
+                    parentDependency.add(reportDependency)
+                }
+                parentDependency.addAll(findDirectParent(upperDependencies, dependencies, parentDependency))
+
+                saveParentsVulnerabilities(parentDependency.distinct(), directDependencies, reportDependency.vulnerabilitiesCount, reportDependency.vulnerabilities, dependencyId)
+            }
+            /*val dependencyId = it.title + ":" + it.mainVersion
             val upperDependencies = dependencies.filter { it.children != null && it.children.contains(dependencyId) }
             val parentDependency = upperDependencies.stream().filter { it.direct!! }.collect(Collectors.toList())
 
@@ -286,8 +304,92 @@ class ReportAPIController(
             }
             parentDependency.addAll(findDirectParent(upperDependencies, dependencies, parentDependency))
 
-            saveParentsVulnerabilities(parentDependency.distinct(), directDependencies, it.vulnerabilitiesCount, it.vulnerabilities, dependencyId)
+            saveParentsVulnerabilities(parentDependency.distinct(), directDependencies, it.vulnerabilitiesCount, it.vulnerabilities, dependencyId)*/
         }
+    }
+
+    private fun getVulnerableDependency(reportDependency: ReportDependency, dependencyVersion: String, privateVersions: ArrayList<String>?): ArrayList<String> {
+        val vulnerableVersions = ArrayList<String>()
+        //val accessPrivateVersions = ArrayList<String>(privateVersions)
+        reportDependency.vulnerabilities.forEach {
+            if (it.versions.size > 1) {
+                it.versions.forEach {
+                    if (it == dependencyVersion)
+                        vulnerableVersions.add(dependencyVersion)
+                    else if (privateVersions != null && privateVersions.contains(it)) {
+                        val vulnerableVersion = it
+                        privateVersions.forEach {
+                            if (it == vulnerableVersion)
+                                vulnerableVersions.add(vulnerableVersion)
+                        }
+                    }
+                }
+            } else {
+                val versions = it.versions[0].split("||")
+
+                for (version in versions) {
+                    val comparisons = version.split(" ")
+                    var betweenLimits = true
+                    for (comparableVersion in comparisons) {
+                        when {
+                            comparableVersion.contains(">") ->
+                                betweenLimits = betweenLimits && compare(comparableVersion.replace(">", ""), dependencyVersion, { compareValue, limitValue -> compareValue > limitValue })
+
+                            comparableVersion.contains(">=") ->
+                                betweenLimits = betweenLimits && compare(comparableVersion.replace(">=", ""), dependencyVersion, { compareValue, limitValue -> compareValue >= limitValue })
+
+                            comparableVersion.contains("<") ->
+                                betweenLimits = betweenLimits && compare(comparableVersion.replace("<", ""), dependencyVersion, { compareValue, limitValue -> compareValue < limitValue })
+
+                            comparableVersion.contains("<=") ->
+                                betweenLimits = betweenLimits && compare(comparableVersion.replace("<=", ""), dependencyVersion, { compareValue, limitValue -> compareValue < limitValue })
+                        }
+
+                        if (privateVersions != null) {
+                            var privateBetweenLimits = true
+                            for (privateVersion in privateVersions) {
+                                when {
+                                    comparableVersion.contains(">") ->
+                                        privateBetweenLimits = privateBetweenLimits && compare(comparableVersion.replace(">", ""), privateVersion, { compareValue, limitValue -> compareValue > limitValue })
+
+                                    comparableVersion.contains(">=") ->
+                                        privateBetweenLimits = privateBetweenLimits && compare(comparableVersion.replace(">=", ""), privateVersion, { compareValue, limitValue -> compareValue >= limitValue })
+
+                                    comparableVersion.contains("<") ->
+                                        privateBetweenLimits = privateBetweenLimits && compare(comparableVersion.replace("<", ""), privateVersion, { compareValue, limitValue -> compareValue < limitValue })
+
+                                    comparableVersion.contains("<=") ->
+                                        privateBetweenLimits = privateBetweenLimits && compare(comparableVersion.replace("<=", ""), privateVersion, { compareValue, limitValue -> compareValue < limitValue })
+                                }
+
+                                if (privateBetweenLimits) {
+                                    vulnerableVersions.add(privateVersion)
+                                }
+                            }
+                        }
+                    }
+
+                    if (betweenLimits && !vulnerableVersions.contains(dependencyVersion)) {
+                        vulnerableVersions.add(dependencyVersion)
+                    }
+                }
+            }
+        }
+        return vulnerableVersions
+    }
+
+    private fun compare(limitVersion: String, toCompareVersion: String, comparison: (compareValue: Int, limitValue: Int) -> Boolean): Boolean {
+        val numLimitVersion = limitVersion.split("-")[0].split(".")
+        val numCompareVersion = toCompareVersion.split("-")[0].split(".")
+        var idx = 0
+        while (idx < numLimitVersion.size) {
+            val numLimit = numLimitVersion[idx].toInt()
+            val numCompare = numCompareVersion[idx].toInt()
+            if (numLimit == numCompare)
+                idx++
+            else return comparison(numCompare, numLimit)
+        }
+        return true
     }
 
     /**
