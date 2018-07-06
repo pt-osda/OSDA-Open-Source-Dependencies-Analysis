@@ -332,34 +332,34 @@ class ReportAPIController(
                     var betweenLimits = true
                     for (comparableVersion in comparisons) {
                         when {
-                            comparableVersion.contains(">") ->
-                                betweenLimits = betweenLimits && compare(comparableVersion.replace(">", ""), dependencyVersion, { compareValue, limitValue -> compareValue > limitValue })
-
                             comparableVersion.contains(">=") ->
                                 betweenLimits = betweenLimits && compare(comparableVersion.replace(">=", ""), dependencyVersion, { compareValue, limitValue -> compareValue >= limitValue })
 
-                            comparableVersion.contains("<") ->
-                                betweenLimits = betweenLimits && compare(comparableVersion.replace("<", ""), dependencyVersion, { compareValue, limitValue -> compareValue < limitValue })
+                            comparableVersion.contains(">") ->
+                                betweenLimits = betweenLimits && compare(comparableVersion.replace(">", ""), dependencyVersion, { compareValue, limitValue -> compareValue > limitValue })
 
                             comparableVersion.contains("<=") ->
                                 betweenLimits = betweenLimits && compare(comparableVersion.replace("<=", ""), dependencyVersion, { compareValue, limitValue -> compareValue < limitValue })
-                        }
+
+                            comparableVersion.contains("<") ->
+                                betweenLimits = betweenLimits && compare(comparableVersion.replace("<", ""), dependencyVersion, { compareValue, limitValue -> compareValue < limitValue })
+                            }
 
                         if (privateVersions != null) {
                             var privateBetweenLimits = true
                             for (privateVersion in privateVersions) {
                                 when {
-                                    comparableVersion.contains(">") ->
-                                        privateBetweenLimits = privateBetweenLimits && compare(comparableVersion.replace(">", ""), privateVersion, { compareValue, limitValue -> compareValue > limitValue })
-
                                     comparableVersion.contains(">=") ->
                                         privateBetweenLimits = privateBetweenLimits && compare(comparableVersion.replace(">=", ""), privateVersion, { compareValue, limitValue -> compareValue >= limitValue })
 
-                                    comparableVersion.contains("<") ->
-                                        privateBetweenLimits = privateBetweenLimits && compare(comparableVersion.replace("<", ""), privateVersion, { compareValue, limitValue -> compareValue < limitValue })
+                                    comparableVersion.contains(">") ->
+                                        privateBetweenLimits = privateBetweenLimits && compare(comparableVersion.replace(">", ""), privateVersion, { compareValue, limitValue -> compareValue > limitValue })
 
                                     comparableVersion.contains("<=") ->
                                         privateBetweenLimits = privateBetweenLimits && compare(comparableVersion.replace("<=", ""), privateVersion, { compareValue, limitValue -> compareValue < limitValue })
+
+                                    comparableVersion.contains("<") ->
+                                        privateBetweenLimits = privateBetweenLimits && compare(comparableVersion.replace("<", ""), privateVersion, { compareValue, limitValue -> compareValue < limitValue })
                                 }
 
                                 if (privateBetweenLimits) {
