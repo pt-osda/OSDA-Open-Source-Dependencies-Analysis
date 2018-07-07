@@ -5,6 +5,7 @@ import com.github.ptosda.projectvalidationmanager.model.report.ReportDependency
 import com.github.ptosda.projectvalidationmanager.database.entities.*
 import com.github.ptosda.projectvalidationmanager.database.repositories.*
 import com.github.ptosda.projectvalidationmanager.model.report.ReportVulnerability
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -285,7 +286,7 @@ class ReportAPIController(
 
             vulnerableVersions.forEach {
                 val dependencyId = "$dependencyTitle:$it"
-                val upperDependencies = dependencies.filter { it.children != null && it.children.contains(dependencyId) }
+                val upperDependencies = dependencies.filter { it.children != null && it.children.contains(dependencyId)}
                 val parentDependency = upperDependencies.stream().filter { it.direct!! }.collect(Collectors.toList())
 
                 if(reportDependency.direct!!){
@@ -295,33 +296,57 @@ class ReportAPIController(
 
                 saveParentsVulnerabilities(parentDependency.distinct(), directDependencies, reportDependency.vulnerabilitiesCount, reportDependency.vulnerabilities, dependencyId)
             }
-            /*val dependencyId = it.title + ":" + it.mainVersion
-            val upperDependencies = dependencies.filter { it.children != null && it.children.contains(dependencyId) }
-            val parentDependency = upperDependencies.stream().filter { it.direct!! }.collect(Collectors.toList())
-
-            if(it.direct!!){
-                parentDependency.add(it)
-            }
-            parentDependency.addAll(findDirectParent(upperDependencies, dependencies, parentDependency))
-
-            saveParentsVulnerabilities(parentDependency.distinct(), directDependencies, it.vulnerabilitiesCount, it.vulnerabilities, dependencyId)*/
         }
     }
 
+
+    /*dependencies.filter { it.children!!.contains(dependencyId) && !it.direct!!}
+    .forEach {
+        val dependencyId = it.title + ":" + it.mainVersion
+        val dependencyParents = dependencies.filter { it.children!!.contains(dependencyId) }
+        parentDependency.addAll(dependencyParents.stream().filter { it.direct!! && !parentDependency.contains(it) }.collect(Collectors.toList()))
+    }*/
+    /**
+     * Function that will recursively travel through the dependency graph beginning in the vulnerable dependencies until
+     * it is found the direct dependency that uses the vulnerable one.
+     *
+     * @param upperDependencies The list of dependencies that have as children the vulnerable dependency.
+     * @param dependencies The dependencies received from the report of the plugin.
+     * @param parentDependency The list of direct dependencies that have as children the vulnerable one.
+     * @return The list of direct dependencies that have as children the vulnerable one.
+     */
+    private fun findDirectParent(upperDependencies: List<ReportDependency>, dependencies: ArrayList<ReportDependency>, parentDependency: MutableList<ReportDependency>): MutableList<ReportDependency> {
+        val dependenciesAnalyses : MutableList<ReportDependency> = mutableListOf()
+        dependenciesAnalyses.addAll(upperDependencies)
+
+        while (!dependenciesAnalyses.isEmpty()){
+            val currentFoundDependencies : MutableList<ReportDependency> = mutableListOf()
+            dependenciesAnalyses.stream().filter { !it.direct!! }.forEach {
+                val dependencyId = it.title + ":" + it.mainVersion
+                parentDependency.addAll(dependencies.filter { it.children!!.contains(dependencyId) && it.direct!! && !parentDependency.contains(it) })
+                currentFoundDependencies.addAll(dependencies.filter { it.children!!.contains(dependencyId) && !it.direct!! })
+            }
+            dependenciesAnalyses.clear()
+            dependenciesAnalyses.addAll(currentFoundDependencies)
+        }
+        return parentDependency
+    }
+
     private fun getVulnerableDependency(reportDependency: ReportDependency, dependencyVersion: String, privateVersions: ArrayList<String>?): ArrayList<String> {
-        val vulnerableVersions = ArrayList<String>()
-        //val accessPrivateVersions = ArrayList<String>(privateVersions)
+        val vulnerableVersions = ArrayList<String>()   // TODO remove from gradle
+        var analysisVersion = ""
+        dependencyVersion.split("-")[0].split(".").subList(0, 3).forEach { analysisVersion += "$it." }
+        analysisVersion = analysisVersion.dropLast(1)
         reportDependency.vulnerabilities.forEach {
             if (it.versions.size > 1) {
                 it.versions.forEach {
-                    if (it == dependencyVersion)
+                    if (it == analysisVersion && !vulnerableVersions.contains(dependencyVersion)) {
                         vulnerableVersions.add(dependencyVersion)
+                        if (privateVersions == null)
+                            return vulnerableVersions
+                    }
                     else if (privateVersions != null && privateVersions.contains(it)) {
-                        val vulnerableVersion = it
-                        privateVersions.forEach {
-                            if (it == vulnerableVersion)
-                                vulnerableVersions.add(vulnerableVersion)
-                        }
+                        vulnerableVersions.add(privateVersions[privateVersions.indexOf(it)])
                     }
                 }
             } else {
@@ -339,7 +364,7 @@ class ReportAPIController(
                                 betweenLimits = betweenLimits && compare(comparableVersion.replace(">", ""), dependencyVersion, { compareValue, limitValue -> compareValue > limitValue })
 
                             comparableVersion.contains("<=") ->
-                                betweenLimits = betweenLimits && compare(comparableVersion.replace("<=", ""), dependencyVersion, { compareValue, limitValue -> compareValue < limitValue })
+                                betweenLimits = betweenLimits && compare(comparableVersion.replace("<=", ""), dependencyVersion, { compareValue, limitValue -> compareValue <= limitValue })
 
                             comparableVersion.contains("<") ->
                                 betweenLimits = betweenLimits && compare(comparableVersion.replace("<", ""), dependencyVersion, { compareValue, limitValue -> compareValue < limitValue })
@@ -362,7 +387,7 @@ class ReportAPIController(
                                         privateBetweenLimits = privateBetweenLimits && compare(comparableVersion.replace("<", ""), privateVersion, { compareValue, limitValue -> compareValue < limitValue })
                                 }
 
-                                if (privateBetweenLimits) {
+                                if (privateBetweenLimits && !vulnerableVersions.contains(privateVersion)) {
                                     vulnerableVersions.add(privateVersion)
                                 }
                             }
@@ -371,6 +396,7 @@ class ReportAPIController(
 
                     if (betweenLimits && !vulnerableVersions.contains(dependencyVersion)) {
                         vulnerableVersions.add(dependencyVersion)
+                        return vulnerableVersions
                     }
                 }
             }
@@ -380,7 +406,7 @@ class ReportAPIController(
 
     private fun compare(limitVersion: String, toCompareVersion: String, comparison: (compareValue: Int, limitValue: Int) -> Boolean): Boolean {
         val numLimitVersion = limitVersion.split("-")[0].split(".")
-        val numCompareVersion = toCompareVersion.split("-")[0].split(".")
+        val numCompareVersion = toCompareVersion.split("-")[0].split(".").subList(0, 3)
         var idx = 0
         while (idx < numLimitVersion.size) {
             val numLimit = numLimitVersion[idx].toInt()
@@ -390,26 +416,6 @@ class ReportAPIController(
             else return comparison(numCompare, numLimit)
         }
         return true
-    }
-
-    /**
-     * Function that will recursively travel through the dependency graph beginning in the vulnerable dependencies until
-     * it is found the direct dependency that uses the vulnerable one.
-     *
-     * @param upperDependencies The list of dependencies that have as children the vulnerable dependency.
-     * @param dependencies The dependencies received from the report of the plugin.
-     * @param parentDependency The list of direct dependencies that have as children the vulnerable one.
-     * @return The list of direct dependencies that have as children the vulnerable one.
-     */
-    private fun findDirectParent(upperDependencies: List<ReportDependency>, dependencies: ArrayList<ReportDependency>, parentDependency: MutableList<ReportDependency>): MutableList<ReportDependency> {
-        upperDependencies.stream().filter { !it.direct!! }.forEach {
-            val dependencyId = it.title + ":" + it.mainVersion
-            val dependencyParents = dependencies.filter { it.children!!.contains(dependencyId) }
-            parentDependency.addAll(dependencyParents.stream().filter { it.direct!! && !parentDependency.contains(it) }.collect(Collectors.toList()))
-
-            parentDependency.addAll(findDirectParent(dependencies.filter { it.children!!.contains(dependencyId) }, dependencies, parentDependency))
-        }
-        return parentDependency
     }
 
     /**
