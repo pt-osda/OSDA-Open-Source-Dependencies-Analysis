@@ -12,12 +12,14 @@ data class Report (
         @JsonProperty("build_tag")
         val buildTag : String?,
 
-        val organization: String?,
+        val organization : String?,
 
-        val repo: String?,   // Indicates the name of the repository
+        val repo : String?,   // Indicates the name of the repository
 
         @JsonProperty("repo_owner")
-        val repoOwner: String?,  // Indicates the owner of the repository
+        val repoOwner : String?,  // Indicates the owner of the repository
+
+        val admin : String, // Indicates the username of the administrator of the project
 
         val dependencies : ArrayList<ReportDependency>
 )

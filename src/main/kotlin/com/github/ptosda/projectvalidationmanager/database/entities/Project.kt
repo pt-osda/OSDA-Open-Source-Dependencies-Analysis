@@ -12,6 +12,13 @@ data class Project(
         @JoinColumn(name = "repo_name", referencedColumnName = "name")
         val repo: Repo?,
 
+        @ManyToOne
+        @JoinColumn(name = "admin_username", referencedColumnName = "username")
+        val admin: User?,
+
+        @OneToMany(mappedBy = "pk.project")
+        val users: List<ProjectUser>? = arrayListOf(),
+
         @OneToMany(mappedBy = "pk.project")
         val report: List<Report>? = arrayListOf()
 ) : Serializable

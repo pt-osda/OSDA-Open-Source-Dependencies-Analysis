@@ -89,7 +89,7 @@ class LicenseService {
         }
         if(statusCode != 200) {
             logger.warn("The license for the dependency was not found.")
-            throw Exception("Error fetching licenses") //TODO Make custom exception to use with problem+json
+            throw Exception("Error fetching licenses")
         }
 
         logger.info("The licenses of the dependency were found.")
