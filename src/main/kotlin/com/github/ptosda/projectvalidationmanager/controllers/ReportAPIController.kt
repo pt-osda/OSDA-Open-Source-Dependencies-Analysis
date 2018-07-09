@@ -15,7 +15,6 @@ import java.util.stream.Collectors
 
 @RestController
 @RequestMapping("/report")
-// TODO validate private versions on npm and return error
 class ReportAPIController(
         val organizationRepository: OrganizationRepository,
         val repoRepository: RepoRepository,
@@ -197,7 +196,7 @@ class ReportAPIController(
      * @return The newly created report.
      */
     private fun storeReport(timestamp: String, tag: String?, project: Project): com.github.ptosda.projectvalidationmanager.database.entities.Report {
-        val report = Report(ReportPk(timestamp, project), tag, setOf())
+        val report = Report(ReportPk(timestamp, project), tag, "", setOf())
         reportRepository.save(report)
         logger.info("All the report regarded information was stored in the database")
         return report
@@ -222,7 +221,6 @@ class ReportAPIController(
                         childrenSet.add(Dependency(DependencyPk(dependency.title, report, dependency.mainVersion),
                                 dependency.description,
                                 0,  // Children don't have vulnerabilities their parents do.
-                                null,
                                 emptySet(),
                                 emptyList(),
                                 arrayListOf(),
@@ -234,8 +232,6 @@ class ReportAPIController(
                     DependencyPk(it.title, report, it.mainVersion),
                     it.description,
                     0,
-                    //it.privateVersions,   // TODO check
-                    null,
                     childrenSet,
                     arrayListOf(),
                     arrayListOf(),
@@ -281,7 +277,6 @@ class ReportAPIController(
         dependencyLicenseRepository.saveAll(licenses)
     }
 
-    // TODO add multiple sources
     /**
      * Function responsible for finding the vulnerabilities that the direct dependencies should have because of their
      * children.

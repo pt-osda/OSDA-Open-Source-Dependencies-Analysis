@@ -1,6 +1,7 @@
 package com.github.ptosda.projectvalidationmanager.controllers
 
 import com.github.ptosda.projectvalidationmanager.CachingConfig
+import com.github.ptosda.projectvalidationmanager.exceptions.UnreachableException
 import com.github.ptosda.projectvalidationmanager.model.*
 import com.github.ptosda.projectvalidationmanager.services.LicenseService
 import com.github.ptosda.projectvalidationmanager.services.VulnerabilityService
@@ -9,8 +10,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.io.IOException
 import java.sql.Timestamp
-import java.time.Instant
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -84,16 +85,11 @@ class DependencyController(private val licenseService: LicenseService, private v
         artifacts.removeIf { it.inCache }
         if(!artifacts.isEmpty()) {
             logger.info("There are dependencies that need to search for vulnerabilities.")
-            val vulnerabilitySearchResult = vulnerabilityService.getVulnerabilities(artifacts)
-
-            if(vulnerabilitySearchResult == null) {
-                logger.info("The external API could not be reached.")
-                return ResponseEntity(HttpStatus.BAD_GATEWAY)
-            }
-            else {
+            try {
+                val vulnerabilitySearchResult = vulnerabilityService.getVulnerabilities(artifacts)
                 logger.info("The external API was successfully queried.")
 
-                vulnerabilitySearchResult.forEachIndexed { index, vulnerabilityEvaluation ->
+                vulnerabilitySearchResult!!.forEachIndexed { index, vulnerabilityEvaluation ->
                     vulnerabilities[artifacts[index].index] = vulnerabilityEvaluation
                     val cacheKey = "$manager:${vulnerabilityEvaluation.title}:${vulnerabilityEvaluation.mainVersion}"
                     val cacheEntry = dependenciesCache.get(cacheKey)
@@ -106,7 +102,13 @@ class DependencyController(private val licenseService: LicenseService, private v
                         cacheEntry.vulnerabilitiesTimestamp = getCurrentInstant().epochSecond
                         dependenciesCache.put(cacheKey, cacheEntry)
                     }
-                 }
+                }
+
+                logger.info("The vulnerabilities search was successfully completed.")
+                return ResponseEntity(vulnerabilities, HttpStatus.OK)
+            } catch (e: IOException) {
+                logger.info("The external API could not be reached.")
+                throw UnreachableException(String.format("An exception occurred when attempting to reach the external API %s", e.message))
             }
         }
         logger.info("The vulnerabilities search was successfully completed.")

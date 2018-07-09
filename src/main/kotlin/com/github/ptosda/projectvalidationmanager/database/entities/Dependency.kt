@@ -15,8 +15,6 @@ data class Dependency ( // TODO In case a specific dependency has new vulnerabil
 
         var vulnerabilitiesCount: Int?,
 
-        val error_info: String?,
-
         @ManyToMany(cascade = [CascadeType.ALL])
         val dependencies: Set<Dependency>,
 

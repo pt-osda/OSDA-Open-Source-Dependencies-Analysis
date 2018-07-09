@@ -12,6 +12,8 @@ data class Report(
 
         val tag: String?,
 
+        val error_info: String?,
+
         @OneToMany(mappedBy = "pk.report")
         val dependency: Set<Dependency>? = setOf()
 ) : Serializable

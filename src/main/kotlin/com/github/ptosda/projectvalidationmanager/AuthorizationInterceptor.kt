@@ -1,21 +1,17 @@
 package com.github.ptosda.projectvalidationmanager
 
-import com.github.ptosda.projectvalidationmanager.controllers.ReportAPIController
 import com.github.ptosda.projectvalidationmanager.database.repositories.TokenRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.HandlerInterceptor
-import org.springframework.web.servlet.ModelAndView
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import org.springframework.web.servlet.HandlerMapping
 import java.util.*
 
-
 @Component
 data class AuthorizationInterceptor (val tokenRepo : TokenRepository) : HandlerInterceptor{
-
     val logger : Logger = LoggerFactory.getLogger(AuthorizationInterceptor::class.java)
 
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {

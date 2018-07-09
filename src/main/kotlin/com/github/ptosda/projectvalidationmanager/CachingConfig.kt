@@ -1,14 +1,11 @@
 package com.github.ptosda.projectvalidationmanager
 
 import com.github.ptosda.projectvalidationmanager.model.DependencyInfo
-import org.ehcache.CacheManager
 import org.ehcache.PersistentCacheManager
 import org.ehcache.config.builders.CacheConfigurationBuilder
 import org.ehcache.config.builders.CacheManagerBuilder
 import org.ehcache.config.builders.ResourcePoolsBuilder
 import org.ehcache.config.units.MemoryUnit
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Configuration
 import java.io.File
@@ -18,7 +15,6 @@ import javax.annotation.PreDestroy
 @Configuration
 @EnableCaching
 class CachingConfig {
-
     init{
         initDependenciesCache()
     }
