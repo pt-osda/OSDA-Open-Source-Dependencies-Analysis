@@ -58,7 +58,7 @@ class ReportAPIController(
         }
 
         logger.info("The report created at {} and identified by {} will be created.", report.timestamp, report.buildTag)
-        val generatedReport = storeReport(report.timestamp, report.buildTag, project)
+        val generatedReport = storeReport(report.timestamp, report.buildTag, report.errorInfo, project)
 
         logger.info("The dependencies of the project will be created.")
         storeDependencies(report.dependencies, generatedReport)
@@ -195,8 +195,8 @@ class ReportAPIController(
      * @param project The project in which this report occurred.
      * @return The newly created report.
      */
-    private fun storeReport(timestamp: String, tag: String?, project: Project): com.github.ptosda.projectvalidationmanager.database.entities.Report {
-        val report = Report(ReportPk(timestamp, project), tag, "", setOf())
+    private fun storeReport(timestamp: String, tag: String?, errorInfo: String? ,project: Project): com.github.ptosda.projectvalidationmanager.database.entities.Report {
+        val report = Report(ReportPk(timestamp, project), tag, errorInfo?: "", setOf())
         reportRepository.save(report)
         logger.info("All the report regarded information was stored in the database")
         return report

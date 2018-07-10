@@ -21,5 +21,8 @@ data class Report (
 
         val admin : String, // Indicates the username of the administrator of the project
 
+        @JsonProperty("error_info")
+        val errorInfo : String?, // Indicates the errors that occurred during report
+
         val dependencies : ArrayList<ReportDependency>
 )
