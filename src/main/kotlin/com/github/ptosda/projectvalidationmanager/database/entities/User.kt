@@ -8,7 +8,7 @@ data class User (
         @Id
         val username: String,
 
-        val password: String,
+        var password: String,
 
         val name: String,
 
