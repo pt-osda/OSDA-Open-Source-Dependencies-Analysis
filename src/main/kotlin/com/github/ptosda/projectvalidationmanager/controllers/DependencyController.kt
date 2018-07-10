@@ -40,20 +40,25 @@ class DependencyController(private val licenseService: LicenseService, private v
             return cacheEntry.licenses!!
         }
 
-        val licenses = licenseService.findLicense(id, version, licenseUrl)
+        val licenses : ArrayList<LicenseModel>
+        try {
+            licenses = licenseService.findLicense(id, version, licenseUrl)
 
-        if(!licenses.isEmpty()) {
-            if (cacheEntry == null) {
-                logger.info("The licenses found will be added to the cache")
-                dependenciesCache.put(cacheKey, DependencyInfo(licenses, getCurrentInstant().epochSecond, null, null))
-            } else {
-                logger.info("The licenses were already present in cache")
-                cacheEntry.licenses = licenses
-                cacheEntry.licensesTimestamp = getCurrentInstant().epochSecond
-                dependenciesCache.put(cacheKey, cacheEntry)
+            if(!licenses.isEmpty()) {
+                if (cacheEntry == null) {
+                    logger.info("The licenses found will be added to the cache")
+                    dependenciesCache.put(cacheKey, DependencyInfo(licenses, getCurrentInstant().epochSecond, null, null))
+                } else {
+                    logger.info("The licenses were already present in cache")
+                    cacheEntry.licenses = licenses
+                    cacheEntry.licensesTimestamp = getCurrentInstant().epochSecond
+                    dependenciesCache.put(cacheKey, cacheEntry)
+                }
             }
+            logger.info("The licenses found will be returned.")
+        } catch (e: Exception) {
+            throw UnreachableException(String.format("There was an error trying to reach the link for a license %s.", e.message))
         }
-        logger.info("The licenses found will be returned.")
         return licenses
     }
 
