@@ -24,7 +24,7 @@ class WebSecurityConfig(
     override fun configure(http: HttpSecurity) {
         http
             .csrf()
-                .ignoringAntMatchers("/{manager}/dependency/**", "/report", "/register")
+                .ignoringAntMatchers("/{manager}/dependency/**", "/report", "/register", "/user/token")
                 .and()
             .authorizeRequests()
                 .antMatchers("/{manager}/dependency/**", "/report", "/register", "/javascript/**", "/css/**").permitAll()

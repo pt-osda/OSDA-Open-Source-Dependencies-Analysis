@@ -17,5 +17,5 @@ data class User (
         val projects: List<ProjectUser>? = listOf(),
 
         @OneToOne
-        val token : Token?
+        var token : Token?
 )

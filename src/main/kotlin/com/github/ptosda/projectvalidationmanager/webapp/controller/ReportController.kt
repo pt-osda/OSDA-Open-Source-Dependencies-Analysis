@@ -22,7 +22,7 @@ import kotlin.collections.set
 @Controller
 @RequestMapping("/")
 class ReportController(val userService: UserService, //TODO meter a negrito os titulos das propriedades como por exemplo na lista de licenças : "License Name", etc
-                       val securityServiceImpl: SecurityServiceImpl,
+                       val securityService: SecurityServiceImpl,
                        val reportRepo: ReportRepository,
                        val projectRepo: ProjectRepository,
                        val dependencyRepo: DependencyRepository,
@@ -36,16 +36,21 @@ class ReportController(val userService: UserService, //TODO meter a negrito os t
      * Gets the view for the home page
      */
     @GetMapping
-    fun getHome(@RequestParam(value = "page", defaultValue = "0") page: Int, model: HashMap<String, Any>) : String
+    fun getHome(@RequestParam(value = "page", defaultValue = "0") page: Int,
+                model: HashMap<String, Any?>) : String
     {
         val currentPage = projectRepo.findAll(PageRequest.of(page, PAGE_SIZE))
 
         model["page_title"] = "Home"
 
-        val projects = currentPage
-                .sortedBy{ it.name}
+        val userName = securityService.findLoggedInUsername()
 
-        model["projects"] = projects
+        val user = userService.getUser(userName!!).get()
+        model["username"] = user.username
+
+        model["projects"] = user.projects!!
+                .map { it.pk.project }
+                .sortedBy { it.name }
 
         if (currentPage.hasNext())
             model["next"] = currentPage.number + 1

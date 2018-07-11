@@ -24,8 +24,10 @@ data class AuthorizationInterceptor (val tokenRepo : TokenRepository) : HandlerI
             response.status = 401
             return false
         }
-        val token = authorizationHeader.split(" ")[1]
-        if(tokenRepo.existsById(token)){
+        val token = Base64.getDecoder().decode(authorizationHeader.split(" ")[1].toByteArray(Charsets.UTF_8))
+        val hashManager = HashManager()
+
+        if(tokenRepo.existsById(hashManager.hashIt(token))){
             return true
         }
         response.status = 401

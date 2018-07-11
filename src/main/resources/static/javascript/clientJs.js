@@ -15,6 +15,14 @@ function httpRequest(method, path, data, cb) {
     xhr.send(data);
 }
 
+function getToken() {
+    var tokenElem = document.getElementById("token-info")
+    tokenElem.innerText = "...Loading"
+    httpRequest('PUT', `/user/token`, null, function(err, data) {
+        tokenElem.innerText = data
+    })
+}
+
 function search(searchElemId, searchRelUrl, searchOutputElemId) {
     var searchValue = document.getElementById(searchElemId).value
     var outputElement = document.getElementById(searchOutputElemId)

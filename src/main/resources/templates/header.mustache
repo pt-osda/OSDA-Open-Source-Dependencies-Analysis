@@ -18,19 +18,28 @@
     <nav class='navbar navbar-expand-lg'>
         <h1 class='navbar-brand'> OSDA </h1>
         <div class='collapse navbar-collapse' id='navbarNav'>
-            <ul class='navbar-nav'>
+            <ul class='navbar-nav mr-auto'>
                 <li class='nav-item active'>
                     <a class='nav-link' href='/'>Home</a>
                 </li>
-                <li class='nav-item active'>
+                <li class='nav-item'>
                     <a class='nav-link' href="/deps?page=0"> Dependencies </a>
                 </li>
-                <li class='nav-item active'>
+                <li class='nav-item'>
                     <a class='nav-link' href="/licenses?page=0"> Licenses </a>
                 </li>
-                <li class='nav-item active'>
+                <li class='nav-item'>
                     <a class='nav-link' href="/register"> Register </a>
                 </li>
             </ul>
+        </div>
+        <div class="dropdown">
+            <button class="btn dropdown-button dropdown-toggle" type="button" data-toggle="dropdown">
+                {{#username}}{{username}}{{/username}}Hello
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="/user">Profile</a>
+                <a class="dropdown-item" href="/logout">Logout</a>
+            </div>
         </div>
     </nav>

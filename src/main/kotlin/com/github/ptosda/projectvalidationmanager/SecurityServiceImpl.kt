@@ -14,7 +14,7 @@ class SecurityServiceImpl (
 ){
 
     fun findLoggedInUsername() : String? {
-        val userDetails = SecurityContextHolder.getContext().authentication.details
+        val userDetails = SecurityContextHolder.getContext().authentication.principal
         if(userDetails is UserDetails){
             return userDetails.username
         }

@@ -2,14 +2,24 @@
 {{> header}}
 
 <div class="container">
-    <form action="/login" method="post">
+    {{#param.error}}
+        <div class="alert alert-error">
+            Invalid username and password.
+        </div>
+    {{/param.error}}
+    {{#param.logout}}
+        <div class="alert alert-success">
+            You have been logged out.
+        </div>
+    {{/param.logout}}
+    <form action="/login" method="POST">
         <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" name="username" class="form-control" id="username" placeholder="Enter username">
+            <label for="user-name">Username</label>
+            <input type="text" name="username" class="form-control" id="user-name" placeholder="Enter username">
         </div>
         <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" name="password" class="form-control" id="password" placeholder="Enter Password">
+            <label for="pwd">Password</label>
+            <input type="password" name="password" class="form-control" id="pwd" placeholder="Enter Password">
         </div>
         <button type="submit" class="btn btn-outline-dark">Submit</button>
     </form>
