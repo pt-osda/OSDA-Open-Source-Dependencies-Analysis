@@ -53,7 +53,7 @@ class UserController(val userService: UserService, //TODO meter a negrito os tit
     fun postRegister(@RequestParam body: Map<String, String>) : RedirectView
     {
         val user = User(body["name"]!!, body["username"]!!, body["password"]!!, null, null)
-        if(!userService.getUser("1111").isPresent) {
+        if(!userService.getUser(body["username"]!!).isPresent) {
             userService.save(user)
         }
         securityService.autoLogin(body["username"]!!, body["password"]!!)
