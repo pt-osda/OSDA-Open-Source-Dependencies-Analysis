@@ -1,9 +1,10 @@
 <!DOCTYPE html>
+<html>
 <head>
     <title>{{page_title}}</title>
 
-    <link rel='stylesheet' href='/css/bootstrap.min.css'>
-	<link rel="stylesheet" href="/css/ui.css" />
+    <link rel='stylesheet' href='/css/bootstrap.min.css' type="text/css"/>
+    <link rel="stylesheet" href="/css/ui.css" type="text/css"/>
 
     <script type='text/javascript' src='/javascript/clientJs.js'></script>
     <script type='text/javascript' src='/javascript/jquery-3.3.1.js'></script>
@@ -15,8 +16,21 @@
 <body>
 
     <nav class='navbar navbar-expand-lg'>
-        <a class="navbar-brand">OSDA</a>
-        <a class='navbar-brand' href="/"> Home </a>
-        <a class='navbar-brand' href="/deps?page=0"> Dependencies </a>
-        <a class='navbar-brand' href="/licenses?page=0"> Licenses </a>
+        <h1 class='navbar-brand'> OSDA </h1>
+        <div class='collapse navbar-collapse' id='navbarNav'>
+            <ul class='navbar-nav'>
+                <li class='nav-item active'>
+                    <a class='nav-link' href='/'>Home</a>
+                </li>
+                <li class='nav-item active'>
+                    <a class='nav-link' href="/deps?page=0"> Dependencies </a>
+                </li>
+                <li class='nav-item active'>
+                    <a class='nav-link' href="/licenses?page=0"> Licenses </a>
+                </li>
+                <li class='nav-item active'>
+                    <a class='nav-link' href="/register"> Register </a>
+                </li>
+            </ul>
+        </div>
     </nav>

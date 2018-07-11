@@ -1,5 +1,7 @@
 package com.github.ptosda.projectvalidationmanager.webapp.controller
 
+import com.github.ptosda.projectvalidationmanager.SecurityServiceImpl
+import com.github.ptosda.projectvalidationmanager.UserService
 import com.github.ptosda.projectvalidationmanager.database.entities.*
 import com.github.ptosda.projectvalidationmanager.database.repositories.*
 import com.github.ptosda.projectvalidationmanager.webapp.service.ReportService
@@ -19,7 +21,8 @@ import kotlin.collections.set
  */
 @Controller
 @RequestMapping("/")
-class ReportController(val reportService: ReportService, //TODO meter a negrito os titulos das propriedades como por exemplo na lista de licenças : "License Name", etc
+class ReportController(val userService: UserService, //TODO meter a negrito os titulos das propriedades como por exemplo na lista de licenças : "License Name", etc
+                       val securityServiceImpl: SecurityServiceImpl,
                        val reportRepo: ReportRepository,
                        val projectRepo: ProjectRepository,
                        val dependencyRepo: DependencyRepository,

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository
 interface DependencyRepository : PagingAndSortingRepository<Dependency, DependencyPk> {
     fun findAllByDirect(direct: Boolean, pageable: Pageable) : Page<Dependency>
 
-    @Query(value = "SELECT id, main_version, description, direct, error_info, vulnerabilities_count, project, \"timestamp\"\n" +
+    @Query(value = "SELECT id, main_version, description, direct, vulnerabilities_count, project, \"timestamp\"\n" +
             "\tFROM public.dependency\n" +
             "\tWHERE project = :project and timestamp = :timestamp and direct = 'true'",
             nativeQuery = true)

@@ -1,16 +1,42 @@
-<ul class="list-group">
-    {{#licenses}}
-        <a class="list-group-item list-group-item-action" href="/projs/{{project}}/report/{{report}}/licenses/{{first.pk.license.spdxId}}">
-            <b>License Name:</b> {{first.pk.license.spdxId}}
-            <br>
-            {{#second}}
-                <b>Number Of Dependencies:</b> {{second}}
+
+Invalid Licenses
+<ul class="list-group" id="error-list">
+    {{#invalid_licenses}}
+        <li class="list-group-item list-group-item-danger">
+            <a class="list-group-item list-group-item-action" href="/projs/{{project}}/report/{{report}}/licenses/{{first.pk.license.spdxId}}">
+                <b>License Name:</b> {{first.pk.license.spdxId}}
                 <br>
-            {{/second}}
-        </a>
+                {{#second}}
+                    <b>Number Of Dependencies:</b> {{second}}
+                    <br>
+                {{/second}}
+            </a>
+        </li>
         <br>
-    {{/licenses}}
-    {{^licenses}}
+    {{/invalid_licenses}}
+    {{^invalid_licenses}}
         There are no licenses for the current context
-    {{/licenses}}
+    {{/invalid_licenses}}
+</ul>
+
+<br>
+
+Valid Licenses
+<ul class="list-group" id="dependency-list">
+    {{#valid_licenses}}
+        <li class="list-group-item list-group-item-success">
+            <a class="list-group-item list-group-item-action" href="/projs/{{project}}/report/{{report}}/licenses/{{first.pk.license.spdxId}}">
+                <b>License Name:</b> {{first.pk.license.spdxId}}
+                <br>
+                {{#second}}
+                    <b>Number Of Dependencies:</b> {{second}}
+                    <br>
+                {{/second}}
+            </a>
+        </li>
+        <br>
+    {{/valid_licenses}}
+    {{^valid_licenses}}
+        There are no licenses for the current context
+    {{/valid_licenses}}
 </ul>

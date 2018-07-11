@@ -92,11 +92,16 @@ class ReportFilterService(private val projectRepo: ProjectRepository,
 
         model["report"] = report.pk.timestamp
         model["project"] = report.pk.project.name
-        model["licenses"] = licenses
+        val reportLicenses = licenses
                 .filter { it.pk.dependency.direct }
                 .groupBy { it.pk.license.spdxId }
                 .map { Pair(it.value[0], it.value.size) }
                 .sortedByDescending { it.second }
+
+
+        model["valid_licenses"] = reportLicenses.filter { it.first.valid }
+        model["invalid_licenses"] = reportLicenses.filter { !it.first.valid }
+
         model["view_name"] = "license/license-list-partial"
 
         return model
@@ -126,10 +131,15 @@ class ReportFilterService(private val projectRepo: ProjectRepository,
 
         model["report"] = reportId
         model["project"] = projectId
-        model["licenses"] = licenses
+        val reportLicenses = licenses
+                .filter { it.pk.dependency.direct }
                 .groupBy { it.pk.license.spdxId }
                 .map { Pair(it.value[0], it.value.size) }
                 .sortedByDescending { it.second }
+
+        model["valid_licenses"] = reportLicenses.filter { it.first.valid }
+        model["invalid_licenses"] = reportLicenses.filter { !it.first.valid }
+
         model["view_name"] = "license/license-list-partial"
 
         return model

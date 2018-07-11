@@ -9,6 +9,7 @@ import com.github.ptosda.projectvalidationmanager.database.repositories.UserRepo
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class UserService (
@@ -22,8 +23,8 @@ class UserService (
         userRepository.save(user)
     }
 
-    fun getUser(username: String) : User{
-        return userRepository.findById(username).get()
+    fun getUser(username: String) : Optional<User> {
+        return userRepository.findById(username)
     }
 
     fun addUserToProject(username: String, projectId: String){

@@ -5,16 +5,17 @@ import javax.persistence.*
 @Entity
 @Table(name = "userInfo")
 data class User (
+        val name: String,
+
         @Id
         val username: String,
 
         var password: String,
 
-        val name: String,
 
         @OneToMany(mappedBy = "pk.userInfo")
-        val projects: List<ProjectUser>?,
+        val projects: List<ProjectUser>? = listOf(),
 
         @OneToOne
-        val token : Token
+        val token : Token?
 )

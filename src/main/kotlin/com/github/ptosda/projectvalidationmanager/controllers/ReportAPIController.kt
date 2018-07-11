@@ -4,6 +4,7 @@ import com.github.ptosda.projectvalidationmanager.model.report.Report
 import com.github.ptosda.projectvalidationmanager.model.report.ReportDependency
 import com.github.ptosda.projectvalidationmanager.database.entities.*
 import com.github.ptosda.projectvalidationmanager.database.repositories.*
+import com.github.ptosda.projectvalidationmanager.model.DependencyVulnerabilityInputModel
 import com.github.ptosda.projectvalidationmanager.model.report.ReportVulnerability
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion
 import org.slf4j.Logger
@@ -66,10 +67,6 @@ class ReportAPIController(
         logger.info("The information from the report was successfully stored in the database.")
         return ResponseEntity(HttpStatus.CREATED)
     }
-
-    data class DependencyVulnerabilityInputModel(val projectId: String, val reportId: String,
-                                                 val dependencyId:String, val dependencyVersion: String,
-                                                 val vulnerabilityId: Long)
 
     @PutMapping("dependency/vulnerability/edit")
     fun alterDependencyVulnerabilityState(@RequestBody dependencyVulnerabilityInput: DependencyVulnerabilityInputModel){
