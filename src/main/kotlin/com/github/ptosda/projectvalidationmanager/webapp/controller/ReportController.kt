@@ -67,15 +67,11 @@ class ReportController(val userService: UserService, //TODO meter a negrito os t
     @GetMapping("deps")
     fun getDependencies(@RequestParam(value = "page", defaultValue = "0") page: Int,  model: HashMap<String, Any?>) : String
     {
-        val currentPage = dependencyRepo.findAllByDirect(true, PageRequest.of(page, PAGE_SIZE))
+        val currentPage = dependencyRepo.findAllByDirectOrderByPkAsc(true, PageRequest.of(page, PAGE_SIZE))
 
         model["page_title"] = "Dependencies"
 
         model["dependencies"] = currentPage
-                .groupBy { it.pk.id + it.pk.mainVersion }
-                .values
-                .map { it.last() }
-                .sortedBy{ it.pk.id.toLowerCase() }
 
         if (currentPage.hasNext())
             model["next"] = currentPage.number + 1
@@ -108,6 +104,7 @@ class ReportController(val userService: UserService, //TODO meter a negrito os t
         model["title"] = dependency.pk.id
         model["dependency_id"] = dependency.title
         model["main_version"] = dependency.pk.mainVersion
+        model["private_versions"] = dependency.privateVersions
         model["description"] = dependency.description
         model["license"] = dependency.license
         model["vulnerabilities"] = dependency.vulnerabilities
@@ -233,9 +230,9 @@ class ReportController(val userService: UserService, //TODO meter a negrito os t
         model["project_id"] = projectId
         model["report_id"] = reportId
 
-        model["title"] = dependency.pk.id
-        model["dependency_id"] = dependency.title
+        model["dependency_id"] = dependency.pk.id
         model["main_version"] = dependency.pk.mainVersion
+        model["private_versions"] = dependency.privateVersions
         model["description"] = dependency.description
         model["license"] = dependency.license
         model["vulnerabilities"] = dependency.vulnerabilities

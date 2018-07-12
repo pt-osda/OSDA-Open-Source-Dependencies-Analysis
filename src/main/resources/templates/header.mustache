@@ -35,11 +35,11 @@
         </div>
         <div class="dropdown">
             <button class="btn dropdown-button dropdown-toggle" type="button" data-toggle="dropdown">
-                {{#username}}{{username}}{{/username}}Hello
+                {{#username}}{{username}}{{/username}}
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 <a class="dropdown-item" href="/user">Profile</a>
-                <a class="dropdown-item" href="/logout">Logout</a>
+                <button class="dropdown-item" onclick="logout()">Logout</button>
             </div>
         </div>
     </nav>

@@ -24,17 +24,18 @@ class WebSecurityConfig(
     override fun configure(http: HttpSecurity) {
         http
             .csrf()
-                .ignoringAntMatchers("/{manager}/dependency/**", "/report", "/register", "/user/token")
+                .ignoringAntMatchers("/{manager}/dependency/**", "/report", "/register", "/user/token", "/logout", "/login")
                 .and()
             .authorizeRequests()
                 .antMatchers("/{manager}/dependency/**", "/report", "/register", "/javascript/**", "/css/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
             .formLogin()
-                /*.loginPage("/login")
-                .permitAll()*/
+                .loginPage("/login")
+                .permitAll()
                 .and()
             .logout()
+                .logoutUrl("/logout")
                 .permitAll()
     }
 

@@ -218,6 +218,7 @@ class ReportAPIController(
                         childrenSet.add(Dependency(DependencyPk(dependency.title, report, dependency.mainVersion),
                                 dependency.description,
                                 0,  // Children don't have vulnerabilities their parents do.
+                                it.privateVersions,
                                 emptySet(),
                                 emptyList(),
                                 arrayListOf(),
@@ -229,6 +230,7 @@ class ReportAPIController(
                     DependencyPk(it.title, report, it.mainVersion),
                     it.description,
                     0,
+                    it.privateVersions,
                     childrenSet,
                     arrayListOf(),
                     arrayListOf(),
@@ -343,7 +345,7 @@ class ReportAPIController(
      * @return  The list of all the vulnerable versions affected by the vulnerabilities brought on by the refereed
      *          dependency.
      */
-    private fun getVulnerableDependency(reportDependency: ReportDependency, dependencyVersion: String, privateVersions: ArrayList<String>?): ArrayList<String> {
+    private fun getVulnerableDependency(reportDependency: ReportDependency, dependencyVersion: String, privateVersions: List<String>?): ArrayList<String> {
         val vulnerableVersions = ArrayList<String>()
         val analysisVersion = dependencyVersion.substring(0, dependencyVersion.indexOfLast { it == '.' })
 

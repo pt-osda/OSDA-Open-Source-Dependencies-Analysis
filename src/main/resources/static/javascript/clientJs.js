@@ -15,6 +15,12 @@ function httpRequest(method, path, data, cb) {
     xhr.send(data);
 }
 
+function logout() {
+    httpRequest('POST', `/logout`, null, function(err, data) {
+        location.reload()
+    })
+}
+
 function getToken() {
     var tokenElem = document.getElementById("token-info")
     tokenElem.innerText = "...Loading"

@@ -2,9 +2,9 @@
 {{> header}}
 
 <div class="container-fluid">
-    <div class="text-center">
+    <h2 class="text-center">
         {{username}}
-    </div>
+    </h2>
 
     <div class="nav nav-pills nav-justified">
         <a class="nav-item nav-link btn-outline-dark  active" id="detail" href="#detail">
@@ -18,18 +18,10 @@
     <div id="show-information">
         <b>Name:</b> {{name}}
         <br>
-        {{#token}}
-            <b>Token</b> <div id="token-info">{{token}}</div>
-            <button class="btn btn-outline-dark" onclick="getToken()">
-                Revoke Token
-            </button>
-        {{/token}}
-        {{^token}}
-            <b>There is no token associated with this user</b>
-            <button class="btn btn-outline-dark" onclick="getToken()">
-                Create Token
-            </button>
-        {{/token}}
+        <b>Token:</b> <div id="token-info"></div>
+        <button class="btn btn-outline-dark" onclick="getToken()">
+            Get Token
+        </button>
     </div>
 
 </div>

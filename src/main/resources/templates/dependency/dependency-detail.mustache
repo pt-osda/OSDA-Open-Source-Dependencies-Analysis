@@ -3,7 +3,7 @@
 <div class="container-fluid">
 
     <h3 class="text-center">
-        {{title}}
+        {{dependency_id}}
     </h3>
 
     <a class="btn btn-outline-danger text-left" href="/projs/{{project_id}}/report/{{report_id}}">See the report</a>
@@ -13,6 +13,20 @@
     <br>
 
     <b>Main Version:</b> {{main_version}}
+    <br>
+    {{#private_versions.size}}
+        <b>Private Versions:</b>
+    {{/private_versions.size}}
+
+    <ul class="list-group">
+        {{#private_versions}}
+            <li class="list-group-item">
+                {{.}}
+            </li>
+            <br>
+        {{/private_versions}}
+    </ul>
+
     {{#description}}
         <br>
         <b>Description:</b> {{description}}
