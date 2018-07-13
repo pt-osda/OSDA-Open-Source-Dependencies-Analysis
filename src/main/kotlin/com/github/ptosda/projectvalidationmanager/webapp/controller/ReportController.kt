@@ -2,9 +2,11 @@ package com.github.ptosda.projectvalidationmanager.webapp.controller
 
 import com.github.ptosda.projectvalidationmanager.SecurityServiceImpl
 import com.github.ptosda.projectvalidationmanager.UserService
-import com.github.ptosda.projectvalidationmanager.database.entities.*
+import com.github.ptosda.projectvalidationmanager.database.entities.DependencyPk
+import com.github.ptosda.projectvalidationmanager.database.entities.Project
+import com.github.ptosda.projectvalidationmanager.database.entities.Report
+import com.github.ptosda.projectvalidationmanager.database.entities.ReportPk
 import com.github.ptosda.projectvalidationmanager.database.repositories.*
-import com.github.ptosda.projectvalidationmanager.webapp.service.ReportService
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Controller
 import org.springframework.transaction.annotation.Transactional
@@ -23,6 +25,7 @@ import kotlin.collections.set
 @RequestMapping("/")
 class ReportController(val userService: UserService, //TODO meter a negrito os titulos das propriedades como por exemplo na lista de licenças : "License Name", etc
                        val securityService: SecurityServiceImpl,
+                       val projectUserRepo: ProjectUserRepository,
                        val reportRepo: ReportRepository,
                        val projectRepo: ProjectRepository,
                        val dependencyRepo: DependencyRepository,
@@ -71,6 +74,11 @@ class ReportController(val userService: UserService, //TODO meter a negrito os t
 
         model["page_title"] = "Dependencies"
 
+        val userName = securityService.findLoggedInUsername()
+
+        val user = userService.getUser(userName!!).get()
+        model["username"] = user.username
+
         model["dependencies"] = currentPage
 
         if (currentPage.hasNext())
@@ -94,6 +102,11 @@ class ReportController(val userService: UserService, //TODO meter a negrito os t
                              model: HashMap<String, Any?>) : String
     {
         model["page_title"] = "Dependency Detail"
+
+        val userName = securityService.findLoggedInUsername()
+
+        val user = userService.getUser(userName!!).get()
+        model["username"] = user.username
 
         //val decodedDepencencyId = dependencyId.replace(':', '/')
 
@@ -124,6 +137,11 @@ class ReportController(val userService: UserService, //TODO meter a negrito os t
 
         model["page_title"] = "Licenses"
 
+        val userName = securityService.findLoggedInUsername()
+
+        val user = userService.getUser(userName!!).get()
+        model["username"] = user.username
+
         model["licenses"] = currentPage
             .sortedBy { it.spdxId }
 
@@ -147,6 +165,11 @@ class ReportController(val userService: UserService, //TODO meter a negrito os t
     {
         model["page_title"] = "Project Reports"
 
+        val userName = securityService.findLoggedInUsername()
+
+        val user = userService.getUser(userName!!).get()
+        model["username"] = user.username
+
         val projectInfo = projectRepo.findById(projectId)
 
         if(!projectInfo.isPresent) {
@@ -155,6 +178,48 @@ class ReportController(val userService: UserService, //TODO meter a negrito os t
 
         val project = projectInfo.get()
         val reports = projectInfo.get().report
+
+        model["is_admin"] = userName == project.admin!!.username
+        model["associated_users"] = projectUserRepo.findAll()
+                .filter{ it.pk.project.name == projectId }
+                .map { it.pk.userInfo }
+
+        model["project_id"] = project.name
+        model["repository"] = project.repo
+
+        model["reports"] = reports!!.toList()
+                .sortedByDescending{ ZonedDateTime.parse(it.pk.timestamp) }
+
+        return "project/project-detail"
+    }
+
+    /**
+     * Gets the view for the detail of a project
+     * @param projectId the id of the project to show
+     */
+    @Transactional
+    @GetMapping("projs/{project-id}/user")
+    fun getProjectAdmin(@PathVariable("project-id") projectId: String,
+                         model: HashMap<String, Any?>) : String
+    {
+        model["page_title"] = "Project Reports"
+
+        val userName = securityService.findLoggedInUsername()
+
+        val user = userService.getUser(userName!!).get()
+        model["username"] = user.username
+
+        val projectInfo = projectRepo.findById(projectId)
+
+        if(!projectInfo.isPresent) {
+            throw Exception("Project not found")
+        }
+
+        val project = projectInfo.get()
+        val reports = projectInfo.get().report
+
+        model["is_admin"] = userName == project.admin!!.username
+
 
         model["project_id"] = project.name
         model["repository"] = project.repo
@@ -176,6 +241,11 @@ class ReportController(val userService: UserService, //TODO meter a negrito os t
                         model: HashMap<String, Any?>) : String
     {
         model["page_title"] = "Report Detail"
+
+        val userName = securityService.findLoggedInUsername()
+
+        val user = userService.getUser(userName!!).get()
+        model["username"] = user.username
 
         val reportInfo = reportRepo.findById(ReportPk(reportId, Project(projectId, null, null)))
 
@@ -219,6 +289,11 @@ class ReportController(val userService: UserService, //TODO meter a negrito os t
     {
         model["page_title"] = "Dependency Detail"
 
+        val userName = securityService.findLoggedInUsername()
+
+        val user = userService.getUser(userName!!).get()
+        model["username"] = user.username
+
         val dependencyInfo = dependencyRepo.findById(DependencyPk(dependencyId, Report(ReportPk(reportId, Project(projectId, null, null)), null, null), dependencyVersion))
 
         if(!dependencyInfo.isPresent) {
@@ -254,6 +329,11 @@ class ReportController(val userService: UserService, //TODO meter a negrito os t
     {
         model["page_title"] = "License Detail"
 
+        val userName = securityService.findLoggedInUsername()
+
+        val user = userService.getUser(userName!!).get()
+        model["username"] = user.username
+
         val licenseInfo = licenseRepo.findById(licenseId)
         if(!licenseInfo.isPresent) {
             throw Exception("License not found")
@@ -282,6 +362,11 @@ class ReportController(val userService: UserService, //TODO meter a negrito os t
     {
         model["page_title"] = "License Detail"
 
+        val userName = securityService.findLoggedInUsername()
+
+        val user = userService.getUser(userName!!).get()
+        model["username"] = user.username
+
         val licenseInfo = licenseRepo.findById(licenseId)
 
         if(!licenseInfo.isPresent) {
@@ -308,6 +393,11 @@ class ReportController(val userService: UserService, //TODO meter a negrito os t
                                model: HashMap<String, Any?>) : String
     {
         model["page_title"] = "Vulnerability Detail"
+
+        val userName = securityService.findLoggedInUsername()
+
+        val user = userService.getUser(userName!!).get()
+        model["username"] = user.username
 
         val vulnerabilityInfo = vulnerabilityRepo.findById(vulnerabilityId)
 

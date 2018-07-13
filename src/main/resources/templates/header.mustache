@@ -3,13 +3,12 @@
 <head>
     <title>{{page_title}}</title>
 
-    <link rel='stylesheet' href='/css/bootstrap.min.css' type="text/css"/>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/ui.css" type="text/css"/>
 
     <script type='text/javascript' src='/javascript/clientJs.js'></script>
     <script type='text/javascript' src='/javascript/jquery-3.3.1.js'></script>
-    <script type='text/javascript' src='/javascript/popper.min.js'></script>
-    <script type='text/javascript' src='/javascript/bootstrap.min.js'></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.bundle.min.js" integrity="sha384-CS0nxkpPy+xUkNGhObAISrkg/xjb3USVCwy+0/NMzd5VxgY4CMCyTkItmy5n0voC" crossorigin="anonymous"></script>
 
 
 </head>
@@ -28,18 +27,17 @@
                 <li class='nav-item'>
                     <a class='nav-link' href="/licenses?page=0"> Licenses </a>
                 </li>
-                <li class='nav-item'>
-                    <a class='nav-link' href="/register"> Register </a>
-                </li>
             </ul>
         </div>
-        <div class="dropdown">
-            <button class="btn dropdown-button dropdown-toggle" type="button" data-toggle="dropdown">
-                {{#username}}{{username}}{{/username}}
-            </button>
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item" href="/user">Profile</a>
-                <button class="dropdown-item" onclick="logout()">Logout</button>
+        {{#username}}
+            <div class="dropdown">
+                <button class="btn dropdown-button dropdown-toggle" type="button" data-toggle="dropdown">
+                    {{username}}
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="/user">Profile</a>
+                    <button class="dropdown-item" onclick="logout()">Logout</button>
+                </div>
             </div>
-        </div>
+        {{/username}}
     </nav>

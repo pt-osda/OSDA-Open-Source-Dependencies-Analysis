@@ -1,28 +1,79 @@
 
-{{> header}}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{page_title}}</title>
 
-<div class="container">
-    {{#param.error}}
-        <div class="alert alert-error">
-            Invalid username and password.
+    <link rel='stylesheet' href='/css/bootstrap.min.css' type="text/css"/>
+    <link rel="stylesheet" href="/css/ui.css" type="text/css"/>
+
+    <script type='text/javascript' src='/javascript/clientJs.js'></script>
+    <script type='text/javascript' src='/javascript/jquery-3.3.1.js'></script>
+    <script type='text/javascript' src='/javascript/popper.min.js'></script>
+    <script type='text/javascript' src='/javascript/bootstrap.min.js'></script>
+
+
+</head>
+<body>
+
+    <nav class='navbar navbar-expand-lg'>
+        <h1 class='navbar-brand'> OSDA </h1>
+    </nav>
+
+<div class="container-fluid">
+
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="login-tab" data-toggle="tab" href="#login" role="tab" aria-controls="home" aria-selected="true">Login</a>
+        </li>
+        Or
+        <li class="nav-item">
+            <a class="nav-link" id="profile-tab" data-toggle="tab" href="#register" role="tab" aria-controls="profile" aria-selected="false">Register</a>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="login" role="tabpanel" aria-labelledby="login-tab">
+            {{#param.error}}
+                <div class="alert alert-error">
+                    Invalid username and password.
+                </div>
+            {{/param.error}}
+            {{#param.logout}}
+                <div class="alert alert-success">
+                    You have been logged out.
+                </div>
+            {{/param.logout}}
+            <form action="/login" method="POST">
+                <div class="form-group">
+                    <label for="user-name">Username</label>
+                    <input type="text" name="username" class="form-control" id="user-name" placeholder="Enter username" required>
+                </div>
+                <div class="form-group">
+                    <label for="pwd">Password</label>
+                    <input type="password" name="password" class="form-control" id="pwd" placeholder="Enter Password" required>
+                </div>
+                <button type="submit" class="btn btn-outline-dark">Submit</button>
+            </form>
         </div>
-    {{/param.error}}
-    {{#param.logout}}
-        <div class="alert alert-success">
-            You have been logged out.
+
+        <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="profile-tab">
+            <form action="/register" method="POST">
+                <div class="form-group">
+                    <label for="name">First and Last name</label>
+                    <input type="text" name="name" class="form-control" id="name" placeholder="Enter name" required>
+                </div>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" name="username" class="form-control" id="username" placeholder="Enter username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" name="password" class="form-control" id="password" placeholder="Enter Password" required>
+                </div>
+                <button type="submit" class="btn btn-outline-dark">Submit</button>
+            </form>
         </div>
-    {{/param.logout}}
-    <form action="/login" method="POST">
-        <div class="form-group">
-            <label for="user-name">Username</label>
-            <input type="text" name="username" class="form-control" id="user-name" placeholder="Enter username">
-        </div>
-        <div class="form-group">
-            <label for="pwd">Password</label>
-            <input type="password" name="password" class="form-control" id="pwd" placeholder="Enter Password">
-        </div>
-        <button type="submit" class="btn btn-outline-dark">Submit</button>
-    </form>
+    </div>
 </div>
 
 {{> footer}}

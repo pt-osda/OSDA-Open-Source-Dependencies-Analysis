@@ -54,7 +54,10 @@
                 <br>
                 <b>Vulnerability Description:</b> {{pk.vulnerability.description}}
                 <br>
-                <b>Affected Versions:</b> {{versionCriteria}}
+                <b>Affected Versions:</b>
+                <ul class="list-group" id="{{pk.vulnerability.id}}">
+                </ul>
+                <script>filterAffectedVersions('{{pk.vulnerability.id}}', '{{versionCriteria}}')</script>
                 <br>
                 <b>Source:</b> {{sourceDependency}}
             </a>

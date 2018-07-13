@@ -6,7 +6,6 @@ import com.github.ptosda.projectvalidationmanager.database.entities.User
 import com.github.ptosda.projectvalidationmanager.database.repositories.ProjectRepository
 import com.github.ptosda.projectvalidationmanager.database.repositories.ProjectUserRepository
 import com.github.ptosda.projectvalidationmanager.database.repositories.UserRepository
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import java.util.*

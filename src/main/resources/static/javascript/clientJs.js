@@ -15,6 +15,14 @@ function httpRequest(method, path, data, cb) {
     xhr.send(data);
 }
 
+function addUser(projectId) {
+    var userName = document.getElementById("user-name").value
+    var userProjectList = document.getElementById("user-project-list")
+    httpRequest('PUT', `/projs/${projectId}/user/${userName}`, null, function(err, data) {
+        userProjectList.innerHTML += '<li class="list-group-item">' + userName + '</li>'
+    })
+}
+
 function logout() {
     httpRequest('POST', `/logout`, null, function(err, data) {
         location.reload()
@@ -66,4 +74,14 @@ function filterElementToShow(filterUrl, outputElemId, tabToShowId) {
     httpRequest('GET', `/${filterUrl}`, null, function(err, data) {
         informationToShow.innerHTML = data
     })
+}
+
+function filterAffectedVersions(outputElemId, affectedVersions) {
+    var outputElem = document.getElementById(outputElemId)
+    if(affectedVersions.includes('&')) {
+        outputElem.innerHTML += '<li class="list-group-item">' + affectedVersions + '</li>'
+    } else {
+        var versions = affectedVersions.split(';')
+        versions.forEach(elem => outputElem.innerHTML += '<li class="list-group-item">' + elem + '</li>')
+    }
 }

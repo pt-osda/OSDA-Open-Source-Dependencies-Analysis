@@ -33,11 +33,6 @@ class UserController(val userService: UserService, //TODO meter a negrito os tit
     {
         model["page_title"] = "Login"
 
-        val referrer = req.getHeader("Referer")
-        if (referrer != null) {
-            req.session.setAttribute("url_prior_login", referrer)
-        }
-
         return "user/login"
     }
 
@@ -89,7 +84,23 @@ class UserController(val userService: UserService, //TODO meter a negrito os tit
         return ResponseEntity(Base64.getEncoder().encodeToString(buffer), HttpStatus.OK)
     }
 
-    @PostMapping("login")
+    @PutMapping("projs/{project-id}/user/{username}")
+    fun addUserToProject(@PathVariable("project-id") projectId : String,
+                         @PathVariable("username") userName : String) : ResponseEntity<String>
+    {
+
+        val userInfo = userService.getUser(userName)
+
+        if(!userInfo.isPresent) {
+            return ResponseEntity("User $userName does not exist", HttpStatus.OK)
+        }
+
+        userService.addUserToProject(userName, projectId)
+
+        return ResponseEntity("Added project to user successfully", HttpStatus.OK)
+    }
+
+    @PostMapping("logout")
     fun checkLogin(@RequestParam body: Map<String, String>) : String
     {
 
@@ -104,7 +115,7 @@ class UserController(val userService: UserService, //TODO meter a negrito os tit
         return "user/register"
     }
 
-    @PostMapping(value = ["register"])
+    @PostMapping("register")
     fun postRegister(@RequestParam body: Map<String, String>) : RedirectView
     {
         val user = User(body["name"]!!, body["username"]!!, body["password"]!!, null, null)

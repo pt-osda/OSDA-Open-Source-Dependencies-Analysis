@@ -16,15 +16,15 @@
 
         <div id="licenses-list">
             {{> license/generic-license-list-partial}}
-
-            {{#previous}}
-                <a href="/licenses?page={{.}}"> Previous </a>
-            {{/previous}}
-
-            {{#next}}
-                <a href="/licenses?page={{.}}"> Next </a>
-            {{/next}}
         </div>
+
+        {{#previous}}
+            <a class="btn btn-outline-dark" href="/licenses?page={{.}}"> Previous </a>
+        {{/previous}}
+
+        {{#next}}
+            <a class="btn btn-outline-dark" href="/licenses?page={{.}}"> Next </a>
+        {{/next}}
     </div>
 
 {{> footer}}

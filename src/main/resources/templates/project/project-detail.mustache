@@ -7,7 +7,9 @@
     <h2 class="text-center">
         {{project_id}}
     </h2>
-
+    {{#is_admin}}
+        {{> user/add-user-project-partial}}
+    {{/is_admin}}
     <p>
         <a class="btn btn-outline-danger text-left" href="/">See all projects</a>
     </p>

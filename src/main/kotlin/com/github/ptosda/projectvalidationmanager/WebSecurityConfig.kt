@@ -2,7 +2,6 @@ package com.github.ptosda.projectvalidationmanager
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -24,7 +23,7 @@ class WebSecurityConfig(
     override fun configure(http: HttpSecurity) {
         http
             .csrf()
-                .ignoringAntMatchers("/{manager}/dependency/**", "/report", "/register", "/user/token", "/logout", "/login")
+                .ignoringAntMatchers("/{manager}/dependency/**", "/report", "/register", "/user/token", "/projs/{project-id}/user/{username}", "/logout", "/login")
                 .and()
             .authorizeRequests()
                 .antMatchers("/{manager}/dependency/**", "/report", "/register", "/javascript/**", "/css/**").permitAll()
