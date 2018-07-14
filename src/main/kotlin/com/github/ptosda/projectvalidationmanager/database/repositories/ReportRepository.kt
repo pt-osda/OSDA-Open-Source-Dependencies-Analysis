@@ -1,6 +1,5 @@
 package com.github.ptosda.projectvalidationmanager.database.repositories
 
-import com.github.ptosda.projectvalidationmanager.database.entities.Repo
 import com.github.ptosda.projectvalidationmanager.database.entities.Report
 import com.github.ptosda.projectvalidationmanager.database.entities.ReportPk
 import org.springframework.data.jpa.repository.Query
@@ -13,7 +12,8 @@ import java.util.*
 interface ReportRepository : PagingAndSortingRepository<Report, ReportPk> {
 
 
-    @Query(value = "select * from report where project = :project",
+    @Query(value = "select * from report where project = :project and timestamp = :timestamp",
             nativeQuery = true)
-    fun findByProjectId(@Param("project") projectId: String): Optional<Report>
+    fun findByProjectIdAndReportId(@Param("project") projectId: String,
+                                   @Param("timestamp") timestamp: String): Optional<Report>
 }

@@ -1,13 +1,16 @@
 package com.github.ptosda.projectvalidationmanager.webapp.controller
 
-import com.github.ptosda.projectvalidationmanager.database.entities.*
+import com.github.ptosda.projectvalidationmanager.database.entities.DependencyPk
+import com.github.ptosda.projectvalidationmanager.database.entities.Project
+import com.github.ptosda.projectvalidationmanager.database.entities.Report
+import com.github.ptosda.projectvalidationmanager.database.entities.ReportPk
 import com.github.ptosda.projectvalidationmanager.database.repositories.*
+import com.github.ptosda.projectvalidationmanager.webapp.service.ReportFilterService
 import com.github.ptosda.projectvalidationmanager.websecurity.service.SecurityServiceImpl
 import com.github.ptosda.projectvalidationmanager.websecurity.service.UserService
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Controller
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -31,13 +34,17 @@ class ReportController(val userService: UserService,
                        val projectRepo: ProjectRepository,
                        val dependencyRepo: DependencyRepository,
                        val vulnerabilityRepo: VulnerabilityRepository,
-                       val licenseRepo: LicenseRepository)
+                       val licenseRepo: LicenseRepository,
+                       val reportFilterService: ReportFilterService)
 {
 
-    private final val PAGE_SIZE = 10 //TODO filter user in search
+    private final val PAGE_SIZE = 10
 
     /**
      * Gets the view for the home page
+     * @param page the current page number
+     * @param model the model for the response
+     * @param req the HTTP request
      */
     @GetMapping
     fun getHome(@RequestParam(value = "page", defaultValue = "0") page: Int,
@@ -68,6 +75,8 @@ class ReportController(val userService: UserService,
 
     /**
      * Gets the view for the collection of dependencies
+     * @param page the current page number
+     * @param model the model for the response
      */
     @GetMapping("deps")
     fun getDependencies(@RequestParam(value = "page", defaultValue = "0") page: Int,  model: HashMap<String, Any?>) : String
@@ -94,10 +103,10 @@ class ReportController(val userService: UserService,
      * Gets the view of a dependency
      * @param dependencyId the id of the dependency to show
      * @param dependencyVersion the version of the dependency to show
-     * TODO differentiate projects and detail of dependency
+     * @param model the model for the response
      */
     @GetMapping("deps/{dep-id}/version/{dep-version}")
-    fun getDependencyGeneric(@PathVariable("dep-id") dependencyId : String,
+    fun getGenericDependency(@PathVariable("dep-id") dependencyId : String,
                              @PathVariable("dep-version") dependencyVersion : String,
                              model: HashMap<String, Any?>) : String
     {
@@ -121,11 +130,16 @@ class ReportController(val userService: UserService,
         model["projects"] = projectRepo.findAll()
                 .filter { it.report?.last()?.dependency?.contains(dependency)!! }
 
+        model["projects"] = projectRepo.findAll()
+                .filter { it.report?.last()?.dependency?.contains(dependency)!! }
+
         return "dependency/generic-dependency-detail"
     }
 
     /**
      * Gets the view for the collection of licenses
+     * @param page the current page number
+     * @param model the model for the response
      */
     @GetMapping("licenses")
     fun getLicenses(@RequestParam(value = "page", defaultValue = "0") page: Int, model: HashMap<String, Any?>) : String
@@ -152,6 +166,7 @@ class ReportController(val userService: UserService,
     /**
      * Gets the view for the detail of a project
      * @param projectId the id of the project to show
+     * @param model the model for the response
      */
     @Transactional
     @GetMapping("projs/{project-id}")
@@ -180,12 +195,14 @@ class ReportController(val userService: UserService,
 
         model["is_admin"] = userName == project.admin!!.username
         model["associated_users"] = projectUserRepo.findAll()
-                .filter{ it.pk.project!!.name == projectId }
+                .filter{ it.pk.project!!.id == projectId }
                 .map { it.pk.userInfo }
 
         model["project_id"] = projectId
         model["project_name"] = project.name
         model["repository"] = project.repo
+
+        model.putAll(reportFilterService.getProjectLicensesView(project))
 
         model["reports"] = reports!!.toList()
                 .sortedByDescending{ ZonedDateTime.parse(it.pk.timestamp) }
@@ -197,15 +214,16 @@ class ReportController(val userService: UserService,
      * Gets the view for the detail of a report from a project
      * @param projectId the id of the project to search for a report
      * @param reportId the id of a report to show
+     * @param model the model for the response
      */
-    @GetMapping("projs/{project-id}/report/{report-id}")    // TODO avoid repeated request while selecting detail
+    @GetMapping("projs/{project-id}/report/{report-id}")
     fun getReportDetail(@PathVariable("project-id") projectId: String,
                         @PathVariable("report-id") reportId: String,
                         model: HashMap<String, Any?>) : ModelAndView
     {
         model["page_title"] = "Report Detail"
 
-        val reportInfo = reportRepo.findByProjectId(projectId)
+        val reportInfo = reportRepo.findByProjectIdAndReportId(projectId, reportId)
 
         if(!reportInfo.isPresent) {
             throw Exception("Report was not found")
@@ -222,6 +240,7 @@ class ReportController(val userService: UserService,
 
         model["project_id"] = projectId
         model["project_name"] = report.pk.project.name
+        model["error_name"] = report.error_info
 
         model["report_id"] = reportId
         model["readable_time"] = report.readableTimeStamp
@@ -234,6 +253,8 @@ class ReportController(val userService: UserService,
                 it.vulnerabilitiesCount!! > 0 && it.direct
         }
 
+        model.putAll(reportFilterService.getReportLicensesView(report))
+
         return ModelAndView("report/report-detail", model)
     }
 
@@ -243,6 +264,7 @@ class ReportController(val userService: UserService,
      * @param reportId the id of a report
      * @param dependencyId the id of a dependency
      * @param dependencyVersion the main version of a dependency
+     * @param model the model for the response
      */
     @GetMapping("projs/{project-id}/report/{report-id}/deps/{dependency-id}/version/{dependency-version}")
     fun getDependencyDetail(@PathVariable("project-id") projectId: String,
@@ -288,6 +310,7 @@ class ReportController(val userService: UserService,
      * @param projectId the id of a project
      * @param reportId the id of a report
      * @param licenseId the id of a license
+     * @param model the model for the response
      */
     @GetMapping("projs/{project-id}/report/{report-id}/licenses/{license-id}")
     fun getReportLicenseDetail(@PathVariable("project-id") projectId: String,
@@ -328,6 +351,7 @@ class ReportController(val userService: UserService,
     /**
      * Gets the view for the detail of a license
      * @param licenseId the id of a license
+     * @param model the model for the response
      */
     @GetMapping("licenses/{license-id}")
     fun getLicenseDetail(@PathVariable("license-id") licenseId: String,
@@ -350,15 +374,17 @@ class ReportController(val userService: UserService,
 
         model["license_id"] = license.spdxId
         val dependencies = license.dependencies.filter { it.pk.dependency.direct }
-        model["dependencies"] = dependencies.filter({ dep -> user.projects!!.any { it.pk.project!!.id == dep.pk.dependency.pk.report.pk.project.id } })
+        model["dependencies"] = dependencies.filter({ dep -> user.projects!!.any { it.pk.project!!.id == dep.pk.dependency.pk.report.pk.project.id } }).distinctBy { it.pk.dependency.pk.id }
+        model["error_info"] = license.errorInfo
 
-        return "license/license-detail"
+        return "license/generic-license-detail"
     }
 
     /**
      * Gets the view for the detail of a vulnerability
      * @param dependencyId the id of a dependency
      * @param vulnerabilityId the id of a vulnerability
+     * @param model the model for the response
      */
     @GetMapping("deps/{dependency-id}/vulnerability/{vulnerability-id}")
     fun getVulnerabilityDetail(@PathVariable("dependency-id") dependencyId: String,

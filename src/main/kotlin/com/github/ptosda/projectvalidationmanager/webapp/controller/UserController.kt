@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.view.RedirectView
 import java.sql.Timestamp
 import java.util.*
@@ -23,20 +24,27 @@ class UserController(val userService: UserService,
                      val tokenRepo: TokenRepository,
                      val userRepo: UserRepository)
 {
+    /**
+     * Gets the view for the login page
+     * @param model the model for the response
+     * @param req the id of the project to show
+     */
     @GetMapping("login")
     fun getHome(model: HashMap<String, Any?>, req: HttpServletRequest) : String
     {
         model["page_title"] = "Login"
 
-        val error = req.getParameter("error")
-        val logout = req.getParameter("logout")
-
-        model["error"] = error
-        model["logout"] = logout
+        model["error"] = req.getParameter("error")
+        model["logout"] = req.getParameter("logout")
 
         return "user/login"
     }
 
+    /**
+     * Gets the view for profile page of a user
+     * @param model the model for the response
+     * @param req the id of the project to show
+     */
     @GetMapping("user")
     fun getUser(model: HashMap<String, Any?>,
                 req: HttpServletRequest) : String
@@ -55,6 +63,9 @@ class UserController(val userService: UserService,
         return "user/user-detail"
     }
 
+    /**
+     * Generates a user token and returns it encoded with Base64
+     */
     @PutMapping("user/token")
     fun generateUserToken() : ResponseEntity<String>
     {
@@ -84,6 +95,11 @@ class UserController(val userService: UserService,
         return ResponseEntity(Base64.getEncoder().encodeToString(buffer), HttpStatus.OK)
     }
 
+    /**
+     * Adds a user to a project
+     * @param projectId the id of the project to add the user
+     * @param userName the userName of the user to add
+     */
     @PutMapping("projs/{project-id}/user/{username}")
     fun addUserToProject(@PathVariable("project-id") projectId : String,
                          @PathVariable("username") userName : String) : ResponseEntity<String>
@@ -99,23 +115,19 @@ class UserController(val userService: UserService,
         return ResponseEntity("Added project to user successfully", HttpStatus.OK)
     }
 
-    @GetMapping("register")
-    fun getRegister(model: HashMap<String, Any>) : String
-    {
-        model["page_title"] = "Register"
-
-        return "user/register"
-    }
-
+    /**
+     * Handles the registering of a user
+     * @param body the parameters to create a user
+     */
     @PostMapping("register")
-    fun postRegister(@RequestParam body: Map<String, String>) : RedirectView
+    fun postRegister(@RequestParam body: Map<String, String>) : ModelAndView
     {
         val user = User(body["name"]!!, body["username"]!!, body["password"]!!, null, null)
         if(userService.getUser(body["username"]!!).isPresent) {
-            return RedirectView("/login")
+            return ModelAndView("redirect:/login?exists", null)
         }
         userService.save(user)
         securityService.autoLogin(body["username"]!!, body["password"]!!)
-        return RedirectView("/")
+        return ModelAndView("redirect:/", null)
     }
 }
