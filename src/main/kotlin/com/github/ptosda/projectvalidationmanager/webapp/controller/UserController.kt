@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletRequest
 
 @Controller
 @RequestMapping("/")
-class UserController(val userService: UserService, //TODO meter a negrito os titulos das propriedades como por exemplo na lista de licenças : "License Name", etc
+class UserController(val userService: UserService,
                      val securityService: SecurityServiceImpl,
                      val tokenRepo: TokenRepository,
                      val userRepo: UserRepository)

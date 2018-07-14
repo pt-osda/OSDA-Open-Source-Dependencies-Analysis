@@ -108,8 +108,6 @@ class ReportController(val userService: UserService,
 
         model["username"] = userName
 
-        //val decodedDepencencyId = dependencyId.replace(':', '/')
-
         val dependencies = dependencyRepo.findAll()
         val dependency = dependencies
                 .last { it.pk.mainVersion == dependencyVersion && it.pk.id == dependencyId }

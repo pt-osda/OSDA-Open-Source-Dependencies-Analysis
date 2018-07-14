@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.util.stream.Collectors
+import kotlin.math.log
 
 @RestController
 @RequestMapping("/report")
@@ -48,7 +49,7 @@ class ReportAPIController(
             repo = storeRepository(report.repo, report.repoOwner, organization)
         }
         logger.info("The project {} will be created.", report.name)
-        var project : Project
+        val project : Project
         try {
             project = storeProject(report.name, report.admin, repo)
             logger.info("The project {} was successfully created.", report.name)
@@ -87,7 +88,9 @@ class ReportAPIController(
         val dependencyVulnerabilityInfo = dependencyVulnerabilityRepository.findById(DependencyVulnerabilityPk(dependency, vulnerability))
 
         if(!dependencyVulnerabilityInfo.isPresent) {
-            throw Exception("Dependency Vulnerability not found")
+            val message = "Dependency Vulnerability not found."
+            logger.warn(message)
+            throw Exception(message)
         }
 
         val dependencyVulnerability = dependencyVulnerabilityInfo.get()
@@ -293,7 +296,11 @@ class ReportAPIController(
         vulnerableDependencies.forEach {
             val reportDependency = it
             val dependencyTitle = reportDependency.title
-            val vulnerableVersions = getVulnerableDependency(reportDependency, reportDependency.mainVersion, reportDependency.privateVersions)
+            val vulnerableVersions : ArrayList<String>
+            vulnerableVersions = if (reportDependency.privateVersions == null || reportDependency.privateVersions.isEmpty()) {
+                arrayListOf(reportDependency.mainVersion)
+            } else
+                getVulnerableDependency(reportDependency, reportDependency.mainVersion, reportDependency.privateVersions)
 
             vulnerableVersions.forEach {
                 val dependencyId = "$dependencyTitle:$it"

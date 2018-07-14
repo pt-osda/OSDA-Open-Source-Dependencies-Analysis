@@ -21,6 +21,7 @@ data class AuthorizationInterceptor (val tokenRepo : TokenRepository) : HandlerI
 
         val authorizationHeader = request.getHeader("Authorization")
         if(authorizationHeader == null || !authorizationHeader.startsWith("Bearer")){
+            logger.warn("Authorization was not present or it didn't contained a Bearer.")
             response.status = 401
             return false
         }
@@ -28,6 +29,7 @@ data class AuthorizationInterceptor (val tokenRepo : TokenRepository) : HandlerI
         val tokenBearer = authorizationHeader.split(" ")
 
         if (tokenBearer.size == 1) {
+            logger.warn("Authorization didn't contained the token.")
             response.status = 401
             return false
         }
@@ -36,9 +38,11 @@ data class AuthorizationInterceptor (val tokenRepo : TokenRepository) : HandlerI
         val hashManager = HashManager()
 
         if(tokenRepo.existsById(hashManager.hashToHex(token))){
+            logger.info("Token send is valid.")
             return true
         }
 
+        logger.warn("Token is invalid.")
         response.status = 401
         return false
     }

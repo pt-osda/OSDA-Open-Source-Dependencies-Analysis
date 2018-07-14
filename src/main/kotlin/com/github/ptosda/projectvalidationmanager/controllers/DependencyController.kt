@@ -14,6 +14,7 @@ import java.io.IOException
 import java.sql.Timestamp
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
+import kotlin.math.log
 
 @RestController
 @RequestMapping("/{manager}/dependency")
@@ -57,7 +58,9 @@ class DependencyController(private val licenseService: LicenseService, private v
             }
             logger.info("The licenses found will be returned.")
         } catch (e: Exception) {
-            throw UnreachableException(String.format("There was an error trying to reach the link for a license %s.", e.message))
+            val message = String.format("There was an error trying to reach the link for a license %s.", e.message)
+            logger.warn(message)
+            throw UnreachableException(message)
         }
         return licenses
     }
@@ -112,7 +115,7 @@ class DependencyController(private val licenseService: LicenseService, private v
                 logger.info("The vulnerabilities search was successfully completed.")
                 return ResponseEntity(vulnerabilities, HttpStatus.OK)
             } catch (e: IOException) {
-                logger.info("The external API could not be reached.")
+                logger.warn("The external API could not be reached.")
                 throw UnreachableException(String.format("An exception occurred when attempting to reach the external API %s", e.message))
             }
         }
