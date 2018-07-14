@@ -172,7 +172,7 @@ class ReportController(val userService: UserService,
         val userName = securityService.findLoggedInUsername()
         val user = userService.getUser(userName!!).get()
 
-        if(!user.projects!!.any { it.pk.project!!.name == projectId }) {
+        if(!user.projects!!.any { it.pk.project!!.id == projectId }) {
             return ModelAndView("redirect:/?error", null)
         }
         model["username"] = user.username
@@ -184,7 +184,8 @@ class ReportController(val userService: UserService,
                 .filter{ it.pk.project!!.name == projectId }
                 .map { it.pk.userInfo }
 
-        model["project_id"] = project.name
+        model["project_id"] = projectId
+        model["project_name"] = project.name
         model["repository"] = project.repo
 
         model["reports"] = reports!!.toList()
@@ -205,7 +206,7 @@ class ReportController(val userService: UserService,
     {
         model["page_title"] = "Report Detail"
 
-        val reportInfo = reportRepo.findById(ReportPk(reportId, Project(projectId, null, null, null, null, null, null, null)))
+        val reportInfo = reportRepo.findByProjectId(projectId)
 
         if(!reportInfo.isPresent) {
             throw Exception("Report was not found")
@@ -215,12 +216,13 @@ class ReportController(val userService: UserService,
         val userName = securityService.findLoggedInUsername()
         val user = userService.getUser(userName!!).get()
 
-        if(!user.projects!!.any { it.pk.project!!.name == projectId }) {
+        if(!user.projects!!.any { it.pk.project!!.id == projectId }) {
             return ModelAndView("redirect:/?error", null)
         }
         model["username"] = userName
 
         model["project_id"] = projectId
+        model["project_name"] = report.pk.project.name
 
         model["report_id"] = reportId
         model["readable_time"] = report.readableTimeStamp
@@ -265,7 +267,7 @@ class ReportController(val userService: UserService,
         val user = userService.getUser(userName!!).get()
         model["username"] = userName
 
-        if(!user.projects!!.any { it.pk.project!!.name == projectId }) {
+        if(!user.projects!!.any { it.pk.project!!.id == projectId }) {
             return ModelAndView("redirect:/?error", null)
         }
 
@@ -307,14 +309,16 @@ class ReportController(val userService: UserService,
         val user = userService.getUser(userName!!).get()
         model["username"] = userName
 
-        if(!user.projects!!.any { it.pk.project!!.name == projectId }) {
+        if(!user.projects!!.any { it.pk.project!!.id == projectId }) {
             return ModelAndView("redirect:/?error", null)
         }
 
+        model["project_id"] = projectId
+        model["report_id"] = reportId
         model["license_id"] = license.spdxId
         model["dependencies"] = license.dependencies
                 .filter{
-                    it.pk.dependency.pk.report.pk.project.name == projectId &&
+                    it.pk.dependency.pk.report.pk.project.id == projectId &&
                             it.pk.dependency.pk.report.pk.timestamp == reportId &&
                             it.pk.dependency.direct
                 }
@@ -348,7 +352,7 @@ class ReportController(val userService: UserService,
 
         model["license_id"] = license.spdxId
         val dependencies = license.dependencies.filter { it.pk.dependency.direct }
-        model["dependencies"] = dependencies.filter({ dep -> user.projects!!.any { it.pk.project!!.name == dep.pk.dependency.pk.report.pk.project.name } })
+        model["dependencies"] = dependencies.filter({ dep -> user.projects!!.any { it.pk.project!!.id == dep.pk.dependency.pk.report.pk.project.id } })
         model["error_info"] = license.errorInfo
 
         return "license/license-detail"

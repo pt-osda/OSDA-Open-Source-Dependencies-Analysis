@@ -10,7 +10,7 @@ data class ReportPk(
         val timestamp: String,
 
         @ManyToOne
-        @JoinColumn(name = "name")
+        @JoinColumn(name = "project", referencedColumnName = "id")
         val project: Project
 ) : Serializable
 {

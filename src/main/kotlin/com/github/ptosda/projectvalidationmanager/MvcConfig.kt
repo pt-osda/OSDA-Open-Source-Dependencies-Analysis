@@ -9,5 +9,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 data class MvcConfig(val interceptor: AuthorizationInterceptor) : WebMvcConfigurer {
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(interceptor).addPathPatterns("/{manager}/dependency/**", "/report")
+                .excludePathPatterns("/report/dependency/vulnerability/edit")
     }
 }

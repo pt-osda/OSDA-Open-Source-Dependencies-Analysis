@@ -15,7 +15,7 @@ data class Project(
         val description: String?,
 
         @ManyToOne
-        @JoinColumn(name = "repo_name", referencedColumnName = "name")
+        @JoinColumn(name = "repo_name")
         val repo: Repo?,
 
         @ManyToOne
