@@ -1,6 +1,7 @@
-package com.github.ptosda.projectvalidationmanager
+package com.github.ptosda.projectvalidationmanager.websecurity.service
 
 import com.github.ptosda.projectvalidationmanager.database.repositories.UserRepository
+import com.github.ptosda.projectvalidationmanager.websecurity.model.SystemUser
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service
 class UserDetailsServiceImpl(
         val userRepository: UserRepository
 ) : UserDetailsService {
-
     override fun loadUserByUsername(username: String): UserDetails {
         val user = userRepository.findById(username)
         if(!user.isPresent){

@@ -1,12 +1,11 @@
 package com.github.ptosda.projectvalidationmanager.webapp.controller
 
-import com.github.ptosda.projectvalidationmanager.HashManager
-import com.github.ptosda.projectvalidationmanager.SecurityServiceImpl
-import com.github.ptosda.projectvalidationmanager.UserService
+import com.github.ptosda.projectvalidationmanager.websecurity.HashManager
+import com.github.ptosda.projectvalidationmanager.websecurity.service.SecurityServiceImpl
+import com.github.ptosda.projectvalidationmanager.websecurity.service.UserService
 import com.github.ptosda.projectvalidationmanager.database.entities.Token
 import com.github.ptosda.projectvalidationmanager.database.entities.User
 import com.github.ptosda.projectvalidationmanager.database.repositories.*
-import com.github.ptosda.projectvalidationmanager.webapp.service.ReportService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
@@ -15,19 +14,14 @@ import org.springframework.web.servlet.view.RedirectView
 import java.sql.Timestamp
 import java.util.*
 import javax.servlet.http.HttpServletRequest
-import jdk.nashorn.tools.ShellFunctions.input
-import java.nio.charset.Charset
-import java.security.MessageDigest
-import kotlin.experimental.and
-
 
 @Controller
 @RequestMapping("/")
 class UserController(val userService: UserService, //TODO meter a negrito os titulos das propriedades como por exemplo na lista de licenças : "License Name", etc
                      val securityService: SecurityServiceImpl,
                      val tokenRepo: TokenRepository,
-                     val userRepo: UserRepository) {
-
+                     val userRepo: UserRepository)
+{
     @GetMapping("login")
     fun getHome(model: HashMap<String, Any>, req: HttpServletRequest) : String
     {
@@ -57,7 +51,6 @@ class UserController(val userService: UserService, //TODO meter a negrito os tit
     @PutMapping("user/token")
     fun generateUserToken() : ResponseEntity<String>
     {
-
         val userName = securityService.findLoggedInUsername()
 
         val user = userService.getUser(userName!!).get()
@@ -75,7 +68,7 @@ class UserController(val userService: UserService, //TODO meter a negrito os tit
         val buffer = tokenString.toByteArray(Charsets.UTF_8)
         val hashManager = HashManager()
 
-        val newToken = Token(hashManager.hashIt(buffer))
+        val newToken = Token(hashManager.hashToHex(buffer))
 
         tokenRepo.save(newToken)
         user.token = newToken
@@ -88,7 +81,6 @@ class UserController(val userService: UserService, //TODO meter a negrito os tit
     fun addUserToProject(@PathVariable("project-id") projectId : String,
                          @PathVariable("username") userName : String) : ResponseEntity<String>
     {
-
         val userInfo = userService.getUser(userName)
 
         if(!userInfo.isPresent) {
@@ -103,7 +95,6 @@ class UserController(val userService: UserService, //TODO meter a negrito os tit
     @PostMapping("logout")
     fun checkLogin(@RequestParam body: Map<String, String>) : String
     {
-
         return "home"
     }
 
@@ -125,5 +116,4 @@ class UserController(val userService: UserService, //TODO meter a negrito os tit
         securityService.autoLogin(body["username"]!!, body["password"]!!)
         return RedirectView("/")
     }
-
 }

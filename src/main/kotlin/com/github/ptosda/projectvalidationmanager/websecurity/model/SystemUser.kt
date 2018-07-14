@@ -1,9 +1,9 @@
-package com.github.ptosda.projectvalidationmanager
+package com.github.ptosda.projectvalidationmanager.websecurity.model
 
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.User
 
-class SystemUser(
+class SystemUser (
         val name: String,
         username: String,
         password: String,

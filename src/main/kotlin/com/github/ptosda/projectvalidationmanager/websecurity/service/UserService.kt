@@ -1,4 +1,4 @@
-package com.github.ptosda.projectvalidationmanager
+package com.github.ptosda.projectvalidationmanager.websecurity.service
 
 import com.github.ptosda.projectvalidationmanager.database.entities.ProjectUser
 import com.github.ptosda.projectvalidationmanager.database.entities.ProjectUserPk
@@ -31,5 +31,4 @@ class UserService (
         val project = projectRepository.findById(projectId).get()
         projectUserRepository.save(ProjectUser(ProjectUserPk(project, user)))
     }
-
 }

@@ -12,7 +12,6 @@ data class User (
 
         var password: String,
 
-
         @OneToMany(mappedBy = "pk.userInfo")
         val projects: List<ProjectUser>? = listOf(),
 

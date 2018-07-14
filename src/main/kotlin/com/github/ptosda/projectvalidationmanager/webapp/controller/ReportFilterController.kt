@@ -5,7 +5,6 @@ import com.github.ptosda.projectvalidationmanager.database.repositories.Dependen
 import com.github.ptosda.projectvalidationmanager.database.repositories.LicenseRepository
 import com.github.ptosda.projectvalidationmanager.database.repositories.ProjectRepository
 import com.github.ptosda.projectvalidationmanager.webapp.service.ReportFilterService
-import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -19,8 +18,6 @@ class ReportFilterController(val reportFilterService: ReportFilterService,
                              val dependencyRepo: DependencyRepository,
                              val licenseRepo: LicenseRepository)
 {
-
-    private final val PAGE_SIZE = 1
     /**
      * HashMap with all project filter types and corresponding functions
      */
@@ -77,7 +74,7 @@ class ReportFilterController(val reportFilterService: ReportFilterService,
      * Gets the view for either of three elements of a Project. These are its detail, licenses or vulnerabilities
      * @param projectId the if of the project to filter
      * @param filterType the type of filtering to be done (detail, licenses or vulnerabilities)
-     * @param model hash map to store all view related information
+     * @param model hashToHex map to store all view related information
      */
     @GetMapping("projs/{project-id}/filter/{filter-type}")
     fun filterProject(@PathVariable("project-id") projectId: String,
@@ -102,7 +99,7 @@ class ReportFilterController(val reportFilterService: ReportFilterService,
      * @param projectId the if of the project that the report belongs
      * @param buildId the if of the report to filter
      * @param filterType the type of filtering to be done (detail, licenses or vulnerabilities)
-     * @param model hash map to store all view related information
+     * @param model hashToHex map to store all view related information
      */
     @GetMapping("projs/{project-id}/report/{report-id}/filter/{filter-type}")
     fun filterBuild(@PathVariable("project-id") projectId: String,
@@ -120,7 +117,7 @@ class ReportFilterController(val reportFilterService: ReportFilterService,
      * @param projectId the if of the project that the report belongs
      * @param buildId the if of the report to filter
      * @param filterType the type of filtering to be done (detail, licenses or vulnerabilities)
-     * @param model hash map to store all view related information
+     * @param model hashToHex map to store all view related information
      */
     @GetMapping("deps/{dependency-id}/version/{version}/filter/{filter-type}")
     fun filterGenericDependency(@PathVariable("dependency-id") dependencyId: String,
@@ -137,7 +134,7 @@ class ReportFilterController(val reportFilterService: ReportFilterService,
      * Gets the view for a search request
      * @param searchType the type of search to be done
      * @param searchValue the value used in the search
-     * @param model hash map to store all view related information
+     * @param model hashToHex map to store all view related information
      */
     @GetMapping("search/{search-type}")
     fun search(@PathVariable("search-type") searchType: String,

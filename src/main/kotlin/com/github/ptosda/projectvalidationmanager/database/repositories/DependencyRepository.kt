@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface DependencyRepository : PagingAndSortingRepository<Dependency, DependencyPk> {
-
     fun findAllByDirectOrderByPkAsc(direct: Boolean, pageable: Pageable) : Page<Dependency>
 
     @Query(value = "SELECT id, main_version, private_versions, description, direct, vulnerabilities_count, project, \"timestamp\"\n" +

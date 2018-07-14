@@ -1,4 +1,4 @@
-package com.github.ptosda.projectvalidationmanager
+package com.github.ptosda.projectvalidationmanager.websecurity.service
 
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -12,7 +12,6 @@ class SecurityServiceImpl (
         val authenticationManager: AuthenticationManager,
         val userDetailsService: UserDetailsService
 ){
-
     fun findLoggedInUsername() : String? {
         val userDetails = SecurityContextHolder.getContext().authentication.principal
         if(userDetails is UserDetails){
@@ -32,5 +31,4 @@ class SecurityServiceImpl (
             SecurityContextHolder.getContext().authentication = usernamePasswordAuthenticationToken
         }
     }
-
 }

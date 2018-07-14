@@ -1,4 +1,4 @@
-package com.github.ptosda.projectvalidationmanager
+package com.github.ptosda.projectvalidationmanager.websecurity
 
 import com.github.ptosda.projectvalidationmanager.database.repositories.TokenRepository
 import org.slf4j.Logger
@@ -24,12 +24,21 @@ data class AuthorizationInterceptor (val tokenRepo : TokenRepository) : HandlerI
             response.status = 401
             return false
         }
-        val token = Base64.getDecoder().decode(authorizationHeader.split(" ")[1].toByteArray(Charsets.UTF_8))
+
+        val tokenBearer = authorizationHeader.split(" ")
+
+        if (tokenBearer.size == 1) {
+            response.status = 401
+            return false
+        }
+
+        val token = Base64.getDecoder().decode(tokenBearer[1].toByteArray(Charsets.UTF_8))
         val hashManager = HashManager()
 
-        if(tokenRepo.existsById(hashManager.hashIt(token))){
+        if(tokenRepo.existsById(hashManager.hashToHex(token))){
             return true
         }
+
         response.status = 401
         return false
     }

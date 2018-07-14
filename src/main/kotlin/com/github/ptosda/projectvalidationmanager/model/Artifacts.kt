@@ -3,7 +3,7 @@ package com.github.ptosda.projectvalidationmanager.model
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 
-data class Artifacts(
+data class Artifacts (
         val pm: String,
         val name: String,
         val version: String,

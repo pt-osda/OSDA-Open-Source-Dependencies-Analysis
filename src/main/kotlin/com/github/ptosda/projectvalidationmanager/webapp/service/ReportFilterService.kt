@@ -98,7 +98,6 @@ class ReportFilterService(private val projectRepo: ProjectRepository,
                 .map { Pair(it.value[0], it.value.size) }
                 .sortedByDescending { it.second }
 
-
         model["valid_licenses"] = reportLicenses.filter { it.first.valid }
         model["invalid_licenses"] = reportLicenses.filter { !it.first.valid }
 
@@ -201,8 +200,6 @@ class ReportFilterService(private val projectRepo: ProjectRepository,
     fun getGenericDependencyDetailView(dependencyId: String, dependencyVersion: String) : HashMap<String, Any?> {
         val model = hashMapOf<String, Any?>()
 
-        //val decodedDepencencyId = dependencyId.replace(':', '/')
-
         val dependency = dependencyRepo.findAll()
                 .last { it.pk.mainVersion == dependencyVersion && it.pk.id == dependencyId }
 
@@ -224,8 +221,6 @@ class ReportFilterService(private val projectRepo: ProjectRepository,
      */
     fun getGenericDependencyProjectsView(dependencyId: String, dependencyVersion: String) : HashMap<String, Any?> {
         val model = hashMapOf<String, Any?>()
-
-        //val decodedDepencencyId = dependencyId.replace(':', '/')
 
         val dependency = dependencyRepo.findAll()
                 .last { it.pk.mainVersion == dependencyVersion && it.pk.id == dependencyId }

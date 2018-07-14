@@ -1,7 +1,7 @@
 package com.github.ptosda.projectvalidationmanager.webapp.controller
 
-import com.github.ptosda.projectvalidationmanager.SecurityServiceImpl
-import com.github.ptosda.projectvalidationmanager.UserService
+import com.github.ptosda.projectvalidationmanager.websecurity.service.SecurityServiceImpl
+import com.github.ptosda.projectvalidationmanager.websecurity.service.UserService
 import com.github.ptosda.projectvalidationmanager.database.entities.DependencyPk
 import com.github.ptosda.projectvalidationmanager.database.entities.Project
 import com.github.ptosda.projectvalidationmanager.database.entities.Report
@@ -23,7 +23,7 @@ import kotlin.collections.set
  */
 @Controller
 @RequestMapping("/")
-class ReportController(val userService: UserService, //TODO meter a negrito os titulos das propriedades como por exemplo na lista de licenças : "License Name", etc
+class ReportController(val userService: UserService,
                        val securityService: SecurityServiceImpl,
                        val projectUserRepo: ProjectUserRepository,
                        val reportRepo: ReportRepository,
@@ -32,7 +32,6 @@ class ReportController(val userService: UserService, //TODO meter a negrito os t
                        val vulnerabilityRepo: VulnerabilityRepository,
                        val licenseRepo: LicenseRepository)
 {
-
     private final val PAGE_SIZE = 10
 
     /**
@@ -260,7 +259,6 @@ class ReportController(val userService: UserService, //TODO meter a negrito os t
         model["report_id"] = reportId
         model["readable_time"] = report.readableTimeStamp
         model["report_tag"] = report.tag
-
 
         model["vulnerable_dependencies"] = report.dependency!!.filter {
             if(it.vulnerabilitiesCount == null)

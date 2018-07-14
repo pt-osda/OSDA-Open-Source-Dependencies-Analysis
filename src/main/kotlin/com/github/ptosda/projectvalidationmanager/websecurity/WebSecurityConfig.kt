@@ -1,5 +1,6 @@
-package com.github.ptosda.projectvalidationmanager
+package com.github.ptosda.projectvalidationmanager.websecurity
 
+import com.github.ptosda.projectvalidationmanager.websecurity.service.UserDetailsServiceImpl
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
@@ -13,7 +14,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 class WebSecurityConfig(
         val userDetailsService: UserDetailsServiceImpl
 ) : WebSecurityConfigurerAdapter(){
-
     @Bean
     fun bCryptPasswordEncoder() = BCryptPasswordEncoder()
 
