@@ -26,23 +26,22 @@
         <li class="nav-item">
             <a class="nav-link active" id="login-tab" data-toggle="tab" href="#login" role="tab" aria-controls="home" aria-selected="true">Login</a>
         </li>
-        Or
         <li class="nav-item">
             <a class="nav-link" id="profile-tab" data-toggle="tab" href="#register" role="tab" aria-controls="profile" aria-selected="false">Register</a>
         </li>
     </ul>
     <div class="tab-content" id="myTabContent">
         <div class="tab-pane fade show active" id="login" role="tabpanel" aria-labelledby="login-tab">
-            {{#param.error}}
+            {{#error}}
                 <div class="alert alert-error">
                     Invalid username and password.
                 </div>
-            {{/param.error}}
-            {{#param.logout}}
+            {{/error}}
+            {{#logout}}
                 <div class="alert alert-success">
                     You have been logged out.
                 </div>
-            {{/param.logout}}
+            {{/logout}}
             <form action="/login" method="POST">
                 <div class="form-group">
                     <label for="user-name">Username</label>

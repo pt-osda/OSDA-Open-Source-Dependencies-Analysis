@@ -5,7 +5,8 @@ import com.github.ptosda.projectvalidationmanager.websecurity.service.SecuritySe
 import com.github.ptosda.projectvalidationmanager.websecurity.service.UserService
 import com.github.ptosda.projectvalidationmanager.database.entities.Token
 import com.github.ptosda.projectvalidationmanager.database.entities.User
-import com.github.ptosda.projectvalidationmanager.database.repositories.*
+import com.github.ptosda.projectvalidationmanager.database.repositories.TokenRepository
+import com.github.ptosda.projectvalidationmanager.database.repositories.UserRepository
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
@@ -23,9 +24,15 @@ class UserController(val userService: UserService, //TODO meter a negrito os tit
                      val userRepo: UserRepository)
 {
     @GetMapping("login")
-    fun getHome(model: HashMap<String, Any>, req: HttpServletRequest) : String
+    fun getHome(model: HashMap<String, Any?>, req: HttpServletRequest) : String
     {
         model["page_title"] = "Login"
+
+        val error = req.getParameter("error")
+        val logout = req.getParameter("logout")
+
+        model["error"] = error
+        model["logout"] = logout
 
         return "user/login"
     }
@@ -92,12 +99,6 @@ class UserController(val userService: UserService, //TODO meter a negrito os tit
         return ResponseEntity("Added project to user successfully", HttpStatus.OK)
     }
 
-    @PostMapping("logout")
-    fun checkLogin(@RequestParam body: Map<String, String>) : String
-    {
-        return "home"
-    }
-
     @GetMapping("register")
     fun getRegister(model: HashMap<String, Any>) : String
     {
@@ -110,9 +111,10 @@ class UserController(val userService: UserService, //TODO meter a negrito os tit
     fun postRegister(@RequestParam body: Map<String, String>) : RedirectView
     {
         val user = User(body["name"]!!, body["username"]!!, body["password"]!!, null, null)
-        if(!userService.getUser(body["username"]!!).isPresent) {
-            userService.save(user)
+        if(userService.getUser(body["username"]!!).isPresent) {
+            return RedirectView("/login")
         }
+        userService.save(user)
         securityService.autoLogin(body["username"]!!, body["password"]!!)
         return RedirectView("/")
     }

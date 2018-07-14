@@ -7,7 +7,7 @@ import javax.persistence.ManyToOne
 @Embeddable
 data class ProjectUserPk (
         @ManyToOne
-        val project: Project,
+        val project: Project?,
 
         @ManyToOne
         val userInfo: User

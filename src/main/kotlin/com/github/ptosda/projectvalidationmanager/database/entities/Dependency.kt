@@ -15,7 +15,7 @@ data class Dependency ( // TODO In case a specific dependency has new vulnerabil
 
         var vulnerabilitiesCount: Int?,
 
-        val privateVersions: ArrayList<String>? = arrayListOf<String>(),
+        val privateVersions: ArrayList<String>? = arrayListOf(),
 
         @ManyToMany(cascade = [CascadeType.ALL])
         val dependencies: Set<Dependency>,
