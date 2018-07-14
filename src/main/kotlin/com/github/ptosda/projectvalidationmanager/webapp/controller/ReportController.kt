@@ -240,7 +240,7 @@ class ReportController(val userService: UserService,
 
         model["project_id"] = projectId
         model["project_name"] = report.pk.project.name
-        model["error_name"] = report.error_info
+        model["error_info"] = report.error_info
 
         model["report_id"] = reportId
         model["readable_time"] = report.readableTimeStamp
@@ -375,7 +375,6 @@ class ReportController(val userService: UserService,
         model["license_id"] = license.spdxId
         val dependencies = license.dependencies.filter { it.pk.dependency.direct }
         model["dependencies"] = dependencies.filter({ dep -> user.projects!!.any { it.pk.project!!.id == dep.pk.dependency.pk.report.pk.project.id } }).distinctBy { it.pk.dependency.pk.id }
-        model["error_info"] = license.errorInfo
 
         return "license/generic-license-detail"
     }
