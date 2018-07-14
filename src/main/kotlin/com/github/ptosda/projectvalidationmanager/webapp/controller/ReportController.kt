@@ -205,7 +205,7 @@ class ReportController(val userService: UserService,
     {
         model["page_title"] = "Report Detail"
 
-        val reportInfo = reportRepo.findById(ReportPk(reportId, Project(projectId, null, null)))
+        val reportInfo = reportRepo.findById(ReportPk(reportId, Project(projectId, null, null, null, null, null, null, null)))
 
         if(!reportInfo.isPresent) {
             throw Exception("Report was not found")
@@ -252,7 +252,7 @@ class ReportController(val userService: UserService,
     {
         model["page_title"] = "Dependency Detail"
 
-        val dependencyInfo = dependencyRepo.findById(DependencyPk(dependencyId, Report(ReportPk(reportId, Project(projectId, null, null)), null, null), dependencyVersion))
+        val dependencyInfo = dependencyRepo.findById(DependencyPk(dependencyId, Report(ReportPk(reportId, Project(projectId, null, null, null, null, null, null)), null, null), dependencyVersion))
 
         if(!dependencyInfo.isPresent) {
             throw Exception("Dependency not found")

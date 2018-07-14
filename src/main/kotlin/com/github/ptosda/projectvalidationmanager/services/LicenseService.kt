@@ -64,6 +64,11 @@ class LicenseService {
             Pair("GNU GENERAL PUBLIC LICENSE, Version 3", "GPL-3.0"),
             Pair("GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1", "LGPL-2.1"),
             Pair("GNU LESSER GENERAL PUBLIC LICENSE, Version 3", "LGPL-3.0"),
+            Pair("GNU GENERAL PUBLIC LICENSE Version 1", "GPL-1.0"),
+            Pair("GNU GENERAL PUBLIC LICENSE Version 2", "GPL-2.0"),
+            Pair("GNU GENERAL PUBLIC LICENSE Version 3", "GPL-3.0"),
+            Pair("GNU LESSER GENERAL PUBLIC LICENSE Version 2.1", "LGPL-2.1"),
+            Pair("GNU LESSER GENERAL PUBLIC LICENSE Version 3", "LGPL-3.0"),
             Pair("MIT License", "MIT"),
             Pair("Mozilla Public License Version 1.1", "MPL-1.1"),
             Pair("Mozilla Public License, Version 2.0", "MPL-2.0")

@@ -51,11 +51,11 @@ class ReportAPIController(
         logger.info("The project {} will be created.", report.name)
         val project : Project
         try {
-            project = storeProject(report.name, report.admin, repo)
-            logger.info("The project {} was successfully created.", report.name)
+            project = storeProject(report.id, report.name, report.version, report.description, report.admin, repo)
+            logger.info("The project {} was successfully created.", report.id)
         }
         catch(e : Exception) {
-            logger.error("The information from the report was not stored in the database.")
+            logger.error("The information from the project was not stored in the database.")
             return ResponseEntity(e.message, HttpStatus.BAD_REQUEST)
         }
 
@@ -72,7 +72,7 @@ class ReportAPIController(
     @PutMapping("dependency/vulnerability/edit")
     fun alterDependencyVulnerabilityState(@RequestBody dependencyVulnerabilityInput: DependencyVulnerabilityInputModel){
         val vulnerabilityInfo = vulnerabilityRepository.findById(dependencyVulnerabilityInput.vulnerabilityId)
-        val dependencyInfo = dependencyRepository.findById(DependencyPk(dependencyVulnerabilityInput.dependencyId, Report(ReportPk(dependencyVulnerabilityInput.reportId, Project(dependencyVulnerabilityInput.projectId, null, null, null, null)), null, null), dependencyVulnerabilityInput.dependencyVersion))
+        val dependencyInfo = dependencyRepository.findById(DependencyPk(dependencyVulnerabilityInput.dependencyId, Report(ReportPk(dependencyVulnerabilityInput.reportId, projectRepository.findById(dependencyVulnerabilityInput.projectId).get()), null, null), dependencyVulnerabilityInput.dependencyVersion))
 
         if(!dependencyInfo.isPresent) {
             throw Exception("Dependency not found")
@@ -155,31 +155,33 @@ class ReportAPIController(
      *
      * If the project already existed and it didn't referenced a repository and one was referenced in the report
      * then the project will be altered to reflect this change.
+     * @param projectId The identifier of the project the report belongs to.
      * @param projectName The name of the project the report belongs to.
+     * @param projectVersion The version of the project the report belongs to.
+     * @param projectDescription The description of the project the report belongs to.
      * @param adminUsername The username of the project administrator.
      * @param repo The repo to which the project belongs to.
      * @return The newly created project or if it already existed the previously created one
      */
-    private fun storeProject(projectName: String, adminUsername: String, repo: Repo?) : Project {
+    private fun storeProject(projectId: String, projectName: String, projectVersion: String?, projectDescription: String?, adminUsername: String, repo: Repo?) : Project {
         var project: Project
-        if (!projectRepository.findById(projectName).isPresent) {
+        if (!projectRepository.findById(projectId).isPresent) {
             val admin = userRepository.findById(adminUsername)
             if(!admin.isPresent){
                 logger.error("The admin username given is invalid because the user does not exist in database")
                 throw Exception("Admin username is invalid")
             }
             logger.info("The project did not existed so a new one will be created.")
-            project = Project(projectName, repo, admin.get(), listOf(), listOf())
+            project = Project(projectId, projectName, projectVersion, projectDescription, repo, admin.get(), listOf(), listOf())
             projectRepository.save(project)
             projectUserRepository.save(ProjectUser(ProjectUserPk(project, admin.get())))
-
         } else {
             logger.info("The project already existed in the database.")
-            project = projectRepository.findById(projectName).get()
+            project = projectRepository.findById(projectId).get()
 
-            if (project.repo == null && repo != null){
+            if (project.repo == null && repo != null || project.version == null && projectVersion != null || project.description == null && projectDescription != null){
                 logger.info("The project did not belonged to a repository but one was referenced in the report.")
-                project = Project(project.name, repo, project.admin, project.users, project.report)
+                project = Project(project.id, project.name, projectVersion, projectDescription, repo, project.admin, project.users, project.report)
                 projectRepository.save(project)
             }
         }
@@ -192,6 +194,7 @@ class ReportAPIController(
      * is not the possibility to repeat reports.
      * @param timestamp The moment in time that the report was completed.
      * @param tag The tag that identifies the report.
+     * @param errorInfo The information of the errors occurred during report.
      * @param project The project in which this report occurred.
      * @return The newly created report.
      */
@@ -291,7 +294,7 @@ class ReportAPIController(
     private fun updateVulnerabilities(dependencies: ArrayList<ReportDependency>, report: com.github.ptosda.projectvalidationmanager.database.entities.Report) {
         val vulnerableDependencies = dependencies.filter { it.vulnerabilitiesCount > 0 }
 
-        val directDependencies = dependencyRepository.getDirectDependenciesFromReport(report.pk.project.name, report.pk.timestamp)
+        val directDependencies = dependencyRepository.getDirectDependenciesFromReport(report.pk.project.id, report.pk.timestamp)
 
         vulnerableDependencies.forEach {
             val reportDependency = it

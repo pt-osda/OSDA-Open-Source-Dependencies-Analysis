@@ -36,7 +36,7 @@ class ReportFilterService(private val projectRepo: ProjectRepository,
     fun getReportDetailView(projectId: String, reportId: String) : HashMap<String, Any?> {
         val model = hashMapOf<String, Any?>()
 
-        val reportInfo = reportRepo.findById(ReportPk(reportId, Project(projectId, null, null)))
+        val reportInfo = reportRepo.findById(ReportPk(reportId, Project(projectId, null, null, null, null, null, null, null)))
 
         if(!reportInfo.isPresent) {
             throw Exception("Report was not found")
@@ -114,7 +114,7 @@ class ReportFilterService(private val projectRepo: ProjectRepository,
     fun getReportLicensesView(projectId: String, reportId: String) : HashMap<String, Any?> {
         val model = hashMapOf<String, Any?>()
 
-        val reportInfo = reportRepo.findById(ReportPk(reportId, Project(projectId, null, null)))
+        val reportInfo = reportRepo.findById(ReportPk(reportId, Project(projectId, null, null, null, null, null, null, null)))
 
         if(!reportInfo.isPresent) {
             throw Exception("Report was not found")
@@ -172,7 +172,7 @@ class ReportFilterService(private val projectRepo: ProjectRepository,
     fun getReportVulnerabilitiesView(projectId: String, reportId: String) : HashMap<String, Any?> {
         val model = hashMapOf<String, Any?>()
 
-        val reportInfo = reportRepo.findById(ReportPk(reportId, Project(projectId, null, null)))
+        val reportInfo = reportRepo.findById(ReportPk(reportId, Project(projectId, null, null, null, null, null, null, null)))
 
         if(!reportInfo.isPresent) {
             throw Exception("Report was not found")

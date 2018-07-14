@@ -49,7 +49,7 @@ class ReportFilterController(val reportFilterService: ReportFilterService,
      */
     val searchFilterFunctions = hashMapOf<String, (String) -> HashMap<String, Any>>(
             "projs" to { searchText ->
-                hashMapOf( "projects" to projectRepo.findAll().filter { it.name.startsWith(searchText, true) },
+                hashMapOf( "projects" to projectRepo.findAll().filter { it.name!!.startsWith(searchText, true) },
                         "view_name" to "project/project-list-partial"
                 )
             },

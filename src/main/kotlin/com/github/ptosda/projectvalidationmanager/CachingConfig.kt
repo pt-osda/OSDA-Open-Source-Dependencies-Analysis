@@ -12,6 +12,9 @@ import java.io.File
 import java.nio.file.Paths
 import javax.annotation.PreDestroy
 
+/**
+ * Cache configuration
+ */
 @Configuration
 @EnableCaching
 class CachingConfig {
@@ -19,6 +22,9 @@ class CachingConfig {
         initDependenciesCache()
     }
 
+    /**
+     * Initializes cache when the application starts
+     */
     private final fun initDependenciesCache() {
         val cacheDirectory = File(Paths.get("src","main","resources","cache").toString()).absolutePath
         persistentCacheManager = CacheManagerBuilder.newCacheManagerBuilder()
@@ -33,6 +39,10 @@ class CachingConfig {
                 .build(true)
     }
 
+    /**
+     * Closes cache before application ends.
+     * Without this, cache won't persist after application reboots.
+     */
     @PreDestroy
     private final fun closeCacheManager(){
         persistentCacheManager.close()

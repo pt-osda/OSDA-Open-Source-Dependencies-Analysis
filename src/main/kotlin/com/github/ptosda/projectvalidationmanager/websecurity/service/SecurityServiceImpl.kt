@@ -12,6 +12,10 @@ class SecurityServiceImpl (
         val authenticationManager: AuthenticationManager,
         val userDetailsService: UserDetailsService
 ){
+    /**
+     * Retrieves the username of the currently logged in user
+     * @return username
+     */
     fun findLoggedInUsername() : String? {
         val userDetails = SecurityContextHolder.getContext().authentication.principal
         if(userDetails is UserDetails){
@@ -21,6 +25,11 @@ class SecurityServiceImpl (
         return null
     }
 
+    /**
+     * Logs in a user that has registered
+     * @param username username of the registered user
+     * @param password password of the registered user
+     */
     fun autoLogin(username: String, password: String) {
         val userDetails = userDetailsService.loadUserByUsername(username)
         val usernamePasswordAuthenticationToken = UsernamePasswordAuthenticationToken(userDetails, password, userDetails.authorities)

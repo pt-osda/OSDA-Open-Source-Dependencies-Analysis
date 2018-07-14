@@ -6,7 +6,13 @@ import javax.persistence.*
 @Entity
 data class Project(
         @Id
-        val name: String,
+        val id: String,
+
+        val name: String?,
+
+        val version: String?,
+
+        val description: String?,
 
         @ManyToOne
         @JoinColumn(name = "repo_name", referencedColumnName = "name")
