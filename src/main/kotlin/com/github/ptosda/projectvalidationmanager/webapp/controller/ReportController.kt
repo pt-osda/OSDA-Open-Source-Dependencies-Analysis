@@ -72,7 +72,6 @@ class ReportController(val userService: UserService,
     @GetMapping("deps")
     fun getDependencies(@RequestParam(value = "page", defaultValue = "0") page: Int,  model: HashMap<String, Any?>) : String
     {
-
         model["page_title"] = "Dependencies"
 
         val userName = securityService.findLoggedInUsername()!!
@@ -322,7 +321,6 @@ class ReportController(val userService: UserService,
                             it.pk.dependency.pk.report.pk.timestamp == reportId &&
                             it.pk.dependency.direct
                 }
-        model["error_info"] = license.errorInfo
 
         return ModelAndView("license/license-detail", model)
     }
@@ -353,7 +351,6 @@ class ReportController(val userService: UserService,
         model["license_id"] = license.spdxId
         val dependencies = license.dependencies.filter { it.pk.dependency.direct }
         model["dependencies"] = dependencies.filter({ dep -> user.projects!!.any { it.pk.project!!.id == dep.pk.dependency.pk.report.pk.project.id } })
-        model["error_info"] = license.errorInfo
 
         return "license/license-detail"
     }

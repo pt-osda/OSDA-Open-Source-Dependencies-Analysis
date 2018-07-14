@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.util.stream.Collectors
-import kotlin.math.log
 
 @RestController
 @RequestMapping("/report")
@@ -224,7 +223,7 @@ class ReportAPIController(
                         childrenSet.add(Dependency(DependencyPk(dependency.title, report, dependency.mainVersion),
                                 dependency.description,
                                 0,  // Children don't have vulnerabilities their parents do.
-                                it.privateVersions,
+                                dependency.privateVersions,
                                 emptySet(),
                                 emptyList(),
                                 arrayListOf(),
@@ -267,7 +266,7 @@ class ReportAPIController(
             val license: License
             if (!licenseRepository.findById(it.spdxId).isPresent) {
                 logger.info("The license did not existed so a new one will be created.")
-                license = License(it.spdxId, null, listOf())    // TODO use errorInfo
+                license = License(it.spdxId, listOf())    // TODO use errorInfo
                 licenseRepository.save(license)
             } else {
                 logger.info("The license already existed in the database.")
