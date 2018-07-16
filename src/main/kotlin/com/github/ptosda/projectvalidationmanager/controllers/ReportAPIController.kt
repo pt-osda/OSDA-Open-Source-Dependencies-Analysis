@@ -33,7 +33,7 @@ class ReportAPIController(
 
     @PostMapping
     fun postReport(@RequestBody report: Report) : ResponseEntity<Any> {
-        logger.info("A new report has been received and will be stored in the database. {}", report.toString())
+        logger.info("A new report has been received and will be stored in the database.")
 
         var organization : Organization? = null
         var repo : Repo? = null
@@ -266,7 +266,7 @@ class ReportAPIController(
             val license: License
             if (!licenseRepository.findById(it.spdxId).isPresent) {
                 logger.info("The license did not existed so a new one will be created.")
-                license = License(it.spdxId, listOf())    // TODO use errorInfo
+                license = License(it.spdxId, listOf())
                 licenseRepository.save(license)
             } else {
                 logger.info("The license already existed in the database.")
@@ -469,7 +469,7 @@ class ReportAPIController(
                     vulnerabilityRepository.save(vulnerability)
                 } else {
                     logger.info("The vulnerability already existed in the database.")
-                    vulnerability = vulnerabilityRepository.findById(it.id).get()   // TODO check if this is needed since a vulnerability is specific to a depenedency
+                    vulnerability = vulnerabilityRepository.findById(it.id).get()
                 }
 
                 toAddVulnerabilities.add(DependencyVulnerability(

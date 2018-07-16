@@ -107,7 +107,7 @@ class UserController(val userService: UserService,
         val userInfo = userService.getUser(userName)
 
         if(!userInfo.isPresent) {
-            return ResponseEntity("User $userName does not exist", HttpStatus.OK)
+            return ResponseEntity("User $userName does not exist", HttpStatus.BAD_REQUEST)
         }
 
         userService.addUserToProject(userName, projectId)

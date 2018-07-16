@@ -6,7 +6,7 @@ import kotlin.jvm.Transient
 
 @Entity
 @Table(name = "dependency")
-data class Dependency ( // TODO In case a specific dependency has new vulnerabilities, add these to the corresponding dependency
+data class Dependency (
         @EmbeddedId
         val pk: DependencyPk,
 

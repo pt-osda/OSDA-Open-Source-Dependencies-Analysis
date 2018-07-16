@@ -44,7 +44,7 @@ class ReportFilterService {
         }
 
         model["report"] = report.pk.timestamp
-        model["project"] = report.pk.project.name
+        model["project"] = report.pk.project.id
         val reportLicenses = licenses
                 .filter { it.pk.dependency.direct }
                 .groupBy { it.pk.license.spdxId }

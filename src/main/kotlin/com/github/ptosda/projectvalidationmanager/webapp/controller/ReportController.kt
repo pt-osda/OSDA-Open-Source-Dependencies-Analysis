@@ -128,10 +128,7 @@ class ReportController(val userService: UserService,
         model["license"] = dependency.license
         model["vulnerabilities"] = dependency.vulnerabilities
         model["projects"] = projectRepo.findAll()
-                .filter { it.report?.last()?.dependency?.contains(dependency)!! }
-
-        model["projects"] = projectRepo.findAll()
-                .filter { it.report?.last()?.dependency?.contains(dependency)!! }
+                .filter { it.report?.last()?.dependency?.contains(dependency)!! && it.users!!.stream().anyMatch { it.pk.userInfo.name == userName } }
 
         return "dependency/generic-dependency-detail"
     }
@@ -144,7 +141,7 @@ class ReportController(val userService: UserService,
     @GetMapping("licenses")
     fun getLicenses(@RequestParam(value = "page", defaultValue = "0") page: Int, model: HashMap<String, Any?>) : String
     {
-        val currentPage = licenseRepo.findAll(PageRequest.of(page, PAGE_SIZE))
+        val currentPage = licenseRepo.findAllByOrderBySpdxIdAsc(PageRequest.of(page, PAGE_SIZE))
 
         model["page_title"] = "Licenses"
 
@@ -374,7 +371,7 @@ class ReportController(val userService: UserService,
 
         model["license_id"] = license.spdxId
         val dependencies = license.dependencies.filter { it.pk.dependency.direct }
-        model["dependencies"] = dependencies.filter({ dep -> user.projects!!.any { it.pk.project!!.id == dep.pk.dependency.pk.report.pk.project.id } }).distinctBy { it.pk.dependency.pk.id }
+        model["dependencies"] = dependencies.distinctBy { it.pk.dependency.pk.id + it.pk.dependency.pk.mainVersion}
 
         return "license/generic-license-detail"
     }

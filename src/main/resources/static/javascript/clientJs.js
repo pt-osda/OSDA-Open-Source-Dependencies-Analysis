@@ -23,6 +23,7 @@ function addUser(projectId) {
     const userName = document.getElementById("user-name").value
     const userProjectList = document.getElementById("user-project-list")
     httpRequest('PUT', `/projs/${projectId}/user/${userName}`, null, function(err, data) {
+        //TODO verificar se o pedido teve sucesso
         userProjectList.innerHTML += '<li class="list-group-item">' + userName + '</li>'
     })
 }
