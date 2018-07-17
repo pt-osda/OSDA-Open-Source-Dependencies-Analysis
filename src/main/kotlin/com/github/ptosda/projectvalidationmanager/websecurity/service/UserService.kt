@@ -40,9 +40,13 @@ class UserService (
      * @param username the username of the user that will be authorized
      * @param projectId the identifier of the project, of which the user will have authorization to see
      */
-    fun addUserToProject(username: String, projectId: String){
+    fun addUserToProject(username: String, projectId: String) : Boolean {
         val user = userRepository.findById(username).get()
         val project = projectRepository.findById(projectId).get()
+        if(user.projects!!.any { it.pk.project!!.id == projectId }) {
+            return false
+        }
         projectUserRepository.save(ProjectUser(ProjectUserPk(project, user)))
+        return true
     }
 }

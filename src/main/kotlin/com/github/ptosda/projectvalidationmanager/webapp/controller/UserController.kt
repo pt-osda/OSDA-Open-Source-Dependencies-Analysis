@@ -16,6 +16,7 @@ import org.springframework.web.servlet.view.RedirectView
 import java.sql.Timestamp
 import java.util.*
 import javax.servlet.http.HttpServletRequest
+import kotlin.collections.HashMap
 
 @Controller
 @RequestMapping("/")
@@ -27,7 +28,7 @@ class UserController(val userService: UserService,
     /**
      * Gets the view for the login page
      * @param model the model for the response
-     * @param req the id of the project to show
+     * @param req the request object
      */
     @GetMapping("login")
     fun getHome(model: HashMap<String, Any?>, req: HttpServletRequest) : String
@@ -43,7 +44,7 @@ class UserController(val userService: UserService,
     /**
      * Gets the view for profile page of a user
      * @param model the model for the response
-     * @param req the id of the project to show
+     * @param req the request object
      */
     @GetMapping("user")
     fun getUser(model: HashMap<String, Any?>,
@@ -110,9 +111,26 @@ class UserController(val userService: UserService,
             return ResponseEntity("User $userName does not exist", HttpStatus.BAD_REQUEST)
         }
 
-        userService.addUserToProject(userName, projectId)
+        if(!userService.addUserToProject(userName, projectId)) {
+            return ResponseEntity("User $userName is already authorized for the $projectId project", HttpStatus.BAD_REQUEST)
+        }
 
         return ResponseEntity("Added project to user successfully", HttpStatus.OK)
+    }
+
+    /**
+     * Gets the view for the login page
+     * @param model the model for the response
+     * @param req the request object
+     */
+    @GetMapping("register")
+    fun getRegister(model: HashMap<String, String?>, req: HttpServletRequest) : String
+    {
+        model["page_title"] = "Register"
+
+        model["exists"] = req.getParameter("exists")
+
+        return "user/register"
     }
 
     /**
@@ -124,7 +142,7 @@ class UserController(val userService: UserService,
     {
         val user = User(body["name"]!!, body["username"]!!, body["password"]!!, null, null)
         if(userService.getUser(body["username"]!!).isPresent) {
-            return ModelAndView("redirect:/login?exists", null)
+            return ModelAndView("redirect:/register?exists", null)
         }
         userService.save(user)
         securityService.autoLogin(body["username"]!!, body["password"]!!)

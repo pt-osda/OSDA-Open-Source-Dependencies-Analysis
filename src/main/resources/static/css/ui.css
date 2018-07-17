@@ -3,54 +3,8 @@
     color:green;
     font-weight:bold;
 }
-.homeElem{
-    margin-left: 50px;
-    font-size: 20px;
-    text-align: center;
-}
 
 .disabled-link {
     pointer-events: none;
     text-decoration: line-through;
-}
-
-.project-buttons{
-    align-self: center;
-    align-content: center;
-    align-items: center;
-    alignment: center;
-    child-align: auto;
-    alignment-baseline: center;
-    text-align: center;
-}
-
-.body-container{
-    extends: container;
-    overflow: auto;
-}
-.container {
-    width: 100%;
-    position: fixed;
-}
-.left-element {
-    display: inline-block;
-    position: absolute;
-    align-self: left;
-    left: 25%;
-}
-.right-element {
-    display: inline-block;
-    position: absolute;
-    align-self: right;
-    left: 75%;
-}
-
-.build-detail {
-    width: 100%;
-    position: absolute;
-    left: 25px;
-}
-
-.filter-error{
-    color: red;
 }

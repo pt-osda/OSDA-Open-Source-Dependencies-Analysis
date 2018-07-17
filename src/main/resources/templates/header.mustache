@@ -3,19 +3,19 @@
 <head>
     <title>{{page_title}}</title>
 
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="/css/ui.css" type="text/css"/>
 
-    <script type='text/javascript' src='/javascript/clientJs.js'></script>
-    <script type='text/javascript' src='/javascript/jquery-3.3.1.js'></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/javascript/clientJs.js"></script>
+    <script type="text/javascript" src="/javascript/jquery-3.3.1.js"></script>
+    <script type="text/javascript" src="/javascript/bootstrap.min.js"></script>
 
 </head>
 <body>
 
     <nav class='navbar navbar-expand-lg'>
         <h1 class='navbar-brand'> OSDA </h1>
-        <div class='collapse navbar-collapse' id='navbarNav'>
+        <div class='collapse navbar-collapse'>
             <ul class='navbar-nav mr-auto'>
                 <li class='nav-item active'>
                     <a class='nav-link' href='/'>Home</a>
@@ -29,14 +29,18 @@
             </ul>
         </div>
         {{#username}}
-            <div class="dropdown">
-                <button class="btn dropdown-button dropdown-toggle" type="button" data-toggle="dropdown">
-                    {{username}}
-                </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <a class="dropdown-item" href="/user">Profile</a>
-                    <button class="dropdown-item" onclick="logout()">Logout</button>
-                </div>
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {{username}}
+            </button>
+            <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" href="/user">
+                    Profile
+                </a>
+                <form class="dropdown-item" method="POST" action="/logout">
+                    <button class="dropdown-item" type="submit">
+                        Logout
+                    </button>
+                </form>
             </div>
         {{/username}}
     </nav>

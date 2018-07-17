@@ -6,13 +6,16 @@ function httpRequest(method, path, data, cb) {
 
     xhr.setRequestHeader("Content-type", "application/json");
 
-    xhr.onreadystatechange = function() {
-        if(xhr.readyState === XMLHttpRequest.DONE) {
-            if(xhr.status === 200)
-                cb( null, xhr.response )
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+            if (xhr.status === 200) {
+                cb(null, xhr.response)
+            } else {
+                cb(xhr.responseText)
+            }
         }
     }
-    xhr.send(data);
+    xhr.send(data)
 }
 
 /**
@@ -22,18 +25,19 @@ function httpRequest(method, path, data, cb) {
 function addUser(projectId) {
     const userName = document.getElementById("user-name").value
     const userProjectList = document.getElementById("user-project-list")
+    const successElem = document.getElementById("add-user-success")
+    const errorElem = document.getElementById("add-user-error")
     httpRequest('PUT', `/projs/${projectId}/user/${userName}`, null, function(err, data) {
-        //TODO verificar se o pedido teve sucesso
-        userProjectList.innerHTML += '<li class="list-group-item">' + userName + '</li>'
-    })
-}
-
-/**
- * Logs out a user
- */
-function logout() {
-    httpRequest('POST', `/logout`, null, function(err, data) {
-        location.reload()
+        if(err) {
+            errorElem.innerText = err
+            successElem.setAttribute('hidden', 'true')
+            errorElem.removeAttribute('hidden')
+        } else {
+            successElem.innerText = data
+            successElem.removeAttribute('hidden')
+            errorElem.setAttribute('hidden', 'true')
+            userProjectList.innerHTML += '<li class="list-group-item">' + userName + '</li>'
+        }
     })
 }
 
