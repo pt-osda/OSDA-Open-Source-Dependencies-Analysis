@@ -27,18 +27,20 @@ function addUser(projectId) {
     const userProjectList = document.getElementById("user-project-list")
     const successElem = document.getElementById("add-user-success")
     const errorElem = document.getElementById("add-user-error")
-    httpRequest('PUT', `/projs/${projectId}/user/${userName}`, null, function(err, data) {
-        if(err) {
-            errorElem.innerText = err
-            successElem.setAttribute('hidden', 'true')
-            errorElem.removeAttribute('hidden')
-        } else {
-            successElem.innerText = data
-            successElem.removeAttribute('hidden')
-            errorElem.setAttribute('hidden', 'true')
-            userProjectList.innerHTML += '<li class="list-group-item">' + userName + '</li>'
-        }
-    })
+    if(username != null){
+        httpRequest('PUT', `/projs/${projectId}/user/${userName}`, null, function(err, data) {
+            if(err) {
+                errorElem.innerText = err
+                successElem.setAttribute('hidden', 'true')
+                errorElem.removeAttribute('hidden')
+            } else {
+                successElem.innerText = data
+                successElem.removeAttribute('hidden')
+                errorElem.setAttribute('hidden', 'true')
+                userProjectList.innerHTML += '<li class="list-group-item">' + userName + '</li>'
+            }
+        })
+    }
 }
 
 /**

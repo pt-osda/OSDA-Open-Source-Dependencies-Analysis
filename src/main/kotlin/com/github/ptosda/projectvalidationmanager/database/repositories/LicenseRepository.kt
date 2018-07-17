@@ -7,6 +7,4 @@ import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface LicenseRepository : PagingAndSortingRepository<License, String>{
-    fun findAllByOrderBySpdxIdAsc(pageable: Pageable) : Page<License>
-}
+interface LicenseRepository : PagingAndSortingRepository<License, String>

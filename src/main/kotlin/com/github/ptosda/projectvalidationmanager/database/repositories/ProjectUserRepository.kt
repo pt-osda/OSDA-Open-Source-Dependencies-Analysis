@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository
 @Repository
 interface ProjectUserRepository : PagingAndSortingRepository<ProjectUser, ProjectUserPk> {
 
-    @Query(value = "select * from project_user join project on (project_id = id) where user_info_username = :username",
+    @Query(value = "select *, p from (project_user join project on (project_id = id)) as p where user_info_username = :username",
             nativeQuery = true)
     fun findAllByUsername(@Param("username") userName: String, pageable: Pageable): Page<ProjectUser>
 }

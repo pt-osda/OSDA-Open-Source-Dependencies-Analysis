@@ -33,14 +33,18 @@
                 {{username}}
             </button>
             <div class="dropdown-menu dropdown-menu-right">
-                <a class="dropdown-item" href="/user">
-                    Profile
-                </a>
-                <form class="dropdown-item" method="POST" action="/logout">
-                    <button class="dropdown-item" type="submit">
-                        Logout
-                    </button>
-                </form>
+                <div class="text-center">
+                    <a class="dropdown-item" href="/user">
+                        Profile
+                    </a>
+                </div>
+                <div class="text-center">
+                    <form class="dropdown-item" method="POST" action="/logout">
+                        <button class="dropdown-item" type="submit">
+                            Logout
+                        </button>
+                    </form>
+                </div>
             </div>
         {{/username}}
     </nav>

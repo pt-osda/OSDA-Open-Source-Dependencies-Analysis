@@ -59,7 +59,8 @@ class ReportAPIController(
         }
 
         logger.info("The report created at {} and identified by {} will be created.", report.timestamp, report.buildTag)
-        val generatedReport = storeReport(report.timestamp, report.buildTag, report.errorInfo, project)
+        val errorInfo = if(report.errorInfo != "") report.errorInfo else null
+        val generatedReport = storeReport(report.timestamp, report.buildTag, errorInfo, project)
 
         logger.info("The dependencies of the project will be created.")
         storeDependencies(report.dependencies, generatedReport)

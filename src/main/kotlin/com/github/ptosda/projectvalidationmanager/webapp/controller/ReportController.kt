@@ -9,6 +9,7 @@ import com.github.ptosda.projectvalidationmanager.webapp.service.ReportFilterSer
 import com.github.ptosda.projectvalidationmanager.websecurity.service.SecurityServiceImpl
 import com.github.ptosda.projectvalidationmanager.websecurity.service.UserService
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Controller
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
@@ -58,11 +59,11 @@ class ReportController(val userService: UserService,
 
         model["error"] = req.getParameter("error")
 
-        val currentPage = projectUserRepo.findAllByUsername(userName, PageRequest.of(page, PAGE_SIZE))
+        val order = Sort.Order(Sort.Direction.ASC, "name").ignoreCase()
+        val currentPage = projectUserRepo.findAllByUsername(userName, PageRequest.of(page, PAGE_SIZE, Sort.by(order)))
 
         model["projects"] = currentPage.content
                 .map { it.pk.project }
-                .sortedBy { it!!.name }
 
         if (currentPage.hasNext())
             model["next"] = currentPage.number + 1
@@ -80,12 +81,12 @@ class ReportController(val userService: UserService,
      */
     @GetMapping("deps")
     fun getDependencies(@RequestParam(value = "page", defaultValue = "0") page: Int,  model: HashMap<String, Any?>) : String
-    {
+     {
         model["page_title"] = "Dependencies"
 
         val userName = securityService.findLoggedInUsername()!!
 
-        val currentPage = dependencyRepo.findAllByDirectOrderByPkAsc(true, PageRequest.of(page, PAGE_SIZE))
+        val currentPage = dependencyRepo.findDistinctDirectDependencies(PageRequest.of(page, PAGE_SIZE))
         model["username"] = userName
 
         model["dependencies"] = currentPage
@@ -128,7 +129,7 @@ class ReportController(val userService: UserService,
         model["license"] = dependency.license
         model["vulnerabilities"] = dependency.vulnerabilities
         model["projects"] = projectRepo.findAll()
-                .filter { it.report?.last()?.dependency?.contains(dependency)!! && it.users!!.stream().anyMatch { it.pk.userInfo.name == userName } }
+                .filter { it.report?.last()?.dependency?.contains(dependency)!! && it.users!!.stream().anyMatch { it.pk.userInfo.username == userName } }
 
         return "dependency/generic-dependency-detail"
     }
@@ -141,15 +142,14 @@ class ReportController(val userService: UserService,
     @GetMapping("licenses")
     fun getLicenses(@RequestParam(value = "page", defaultValue = "0") page: Int, model: HashMap<String, Any?>) : String
     {
-        val currentPage = licenseRepo.findAllByOrderBySpdxIdAsc(PageRequest.of(page, PAGE_SIZE))
-
         model["page_title"] = "Licenses"
 
         val userName = securityService.findLoggedInUsername()
         model["username"] = userName
 
+        val order = Sort.Order(Sort.Direction.ASC, "spdxId").ignoreCase()
+        val currentPage = licenseRepo.findAll(PageRequest.of(page, PAGE_SIZE, Sort.by(order)))
         model["licenses"] = currentPage
-            .sortedBy { it.spdxId }
 
         if (currentPage.hasNext())
             model["next"] = currentPage.number + 1
@@ -197,6 +197,8 @@ class ReportController(val userService: UserService,
 
         model["project_id"] = projectId
         model["project_name"] = project.name
+        model["project_version"] = project.version
+        model["project_description"] = project.description
         model["repository"] = project.repo
 
         model.putAll(reportFilterService.getProjectLicensesView(project))
@@ -355,11 +357,7 @@ class ReportController(val userService: UserService,
                          model: HashMap<String, Any?>) : String
     {
         model["page_title"] = "License Detail"
-
-        val userName = securityService.findLoggedInUsername()
-
-        val user = userService.getUser(userName!!).get()
-        model["username"] = userName
+        model["username"] = securityService.findLoggedInUsername()
 
         val licenseInfo = licenseRepo.findById(licenseId)
 
@@ -401,7 +399,7 @@ class ReportController(val userService: UserService,
         }
         val vulnerability = vulnerabilityInfo.get()
 
-        if(!user.projects!!.any {
+        /*if(!user.projects!!.any {
                     it.pk.project!!.report!!.any {
                         it.dependency!!.any {
                             it.title == dependencyId
@@ -410,7 +408,7 @@ class ReportController(val userService: UserService,
                 }
         ) {
             return ModelAndView("redirect:/?error", null)
-        }
+        }*/
 
         model["dependency_id"] = dependencyId
 

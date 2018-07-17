@@ -3,6 +3,9 @@
 <br>
 
 <div class="container-fluid">
+    <p>
+        <a class="btn btn-outline-danger text-left" href="/">See all projects</a>
+    </p>
 
     <h2 class="text-center">
         {{project_name}}
@@ -10,9 +13,18 @@
     {{#is_admin}}
         {{> user/add-user-project-partial}}
     {{/is_admin}}
-    <p>
-        <a class="btn btn-outline-danger text-left" href="/">See all projects</a>
-    </p>
+    <br>
+
+    {{#project_version}}
+        <b>Version:</b> {{project_version}}
+        <br>
+    {{/project_version}}
+    {{#project_description}}
+        <b>Description:</b> {{project_description}}
+        <br>
+    {{/project_description}}
+
+    <br>
 
     <ul class="nav nav-pills nav-justified">
         <li class="nav-item">

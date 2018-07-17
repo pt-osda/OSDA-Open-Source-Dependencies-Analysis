@@ -1,14 +1,14 @@
 {{> header}}
 
+<br>
+
 <div class="container-fluid">
+
+    <a class="btn btn-outline-danger text-left" href="/projs/{{project_id}}/report/{{report_id}}">See the report</a>
 
     <h3 class="text-center">
         {{dependency_id}}
     </h3>
-
-    <a class="btn btn-outline-danger text-left" href="/projs/{{project_id}}/report/{{report_id}}">See the report</a>
-
-    <br>
 
     <br>
 
@@ -28,7 +28,6 @@
     </ul>
 
     {{#description}}
-        <br>
         <b>Description:</b> {{description}}
         <br>
     {{/description}}
