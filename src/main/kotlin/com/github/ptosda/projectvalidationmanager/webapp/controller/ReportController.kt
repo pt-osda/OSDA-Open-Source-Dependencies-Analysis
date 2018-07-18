@@ -22,7 +22,6 @@ import java.util.*
 import javax.servlet.http.HttpServletRequest
 import kotlin.collections.set
 
-
 /**
  * Controller for the WebApp
  */
@@ -38,7 +37,6 @@ class ReportController(val userService: UserService,
                        val licenseRepo: LicenseRepository,
                        val reportFilterService: ReportFilterService)
 {
-
     private final val PAGE_SIZE = 10
 
     /**
@@ -243,7 +241,6 @@ class ReportController(val userService: UserService,
 
         model["report_id"] = reportId
         model["readable_time"] = report.readableTimeStamp
-        model["report_tag"] = report.tag
 
         model["vulnerable_dependencies"] = report.dependency!!.filter {
             if(it.vulnerabilitiesCount == null)
@@ -274,7 +271,7 @@ class ReportController(val userService: UserService,
     {
         model["page_title"] = "Dependency Detail"
 
-        val dependencyInfo = dependencyRepo.findById(DependencyPk(dependencyId, Report(ReportPk(reportId, Project(projectId, null, null, null, null, null, null)), null, null), dependencyVersion))
+        val dependencyInfo = dependencyRepo.findById(DependencyPk(dependencyId, Report(ReportPk(reportId, Project(projectId, null, null, null, null, null, null)), null, false), dependencyVersion))
 
         if(!dependencyInfo.isPresent) {
             throw Exception("Dependency not found")

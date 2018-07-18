@@ -10,9 +10,9 @@ data class Report(
         @EmbeddedId
         val pk: ReportPk,
 
-        val tag: String?,
-
         val error_info: String?,
+
+        val successfulBuild: Boolean,
 
         @OneToMany(mappedBy = "pk.report")
         val dependency: Set<Dependency>? = setOf()

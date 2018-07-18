@@ -58,9 +58,9 @@ class ReportAPIController(
             return ResponseEntity(e.message, HttpStatus.BAD_REQUEST)
         }
 
-        logger.info("The report created at {} and identified by {} will be created.", report.timestamp, report.buildTag)
+        logger.info("The report created at {} will be stored.", report.timestamp)
         val errorInfo = if(report.errorInfo != "") report.errorInfo else null
-        val generatedReport = storeReport(report.timestamp, report.buildTag, errorInfo, project)
+        val generatedReport = storeReport(report.timestamp, errorInfo, project)
 
         logger.info("The dependencies of the project will be created.")
         storeDependencies(report.dependencies, generatedReport)
@@ -72,7 +72,7 @@ class ReportAPIController(
     @PutMapping("dependency/vulnerability/edit")
     fun alterDependencyVulnerabilityState(@RequestBody dependencyVulnerabilityInput: DependencyVulnerabilityInputModel){
         val vulnerabilityInfo = vulnerabilityRepository.findById(dependencyVulnerabilityInput.vulnerabilityId)
-        val dependencyInfo = dependencyRepository.findById(DependencyPk(dependencyVulnerabilityInput.dependencyId, Report(ReportPk(dependencyVulnerabilityInput.reportId, projectRepository.findById(dependencyVulnerabilityInput.projectId).get()), null, null), dependencyVulnerabilityInput.dependencyVersion))
+        val dependencyInfo = dependencyRepository.findById(DependencyPk(dependencyVulnerabilityInput.dependencyId, Report(ReportPk(dependencyVulnerabilityInput.reportId, projectRepository.findById(dependencyVulnerabilityInput.projectId).get()), null,false), dependencyVulnerabilityInput.dependencyVersion))
 
         if(!dependencyInfo.isPresent) {
             throw Exception("Dependency not found")
@@ -193,13 +193,12 @@ class ReportAPIController(
      * Function to create the new report. Since every report occurs at a different time, there
      * is not the possibility to repeat reports.
      * @param timestamp The moment in time that the report was completed.
-     * @param tag The tag that identifies the report.
      * @param errorInfo The information of the errors occurred during report.
      * @param project The project in which this report occurred.
      * @return The newly created report.
      */
-    private fun storeReport(timestamp: String, tag: String?, errorInfo: String? ,project: Project): com.github.ptosda.projectvalidationmanager.database.entities.Report {
-        val report = Report(ReportPk(timestamp, project), tag, errorInfo?: "", setOf())
+    private fun storeReport(timestamp: String, errorInfo: String? ,project: Project): com.github.ptosda.projectvalidationmanager.database.entities.Report {
+        val report = Report(ReportPk(timestamp, project), errorInfo?: "", false)
         reportRepository.save(report)
         logger.info("All the report regarded information was stored in the database")
         return report

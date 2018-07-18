@@ -9,9 +9,6 @@ data class Report (
         val description : String?,
         val timestamp : String,
 
-        @JsonProperty("build_tag")
-        val buildTag : String?,
-
         val organization : String?,
 
         val repo : String?,   // Indicates the name of the repository
@@ -24,5 +21,6 @@ data class Report (
         @JsonProperty("error_info")
         val errorInfo : String?, // Indicates the errors that occurred during report
 
-        val dependencies : ArrayList<ReportDependency>
+        val dependencies : ArrayList<ReportDependency>,
+        val successfulBuild : Boolean
 )
