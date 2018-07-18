@@ -117,7 +117,7 @@ class ReportController(val userService: UserService,
 
         val dependencies = dependencyRepo.findAll()
         val dependency = dependencies
-                .last { it.pk.mainVersion == dependencyVersion && it.pk.id == dependencyId }
+                .last { it.pk.mainVersion == dependencyVersion && it.title == dependencyId }
 
         model["title"] = dependency.pk.id
         model["dependency_id"] = dependency.title
@@ -246,7 +246,7 @@ class ReportController(val userService: UserService,
             if(it.vulnerabilitiesCount == null)
                 false
             else
-                it.vulnerabilitiesCount!! > 0 && it.direct
+                it.direct && it.vulnerabilities.count{!it.ignored} > 0
         }
 
         model.putAll(reportFilterService.getReportLicensesView(report))
@@ -271,7 +271,7 @@ class ReportController(val userService: UserService,
     {
         model["page_title"] = "Dependency Detail"
 
-        val dependencyInfo = dependencyRepo.findById(DependencyPk(dependencyId, Report(ReportPk(reportId, Project(projectId, null, null, null, null, null, null)), null, false), dependencyVersion))
+        val dependencyInfo = dependencyRepo.findById(DependencyPk(dependencyId, Report(ReportPk(reportId, Project(projectId, null, null, null, null, null, null, null, null)), null, false), dependencyVersion))
 
         if(!dependencyInfo.isPresent) {
             throw Exception("Dependency not found")
@@ -395,17 +395,6 @@ class ReportController(val userService: UserService,
             throw Exception("Vulnerability not found")
         }
         val vulnerability = vulnerabilityInfo.get()
-
-        /*if(!user.projects!!.any {
-                    it.pk.project!!.report!!.any {
-                        it.dependency!!.any {
-                            it.title == dependencyId
-                        }
-                    }
-                }
-        ) {
-            return ModelAndView("redirect:/?error", null)
-        }*/
 
         model["dependency_id"] = dependencyId
 

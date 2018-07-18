@@ -56,4 +56,8 @@ data class Dependency (
         @Transient
         var title = ""
         get() = pk.id.replace('/',':')
+
+        @Transient
+        var notIgnoredVulnerabilitiesCount = 0
+                get() = vulnerabilities.count { !it.ignored }
 }

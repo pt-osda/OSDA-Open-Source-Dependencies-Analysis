@@ -70,15 +70,12 @@ function search(searchElemId, searchRelUrl, searchOutputElemId) {
 }
 
 /**
- * Ignores a vulnerability
+ * Ignores a vulnerability in a project
  * @param projectId the id of the project
- * @param reportId the id of the report
- * @param dependencyId the id of the dependency
- * @param dependencyVersion the version of the dependency
  * @param vulnerabilityId the id of the vulnerability
  */
-function ignoreVulnerability(projectId, reportId, dependencyId, dependencyVersion, vulnerabilityId) {
-    httpRequest('PUT', '/report/dependency/vulnerability/edit', JSON.stringify({projectId,reportId,dependencyId,dependencyVersion,vulnerabilityId}), function(err, data) {
+function ignoreVulnerability(projectId, vulnerabilityId) {
+    httpRequest('PUT', '/report/dependency/vulnerability/edit', JSON.stringify({projectId,vulnerabilityId}), function(err, data) {
         const linkElement = document.getElementById(vulnerabilityId)
         const buttonElement = document.getElementById(vulnerabilityId+'-btn')
         if(linkElement.classList.contains('disabled-link')) {

@@ -23,10 +23,13 @@ data class Project(
         val admin: User?,
 
         @OneToMany(mappedBy = "pk.project")
-        val users: List<ProjectUser>? = arrayListOf(),
+        val users: List<ProjectUser>?,
 
         @OneToMany(mappedBy = "pk.project")
-        val report: List<Report>? = arrayListOf()
+        val report: List<Report>?,
+
+        @OneToMany
+        var ignoredVulnerabilities: MutableList<Vulnerability>?
 ) : Serializable
 {
         override fun toString(): String {

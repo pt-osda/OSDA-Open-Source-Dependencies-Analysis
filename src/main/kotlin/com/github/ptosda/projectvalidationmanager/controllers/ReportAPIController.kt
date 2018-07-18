@@ -72,31 +72,27 @@ class ReportAPIController(
     @PutMapping("dependency/vulnerability/edit")
     fun alterDependencyVulnerabilityState(@RequestBody dependencyVulnerabilityInput: DependencyVulnerabilityInputModel){
         val vulnerabilityInfo = vulnerabilityRepository.findById(dependencyVulnerabilityInput.vulnerabilityId)
-        val dependencyInfo = dependencyRepository.findById(DependencyPk(dependencyVulnerabilityInput.dependencyId, Report(ReportPk(dependencyVulnerabilityInput.reportId, projectRepository.findById(dependencyVulnerabilityInput.projectId).get()), null,false), dependencyVulnerabilityInput.dependencyVersion))
+        val projectInfo = projectRepository.findById(dependencyVulnerabilityInput.projectId)
 
-        if(!dependencyInfo.isPresent) {
-            throw Exception("Dependency not found")
+        if(!projectInfo.isPresent) {
+            throw Exception("Project not found")
         }
 
         if(!vulnerabilityInfo.isPresent) {
             throw Exception("Vulnerability not found")
         }
 
-        val dependency = dependencyInfo.get()
+        val project = projectInfo.get()
         val vulnerability = vulnerabilityInfo.get()
 
-        val dependencyVulnerabilityInfo = dependencyVulnerabilityRepository.findById(DependencyVulnerabilityPk(dependency, vulnerability))
-
-        if(!dependencyVulnerabilityInfo.isPresent) {
-            val message = "Dependency Vulnerability not found."
-            logger.warn(message)
-            throw Exception(message)
+        if(project.ignoredVulnerabilities!!.contains(vulnerability)){
+           project.ignoredVulnerabilities!!.remove(vulnerability)
+        }
+        else{
+            project.ignoredVulnerabilities!!.add(vulnerability)
         }
 
-        val dependencyVulnerability = dependencyVulnerabilityInfo.get()
-        dependencyVulnerability.ignored = !dependencyVulnerability.ignored
-
-        dependencyVulnerabilityRepository.save(dependencyVulnerability)
+        projectRepository.save(project)
     }
 
     /**
@@ -172,7 +168,7 @@ class ReportAPIController(
                 throw Exception("Admin username is invalid")
             }
             logger.info("The project did not existed so a new one will be created.")
-            project = Project(projectId, projectName, projectVersion, projectDescription, repo, admin.get(), listOf(), listOf())
+            project = Project(projectId, projectName, projectVersion, projectDescription, repo, admin.get(), listOf(), listOf(), mutableListOf())
             projectRepository.save(project)
             projectUserRepository.save(ProjectUser(ProjectUserPk(project, admin.get())))
         } else {
@@ -181,7 +177,7 @@ class ReportAPIController(
 
             if (project.repo == null && repo != null || project.version == null && projectVersion != null || project.description == null && projectDescription != null){
                 logger.info("The project did not belonged to a repository but one was referenced in the report.")
-                project = Project(project.id, project.name, projectVersion, projectDescription, repo, project.admin, project.users, project.report)
+                project = Project(project.id, project.name, projectVersion, projectDescription, repo, project.admin, project.users, project.report, project.ignoredVulnerabilities)
                 projectRepository.save(project)
             }
         }

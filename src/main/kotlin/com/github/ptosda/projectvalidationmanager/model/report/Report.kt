@@ -22,5 +22,7 @@ data class Report (
         val errorInfo : String?, // Indicates the errors that occurred during report
 
         val dependencies : ArrayList<ReportDependency>,
+
+        @JsonProperty("successful_build")
         val successfulBuild : Boolean
 )

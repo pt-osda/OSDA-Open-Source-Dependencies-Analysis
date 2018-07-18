@@ -37,7 +37,7 @@ data class Report(
             if(it.vulnerabilitiesCount == null)
                     false
                     else
-                    it.vulnerabilitiesCount!! > 0
+                    it.direct && it.vulnerabilities.count{!it.ignored} > 0
             }
 
     @Transient
@@ -47,7 +47,7 @@ data class Report(
     @Transient
     var ignoredVulnerabilitiesCount = 0
         get() = dependency!!.sumBy {
-            it.vulnerabilities.count{ it.ignored }
+            it.vulnerabilities.count{ pk.project.ignoredVulnerabilities!!.contains(it.pk.vulnerability)}
         }
 
     @Transient

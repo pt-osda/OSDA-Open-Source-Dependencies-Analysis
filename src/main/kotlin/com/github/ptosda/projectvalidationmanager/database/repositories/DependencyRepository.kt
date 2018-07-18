@@ -12,7 +12,7 @@ import java.io.Serializable
 
 @Repository
 interface DependencyRepository : PagingAndSortingRepository<Dependency, DependencyPk> {
-    @Query(value = "SELECT d.id AS id, d.main_version AS mainVersion, d.vulnerabilities_count AS vulnerabilitiesCount, d.direct AS direct " +
+    @Query(value = "SELECT d.id AS id, d.main_version AS mainVersion, d.vulnerabilities_count AS vulnerabilitiesCount, d.direct AS direct, REPLACE(d.id, '/', ':') AS pathId " +
             "FROM dependency d " +
             "WHERE d.direct='true' " +
             "GROUP BY d.id, d.main_version, d.vulnerabilities_count, d.direct " +
@@ -27,7 +27,7 @@ interface DependencyRepository : PagingAndSortingRepository<Dependency, Dependen
     fun getDirectDependenciesFromReport(@Param("project") project : String, @Param("timestamp") timestamp : String) : List<Dependency>
 }
 
-interface DistinctDependency{
+interface DistinctDependency {
     fun getId() : String
 
     fun getMainVersion() : String
@@ -35,4 +35,6 @@ interface DistinctDependency{
     fun getVulnerabilitiesCount() : Int
 
     fun getDirect() : Boolean
+
+    fun getPathId() : String
 }
