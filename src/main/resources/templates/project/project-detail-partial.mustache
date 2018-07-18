@@ -6,7 +6,10 @@
         {{#repository}}
             Associated to {{repository.name}} repository
             {{#repository.organization}}
-                in {{repository.organization.name}}
+                in {{repository.organization.name}} organization.
+            {{/repository.organization}}
+            {{^repository.organization}}
+                owned by {{repository.owner}}.
             {{/repository.organization}}
         {{/repository}}
 
