@@ -2,6 +2,7 @@ package com.github.ptosda.projectvalidationmanager.webapp.controller
 
 import com.github.ptosda.projectvalidationmanager.database.repositories.DependencyRepository
 import com.github.ptosda.projectvalidationmanager.database.repositories.LicenseRepository
+import com.github.ptosda.projectvalidationmanager.database.repositories.ProjectRepository
 import com.github.ptosda.projectvalidationmanager.database.repositories.ProjectUserRepository
 import com.github.ptosda.projectvalidationmanager.websecurity.service.SecurityServiceImpl
 import org.springframework.stereotype.Controller
@@ -17,7 +18,7 @@ class ReportFilterController(
                              val securityService: SecurityServiceImpl,
                              val dependencyRepo: DependencyRepository,
                              val licenseRepo: LicenseRepository,
-                             val projectUserRepo: ProjectUserRepository)
+                             val projectRepo: ProjectRepository)
 {
 
     /**
@@ -25,24 +26,25 @@ class ReportFilterController(
      */
     val searchFilterFunctions = hashMapOf<String, (String, String) -> HashMap<String, Any>>(
             "projs" to { searchText, userName ->
-                hashMapOf( "projects" to projectUserRepo.findAll().filter {
-                    it.pk.userInfo.username == userName && it.pk.project!!.name!!.startsWith(searchText, true)
-                }.map { it.pk.project },
+                hashMapOf( "projects" to projectRepo.findAll()
+                        .filter { (it.admin!!.username == userName || it.users!!.any { it.pk.userInfo.username == userName }) &&
+                        it.name!!.startsWith(searchText, true)}
+                        .sortedBy { it.name },
                         "view_name" to "project/project-list-partial"
                 )
             },
             "dependencies" to { searchText, _ ->
                 hashMapOf("dependencies" to dependencyRepo.findAll()
-                        .groupBy { it.pk.id + it.pk.mainVersion }
-                        .values
-                        .map { it.last() }
-                        .sortedBy{ it.pk.id }
-                        .filter { it.pk.id.startsWith(searchText, true) },
+                        .filter { it.pk.id.startsWith(searchText, true) && it.direct }
+                        .sortedBy { it.pk.id }
+                        .distinctBy { it.pk.id },
                         "view_name" to "dependency/dependency-list-partial"
                 )
             },
             "licenses" to { searchText, _ ->
-                hashMapOf( "licenses" to licenseRepo.findAll().filter { it.spdxId.trimStart('(').startsWith(searchText, true) },
+                hashMapOf( "licenses" to licenseRepo.findAll()
+                            .filter { it.spdxId.trimStart('(').startsWith(searchText, true) }
+                            .sortedBy { it.spdxId },
                         "view_name" to "license/generic-license-list-partial"
                 )
             }

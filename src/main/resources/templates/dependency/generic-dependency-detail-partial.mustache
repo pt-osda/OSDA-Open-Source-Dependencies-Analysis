@@ -5,6 +5,16 @@
         <b>Description:</b> {{description}}
         <br>
     {{/description}}
+    {{#private_versions.size}}
+        <b>Private Versions:</b>
+    {{/private_versions.size}}
+        <ul class="list-group">
+    {{#private_versions}}
+        <li class="list-group-item">
+            {{.}}
+        </li>
+    {{/private_versions}}
+        </ul>
     <br>
     <h4>Licenses:</h4>
     <ul class="list-group">

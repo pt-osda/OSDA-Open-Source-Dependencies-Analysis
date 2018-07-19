@@ -57,17 +57,9 @@ class ReportController(val userService: UserService,
 
         model["error"] = req.getParameter("error")
 
-        val order = Sort.Order(Sort.Direction.ASC, "name").ignoreCase()
-        val currentPage = projectUserRepo.findAllByUsername(userName, PageRequest.of(page, PAGE_SIZE, Sort.by(order)))
-
-        model["projects"] = currentPage.content
-                .map { it.pk.project }
-
-        if (currentPage.hasNext())
-            model["next"] = currentPage.number + 1
-
-        if (currentPage.hasPrevious())
-            model["previous"] = currentPage.number - 1
+        model["projects"] = projectRepo.findAll()
+                .filter { it.admin!!.username == userName || it.users!!.any { it.pk.userInfo.username == userName } }
+                .sortedBy { it.name }
 
         return "home"
     }
@@ -84,16 +76,12 @@ class ReportController(val userService: UserService,
 
         val userName = securityService.findLoggedInUsername()!!
 
-        val currentPage = dependencyRepo.findDistinctDirectDependencies(PageRequest.of(page, PAGE_SIZE))
         model["username"] = userName
 
-        model["dependencies"] = currentPage
-
-        if (currentPage.hasNext())
-            model["next"] = currentPage.number + 1
-
-        if (currentPage.hasPrevious())
-            model["previous"] = currentPage.number - 1
+        model["dependencies"] = dependencyRepo.findAll()
+                .filter { it.direct }
+                .sortedBy { it.pk.id }
+                .distinctBy { it.pk.id }
 
         return "dependency/dependency-list"
     }
@@ -145,15 +133,9 @@ class ReportController(val userService: UserService,
         val userName = securityService.findLoggedInUsername()
         model["username"] = userName
 
-        val order = Sort.Order(Sort.Direction.ASC, "spdxId").ignoreCase()
-        val currentPage = licenseRepo.findAll(PageRequest.of(page, PAGE_SIZE, Sort.by(order)))
-        model["licenses"] = currentPage
-
-        if (currentPage.hasNext())
-            model["next"] = currentPage.number + 1
-
-        if (currentPage.hasPrevious())
-            model["previous"] = currentPage.number - 1
+        model["licenses"] = licenseRepo.findAll()
+                .sortedBy { it.spdxId }
+                .distinctBy { it.spdxId }
 
         return "license/generic-license-list"
     }
@@ -364,7 +346,8 @@ class ReportController(val userService: UserService,
         val license = licenseInfo.get()
 
         model["license_id"] = license.spdxId
-        model["dependencies"] = license.dependencies.distinctBy { it.pk.dependency.pk.id + it.pk.dependency.pk.mainVersion}
+        model["dependencies"] = license.dependencies
+                .distinctBy { it.pk.dependency.pk.id + it.pk.dependency.pk.mainVersion }
 
         return "license/generic-license-detail"
     }
