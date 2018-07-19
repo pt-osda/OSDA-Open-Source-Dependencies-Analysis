@@ -30,10 +30,10 @@ class ReportFilterService {
     }
 
     /**
-     * Gets the model for the licenses of a project. Only shows from the last report of the project
+     * Gets the model for the licenses and vulnerabilties of a project. Only shows from the last report of the project
      * @param project the project to filter
      */
-    fun getProjectLicensesView(project: Project) : HashMap<String, Any?> {
+    fun getProjectLicensesAndVulnerabilities(project: Project) : HashMap<String, Any?> {
         val model = hashMapOf<String, Any?>()
         val licenses = ArrayList<DependencyLicense>()
 
@@ -54,21 +54,16 @@ class ReportFilterService {
         model["valid_licenses"] = reportLicenses.filter { it.first.valid }
         model["invalid_licenses"] = reportLicenses.filter { !it.first.valid }
 
-        val vulnerabilities = ArrayList<DependencyVulnerability>()
-        report.dependency?.forEach {
-            vulnerabilities.addAll(it.vulnerabilities)
-        }
-
-        model["vulnerabilities"] = vulnerabilities
+        model["vulnerabilities"] = report.dependency?.map { it.vulnerabilities }!!.flatten()
 
         return model
     }
 
     /**
-     * Gets the model for the licenses of a report
+     * Gets the model for the licenses and vulnerabilities of a report
      * @param report the report to filter
      */
-    fun getReportLicensesView(report: Report) : HashMap<String, Any?> {
+    fun getReportLicensesAndVulnerabilties(report: Report) : HashMap<String, Any?> {
         val model = hashMapOf<String, Any?>()
 
         val licenses = ArrayList<DependencyLicense>()
@@ -88,14 +83,7 @@ class ReportFilterService {
         model["valid_licenses"] = reportLicenses.filter { it.first.valid }
         model["invalid_licenses"] = reportLicenses.filter { !it.first.valid }
 
-        val vulnerabilities = ArrayList<DependencyVulnerability>()
-
-        report.dependency.forEach {
-            vulnerabilities.addAll(it.vulnerabilities)
-        }
-
-        model["vulnerabilities"] = vulnerabilities
-
+        model["vulnerabilities"] = report.dependency.map { it.vulnerabilities }.flatten()
 
         return model
     }

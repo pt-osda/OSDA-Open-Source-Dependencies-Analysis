@@ -198,11 +198,10 @@ class ReportController(val userService: UserService,
         model["project_version"] = project.version
         model["project_description"] = project.description
         model["repository"] = project.repo
-
-        model.putAll(reportFilterService.getProjectLicensesView(project))
-
         model["reports"] = reports!!.toList()
                 .sortedByDescending{ ZonedDateTime.parse(it.pk.timestamp) }
+
+        model.putAll(reportFilterService.getProjectLicensesAndVulnerabilities(project))
 
         return ModelAndView("project/project-detail", model)
     }
@@ -249,7 +248,7 @@ class ReportController(val userService: UserService,
                 it.direct && it.vulnerabilities.count{!it.ignored} > 0
         }
 
-        model.putAll(reportFilterService.getReportLicensesView(report))
+        model.putAll(reportFilterService.getReportLicensesAndVulnerabilties(report))
 
         return ModelAndView("report/report-detail", model)
     }
@@ -365,8 +364,7 @@ class ReportController(val userService: UserService,
         val license = licenseInfo.get()
 
         model["license_id"] = license.spdxId
-        val dependencies = license.dependencies.filter { it.pk.dependency.direct }
-        model["dependencies"] = dependencies.distinctBy { it.pk.dependency.pk.id + it.pk.dependency.pk.mainVersion}
+        model["dependencies"] = license.dependencies.distinctBy { it.pk.dependency.pk.id + it.pk.dependency.pk.mainVersion}
 
         return "license/generic-license-detail"
     }
