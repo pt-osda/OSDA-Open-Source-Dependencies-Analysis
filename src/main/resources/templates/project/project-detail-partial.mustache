@@ -22,6 +22,7 @@
         <ul class="list-group">
             <br>
             {{#reports}}
+            <li class="list-group-item {{#successfulBuild}}list-group-item-success{{/successfulBuild}}{{^successfulBuild}}list-group-item-danger{{/successfulBuild}}">
                 <a href="/projs/{{project_id}}/report/{{pk.timestamp}}" class="list-group-item list-group-item-action">
                     <b>Timestamp:</b> {{readableTimeStamp}}
                     <br>
@@ -32,8 +33,9 @@
                     Out of {{dependency.size}} dependencies, {{vulnerableDependencies}} are vulnerable
                     <br>
                     In total, {{vulnerabilitiesCount}} vulnerabilities were found. Of these, {{ignoredVulnerabilitiesCount}} are being ignored.
-                    <br>
                 </a>
+            </li>
+            <br>
             {{/reports}}
             <br>
         </ul>

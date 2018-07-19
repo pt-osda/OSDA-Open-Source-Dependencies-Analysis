@@ -237,7 +237,7 @@ class ReportController(val userService: UserService,
 
         model["project_id"] = projectId
         model["project_name"] = report.pk.project.name
-        model["error_info"] = report.error_info
+        model["error_info"] = if(report.error_info == null || report.error_info == "") null else report.error_info
 
         model["report_id"] = reportId
         model["readable_time"] = report.readableTimeStamp
