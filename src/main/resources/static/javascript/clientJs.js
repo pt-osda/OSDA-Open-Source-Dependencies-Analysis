@@ -27,7 +27,7 @@ function addUser(projectId) {
     const userProjectList = document.getElementById("user-project-list")
     const successElem = document.getElementById("add-user-success")
     const errorElem = document.getElementById("add-user-error")
-    if(username != null){
+    if(userName != ""){
         httpRequest('PUT', `/projs/${projectId}/user/${userName}`, null, function(err, data) {
             if(err) {
                 errorElem.innerText = err
